@@ -11,7 +11,7 @@ Demais diretrizes constam no Moodle.
 
 ## Alunos
 |Matrícula | Aluno |
-| -- | -- | -- |
+| -- | -- |
 | 22/2024837  | Guilherme Costa Zanella  |
 | 22/1029220  | Guilherme Davila Rodrigues Carneiro Sampaio  |
 | 23/2003652  | João Paulo Barbosa Pereira Nunes |
@@ -31,8 +31,8 @@ Demais diretrizes constam no Moodle.
 | 222024837  | Guilherme Costa Zanella  |
 | 211030620  | Patrick Anderson Carvalho dos Santos |
 | 212005435  | Pedro Luciano de Azevedo |
-| 22/1029220  | Guilherme Davila Rodrigues Carneiro Sampaio  |
-| 23/1012281  | Maria Clara Sena de Lima  |
+| 221029220  | Guilherme Davila Rodrigues Carneiro Sampaio  |
+| 231012281  | Maria Clara Sena de Lima  |
 
 ---
 
