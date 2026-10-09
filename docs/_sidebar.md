@@ -3,6 +3,15 @@
 - [Home](/docs)
 - [Projetos](/docs/Projeto/Projeto.md)
 
+- Reuniões e Atas
+  - [Modelo de Ata](/ReunioesAtas/ModeloAta.md)
+  - SubEquipe 01
+  - SubEquipe 03
+    - [Ata de reunião do dia 30/09/26](/ReunioesAtas/Subequipe3/Ata30_09.md)
+    - [Gravação da reunião do dia 30/09/26](/ReunioesAtas/Subequipe3/Gravacao30_09.md)
+    
+
+
 - **Base**
   - [1. Desenho de Software (Padrões de Projeto)](/Base/1.PadroesDeProjeto.md)
   - Relatórios
