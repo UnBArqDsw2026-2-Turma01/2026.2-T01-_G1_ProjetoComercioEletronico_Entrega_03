@@ -42,23 +42,18 @@ Este documento tem como finalidade evidenciar, de forma rastreável, que os elem
 
 | # | Item do backlog | Sprint | Responsável | Data de conclusão | Evidência (arquivo/commit) | Critério de Pronto atendido? | Status |
 |---|---|---|---|---|---|---|---|
-| 1 | Levantamento de entidades e atores do domínio | 1 | TODOS| Entrega 1| Documentação realizada na entrega 1 a partir da engenharia reversa| <span style="color: #32CD32; font-weight: bold;">Sim</span> | <span style="color: #32CD32; font-weight: bold;">Concluído</span> |
-| 2 | Diagrama de Classes | 1 | José Joaquim | 11/09/26 | [Diagrama de Classes](/Base/Relatórios/Subequipe03/ModelagemEstatica/DiagramaDeClasses.md) | <span style="color: #32CD32; font-weight: bold;">Sim</span> | <span style="color: #32CD32; font-weight: bold;">Concluído</span> |
-| 3 | Diagrama de Implantação | 1 | Pedro Henrique | 15/09/26 | [Diagrama de Implantação](/Base/Relatórios/Subequipe03/ModelagemEstatica/DiagramaDeImplantacao.md) | <span style="color: #32CD32; font-weight: bold;">Sim</span> | <span style="color: #32CD32; font-weight: bold;">Concluído</span> |
-| 4 | Diagrama de Componentes | 1 | João Paulo | 17/09/26 | [Diagrama de Componentes](/Base/Relatórios/Subequipe03/ModelagemEstatica/DiagramaDeComponentes.md) | <span style="color: #32CD32; font-weight: bold;">Sim</span> | <span style="color: #32CD32; font-weight: bold;">Concluído</span> |
-| 5 | Diagrama de Pacotes | 1 | José Joaquim | 13/09/26 | [Diagrama de Pacotes](/Base/Relatórios/Subequipe03/ModelagemEstatica/DiagramaDePacotes.md) | <span style="color: #32CD32; font-weight: bold;">Sim</span> | <span style="color: #32CD32; font-weight: bold;">Concluído</span> |
-| 6 | Diagrama de Casos de Uso | 1 | Júlia Santana | 18/09/26 | [Diagrama de Casos de Uso](/Base/Relatórios/Subequipe03/ModelagemEstatica/DiagramaDeCasosDeUso.md) | <span style="color: #32CD32; font-weight: bold;">Sim</span> | <span style="color: #32CD32; font-weight: bold;">Concluído</span> |
-| 7 | Diagrama de Sequência | 2 | José Joaquim e Pedro Henrique| 18/09/26| [Diagrama de Sequência](/Base/Relatórios/Subequipe03/ModelagemDinamica/DiagramaDeSequencia.md) | <span style="color: #32CD32; font-weight: bold;">Sim</span> | <span style="color: #32CD32; font-weight: bold;">Concluído</span> |
-| 8 | Diagrama de Atividades | 2 | José Joaquim e Pedro Henrique| 17/09/26 | [Diagrama de Atividades](/Base/Relatórios/Subequipe03/ModelagemDinamica/DiagramaDeAtividades.md) | <span style="color: #32CD32; font-weight: bold;">Sim</span> | <span style="color: #32CD32; font-weight: bold;">Concluído</span> |
-| 9 | Diagrama de Máquina de Estados | 2 | João Paulo e Júlia Campos| 17/09/26 | [Diagrama de Máquina de Estados](/Base/Relatórios/Subequipe03/ModelagemDinamica/DiagramaDeMaquinaDeEstados.md) | <span style="color: #32CD32; font-weight: bold;">Sim</span> | <span style="color: #32CD32; font-weight: bold;">Concluído</span> |
-| 10 | Diagrama de Comunicação | 2 | José Joaquim e Pedro Henrique| 18/09/26 | [Diagrama de Comunicação](/Base/Relatórios/Subequipe03/ModelagemDinamica/DiagramaDeComunicacao.md) | <span style="color: #32CD32; font-weight: bold;">Sim</span> | <span style="color: #32CD32; font-weight: bold;">Concluído</span> |
-| 11 | Revisão geral e consolidação | 2 | TODOS | 17/09/26 | [Ata da reunião](/ReunioesAtas/Subequipe3/Ata17_09.md)<br>[Gravação da reunião](/ReunioesAtas/Subequipe3/Gravacao17_09.md) | <span style="color: #32CD32; font-weight: bold;">Sim</span> | <span style="color: #32CD32; font-weight: bold;">Concluído</span> |
+|01|Modelagem do Fluxo de Compras (State) | 01 | José Joaquim |?|?|?|?|
+|02|---| 01 | Pedro Henrique |---|---|---|---|
+|03|---| 01 | João Paulo |---|---|---|---|
+|04|---| 01 | Júlia Campos |---|---|---|---|
+|05|Código do Fluxo de Compras (State) | 02 | José Joaquim |?|?|?|?|
+|06|Código do ? (Padrão) | 02 | Pedro Henrique |?|?|?|?|
+|07|Código do ? (Padrão) | 02 | João Paulo |?|?|?|?|
+|08|Código do ? (Padrão) | 02 | Júlia Campos |?|?|?|?|
+
 
 O critério de "Pronto" referenciado nesta tabela é o definido na seção 8 da documentação da metodologia (revisão por outro integrante, consistência entre diagramas, versionamento e notação UML padrão). [Clique aqui para acessar a seção do 8 do documento de definição da metodologia!](/Base/Relatórios/Subequipe03/Metodologia.md#definiçãodepronto).
 
-Vale a pena ressaltar que a revisão dos outros membros foram realizadas também durante as reuniões:
-
-[Gravação da reunião 11/09/26](/ReunioesAtas/Subequipe3/Gravacao11_09.md) <br> [Gravação da reunião 17/09/26](/ReunioesAtas/Subequipe3/Gravacao17_09.md)
 
 ---
 
@@ -66,8 +61,8 @@ Vale a pena ressaltar que a revisão dos outros membros foram realizadas também
 
 | Papel (Scrum) | Integrante(s) responsável(is) | Evidência de exercício do papel |
 |---|---|---|
-| Product Owner | Pedro Henrique Gomes | Os registros de versionamento das páginas e as reuniões evidenciam o exercício do papel. <br> [Gravação da reunião 04/09/26](/ReunioesAtas/Subequipe3/Gravacao04_09.md) <br> [Gravação da reunião 11/09/26](/ReunioesAtas/Subequipe3/Gravacao11_09.md) <br> [Gravação da reunião 17/09/26](/ReunioesAtas/Subequipe3/Gravacao17_09.md)|
-| Scrum Master | José Joaquim da Silva Neto| Os registros de versionamento das páginas e as reuniões evidenciam o exercício do papel. <br> [Gravação da reunião 04/09/26](/ReunioesAtas/Subequipe3/Gravacao04_09.md) <br> [Gravação da reunião 11/09/26](/ReunioesAtas/Subequipe3/Gravacao11_09.md) <br> [Gravação da reunião 17/09/26](/ReunioesAtas/Subequipe3/Gravacao17_09.md) |
+| Product Owner | Pedro Henrique Gomes | Os registros de versionamento das páginas e as reuniões evidenciam o exercício do papel. |
+| Scrum Master | José Joaquim da Silva Neto| Os registros de versionamento das páginas e as reuniões evidenciam o exercício do papel. |
 | Development Team | TODOS | As evidências podem ser encontradas em [Matriz de rastreabilidade](#matriz) |
 
 > Não aconteceu papéis rotativos entre Sprints.
@@ -83,7 +78,7 @@ Esta seção verifica se as adaptações descritas na metodologia (seção 7 do 
 | Sprints de 1 semana (em vez de 2-4 semanas) | <span style="color: #32CD32; font-weight: bold;">Sim</span> | [Cronograma](#eventos) |
 | Daily Scrum substituído por check-in assíncrono | <span style="color: #32CD32; font-weight: bold;">Sim</span> |[Ir para Daily](#eventos) |
 | Product Owner rotativo/compartilhado | <span style="color: #FF073A; font-weight: bold;">Não</span> | No nosso trabalho foi escolhido não adotar essa prática |
-| Backlog definido majoritariamente no início | <span style="color: #32CD32; font-weight: bold;">Sim</span> | [Backlog](/Base/Relatórios/Subequipe03/Metodologia.md#Backlog) |
+| Backlog definido | <span style="color: #32CD32; font-weight: bold;">Sim</span> | [Backlog](/Base/Relatórios/Subequipe03/Metodologia.md#Backlog) |
 | Review interno ao grupo (com validação ocasional do orientador) | <span style="color: #32CD32; font-weight: bold;">Sim</span> | As revisões dos trabalhos do grupo podem ser encontradas nas Atas e Gravações de Reuniões e também nas evidências de [daily](#eventos) |
 
 ---
@@ -96,12 +91,13 @@ Liste aqui qualquer desvio entre o que foi planejado na metodologia e o que efet
 
 | Divergência | Sprint em que ocorreu | Motivo | Ação tomada |
 |---|---|---|---|
-| No planejamento inicial para a entrega o grupo combinou que a daily seria realizada remotamente respondendo 3 perguntas, sendo elas: O que modelei ontem? O que vou modelar hoje? Há algum bloqueio ou dúvida?. Tanto a reunião quando a ata do planejamento inicial podem ser acessadas por aqui: <br>[Ata da reunião](/ReunioesAtas/Subequipe3/Ata04_09.md)<br>[Gravação da reunião](/ReunioesAtas/Subequipe3/Gravacao04_09.md). | 1 e 2 | Adversidades do dia a dia | Para contornar esse problema, a equipe decidiu se comunicar de forma mais natural e também se comunicar pessoalmente quando possível|
-| As Dailys check-in do dia 05/09/2026 até o dia 07/09/2026 acabaram não sendo realizadas| 1 | Os membros se esqueceram de participar, porém estavam realizados pesquisas e estudando os conteúdos dessa entrega| Fortalecer o compromisso de participação |
 
 ---
 
 ## 7. Conclusão da rastreabilidade
+
+ATENÇÃO - ALTERAR O LINK PARA A GRAVAÇÃO DA REUNIÃO QUANDO ELA ACONTECER!!!!!!!!!!!
+
 
 A metodologia adotada nessa entrega teve um excelente resultado. Conforme registrado na reunião final da última sprint (sprint 2), [Clique aqui para acessar a gravação da reunião](/ReunioesAtas/Subequipe3/Gravacao17_09.md), os membros da subequipe 03 declaram seus feedbacks sobre a prática da metodologia adotada. No geral, a organização da subequipe foi bem melhor, resultando em melhores resultados de entrega e também em um processo com uma rastreabilidade melhor.
 
