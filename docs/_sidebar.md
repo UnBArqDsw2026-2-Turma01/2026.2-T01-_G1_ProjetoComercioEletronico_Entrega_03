@@ -15,8 +15,7 @@
       - GoFs Comportamentais
         - [Fluxo de Compra (State)](</Base/Relatórios/Subequipe03/GofsComportamentais/FluxoDeCompra(State).md>)
 
-  - [1.2. Participações - Padrões de Projeto](/Base/1.2.ParticipacoesPadroesDeProjeto.md)
-    - [1.2.1 SubEquipe01]()
-    - [1.2.2 SubEquipe02]()
-    - [1.2.3 SubEquipe03](/Base/Relatórios/Subequipe03/ParticipacoesSubequipe3.md)
+  - [1.2. Participações - Padrões de Projeto]()
+    - [1.2.1 SubEquipe01](/Participacoes/Subequipe1.md)
+    - [1.2.2 SubEquipe03](/Participacoes/Subequipe3.md)
   - [1.3. Iniciativas Extras - Padrões de Projeto](/Base/1.3.IniciativasExtras.md)
