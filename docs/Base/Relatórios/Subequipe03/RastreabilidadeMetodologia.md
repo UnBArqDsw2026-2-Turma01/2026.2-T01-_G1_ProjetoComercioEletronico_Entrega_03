@@ -15,10 +15,10 @@ Este documento tem como finalidade evidenciar, de forma rastreável, que os elem
 | Evento | Data planejada | Planejado (metodologia) | Data realizada | Evidência | Status |
 |---|---|---|---|---|---|
 | Sprint 1 Planning | 30/09/2026 | Reunião no início da Semana 1 para montar o Sprint Backlog | 30/09/26 | [Ata da reunião](/ReunioesAtas/Subequipe3/)<br>[Gravação da reunião](/ReunioesAtas/Subequipe3/)| <span style="color: #32CD32; font-weight: bold;">Concluído com evidência</span> |
-| Daily check-in — Sprint 1 (dia 1) | 01/10/2026 | Check-in assíncrono diário | -- | --- |  <span style="color: #FF073A; font-weight: bold;">Não Realizado</span> |
-| Daily check-in — Sprint 1 (dia 2) | 02/10/2026 | Check-in assíncrono diário | --- | --- | <span style="color: #FF073A; font-weight: bold;">Não Realizado</span> |
-| Daily check-in — Sprint 1 (dia 3) | 03/10/2026 |Check-in assíncrono diário | --- | ---  | <span style="color: #FF073A; font-weight: bold;">Não Realizado</span> |
-| Daily check-in — Sprint 1 (dia 4) | 04/10/2026 | Check-in assíncrono diário | --- | -- | <span style="color: #FF073A; font-weight: bold;">Não Realizado</span> |
+| Daily check-in — Sprint 1 (dia 1) | 01/10/2026 | Check-in assíncrono diário | 01/10/2026 | Daily realizada presencialmente |  <span style="color: #2c07ff; font-weight: bold;">Concluído sem evidência registrada</span> |
+| Daily check-in — Sprint 1 (dia 2) | 02/10/2026 | Check-in assíncrono diário | 02/10/2026 | Daily realizada presencialmente | <span style="color: #2c07ff; font-weight: bold;">Concluído sem evidência registrada</span> |
+| Daily check-in — Sprint 1 (dia 3) | 03/10/2026 |Check-in assíncrono diário | 03/10/2026 | Daily realizada presencialmente  | <span style="color: #2c07ff; font-weight: bold;">Concluído sem evidência registrada</span> |
+| Daily check-in — Sprint 1 (dia 4) | 04/10/2026 | Check-in assíncrono diário | 04/10/2026 | Daily realizada presencialmente | <span style="color: #2c07ff; font-weight: bold;">Concluído sem evidência registrada</span> |
 | Daily check-in — Sprint 1 (dia 5) | 05/10/2026 | Check-in assíncrono diário | -- | -- | <span style="color: #FF073A; font-weight: bold;">Não Realizado</span> |
 | Daily check-in — Sprint 1 (dia 6) | 06/10/2026 | Check-in assíncrono diário | -- | -- | <span style="color: #FF073A; font-weight: bold;">Não Realizado</span> |
 | Sprint 1 Review/Retrospective | 07/10/2026 | Reflexão sobre o processo da Sprint 1 | -- | -- | <span style="color: #FF073A; font-weight: bold;">Não Realizado</span> |
@@ -106,4 +106,4 @@ A metodologia adotada nessa entrega teve um excelente resultado. Conforme regist
 | Versão | Data | Descrição | Autor(es) | Revisor(es) |
 | -- | -- | -- | -- | -- |
 | 1.0 | 05/10/2026 | Criação do documento de rastreabilidade da metodologia | José Joaquim da Silva Neto | João Paulo Barbosa Pereira Nunes, Júlia Santana Campos e Pedro Henrique Gomes |
-
+| 1.1 | 09/10/2026 | Atualiza matriz de rastreabilidade | José Joaquim da Silva Neto | -- |
