@@ -62,8 +62,8 @@ Este trabalho segue o material da aula *Arquitetura e Desenho de Software: GoFs 
 | Estrutura da aula | Onde está nesta documentação |
 |---|---|
 | Objetivo | Seções 1.1 a 1.3 e 4.1 |
-| Modelagem genérica | Seção 2.4 |
-| Participantes | Seções 2.3 e 2.4 |
+| Modelagem genérica | Seções 2.4 e 2.5 |
+| Participantes | Seções 2.3, 2.4 e 2.5 |
 | Modelagem aplicada/instanciada | Seção 2.2 |
 | Motivação | Seção 1.1 |
 | Solução | Seções 4 e 5 |
@@ -148,6 +148,99 @@ observer-pagamento/
 | `update()` | `atualizar(Pagamento)` |
 | `ConcreteObserver` | Os quatro observadores concretos |
 | (sem equivalente) | `StatusPagamento`, elemento adicional que não aparece na modelagem genérica |
+
+### 2.5 Modelagem Genérica: padrão Observer
+
+<div style="text-align:center;">
+
+![Modelagem genérica do Observer no pagamento](../assets/observer_generico_pagamento.png)
+
+<p><strong>Modelagem genérica do Observer</strong>: participantes do GoF aplicados ao pagamento do Mercado Livre. <em>Autora: Júlia Santana Campos</em></p>
+
+[Clique aqui para baixar o diagrama em PDF!](</Base/Relatórios/Subequipe03/assets/Template de Diagrama de Entidade-Relacionamento.pdf> ':ignore')
+
+</div>
+
+#### 2.5.1 Objetivo do padrão
+
+O Observer é um padrão de projeto **comportamental** do catálogo GoF. Ele também é conhecido como *Dependents* ou *Publish-Subscribe*. Seu objetivo é definir uma dependência **um-para-muitos** entre objetos: quando um objeto muda de estado, todos os seus dependentes são notificados e atualizados automaticamente (GAMMA *et al.*, 1995).
+
+No subsistema de pagamento do Mercado Livre, o objeto que muda de estado é o pagamento. Seu status passa por PENDENTE, APROVADO, RECUSADO ou ESTORNADO, e cada mudança interessa a várias partes do sistema: a comunicação com o comprador, o aviso ao vendedor, a liberação do envio e a reposição do estoque. O padrão permite que todas essas partes reajam à mudança sem que o pagamento precise saber quem elas são.
+
+#### 2.5.2 Participantes
+
+**Subject (`Subject`)**
+Classe abstrata que representa qualquer objeto observável. Ela mantém a lista de observadores interessados e oferece a interface para gerenciá-la:
+- `attach(o: Observer)`: inclui um observador na lista;
+- `detach(o: Observer)`: remove um observador da lista;
+- `notify()`: percorre a lista e chama `update()` em cada observador.
+
+No diagrama, a lista aparece como a associação `observers` com multiplicidade `0..*`: um sujeito pode ter nenhum, um ou muitos observadores. Essa associação aponta para a abstração `Observer`, e não para as classes concretas.
+
+**Observer (`Observer`)**
+Classe abstrata que define a interface de atualização comum a todos os observadores, o método `update()`. Ela não implementa nenhuma reação. Apenas garante que qualquer observador pode ser notificado da mesma forma. É essa abstração que permite ao Subject avisar objetos de tipos diferentes sem conhecer nenhum deles.
+
+**ConcreteSubject (`Pagamento`)**
+É o objeto observado de fato. Ele herda de `Subject` todo o gerenciamento da lista e da notificação e acrescenta o estado que interessa aos observadores, o atributo `status: StatusPagamento`. Os atributos `id` e `valor` completam a representação do pagamento, mas não fazem parte do mecanismo do padrão.
+- `getState()`: devolve o status atual do pagamento;
+- `setState(status)`: altera o status e, em seguida, chama `notify()`, conforme a nota do diagrama.
+
+O status é tipado pela enumeração `StatusPagamento`, da qual o `Pagamento` depende. Assim, o estado só pode assumir valores válidos.
+
+**ConcreteObserver (`NotificacaoComprador`, `NotificacaoVendedor`, `LiberacaoEnvio`, `ReposicaoEstoque`)**
+São as classes que reagem às mudanças. Cada uma herda de `Observer`, implementa `update()` à sua maneira e guarda uma referência ao `Pagamento` que observa (associação `subject`, multiplicidade `1`). Dentro de `update()`, o observador consulta `subject.getState()`, armazena o valor em `observerState` e decide como agir. Por exemplo, `LiberacaoEnvio` libera o pedido para envio quando o status é APROVADO, e `ReposicaoEstoque` devolve o item ao estoque quando o status é RECUSADO ou ESTORNADO.
+
+**Colaboração entre os participantes**
+1. Cada observador concreto é registrado no pagamento por meio de `attach()`.
+2. Quando o status muda, por exemplo na confirmação do banco, é chamado `setState(APROVADO)`.
+3. O `Pagamento` atualiza seu `status` e chama `notify()`.
+4. `notify()` chama `update()` em cada observador da lista, sem distinguir de que tipo ele é.
+5. Cada observador consulta `getState()` e reage conforme sua própria regra. Um observador pode também não fazer nada, como `ReposicaoEstoque` diante de um pagamento aprovado.
+
+Esse modo de obter o estado, em que o observador consulta o sujeito depois de ser avisado, corresponde ao modelo *pull* descrito pelo GoF.
+
+#### 2.5.3 Leitura do diagrama
+
+O diagrama segue a estrutura do Observer no catálogo GoF, mas já com os nomes do domínio de pagamento, o que o deixa entre a modelagem genérica da seção 2.4 e a modelagem aplicada da seção 2.2. Os elementos de notação usados são:
+
+| Elemento do diagrama | Notação | Significado |
+|---|---|---|
+| `Pagamento` → `Subject` | Generalização (seta contínua com triângulo vazio) | O `Pagamento` **é um** `Subject` e herda `attach`, `detach` e `notify` |
+| Observadores concretos → `Observer` | Generalização | Cada observador concreto **é um** `Observer` e redefine `update()` |
+| `Subject` → `Observer` (`observers`, `0..*`) | Associação navegável | O sujeito conhece seus observadores apenas pela abstração |
+| Observadores concretos → `Pagamento` (`subject`, `1`) | Associação navegável | Cada observador concreto conhece o pagamento que observa, para consultar `getState()` |
+| `Pagamento` → `StatusPagamento` | Dependência (seta tracejada) | O tipo do estado observado é definido pela enumeração |
+| Notas amarelas | Notas UML | Descrevem o corpo de `notify()`, `setState()` e de dois `update()` |
+
+As notas tornam explícito o comportamento que a estrutura estática sozinha não mostra: `setState` altera o status **antes** de chamar `notify()`, de modo que o sujeito está consistente quando os observadores o consultam, e cada `update()` filtra o status que interessa ao seu observador.
+
+#### 2.5.4 Por que o padrão resolve o problema
+
+Sem o padrão, a classe `Pagamento` precisaria chamar diretamente cada parte do sistema interessada na mudança de status: o serviço de notificação do comprador, o do vendedor, o de envio e o de estoque. Ela ficaria fortemente acoplada a classes que não têm relação com o conceito de pagamento. Cada nova reação exigiria alterar o `Pagamento`, com risco de quebrar o que já funcionava, e o teste da classe dependeria de todos esses serviços.
+
+Com o Observer, o `Pagamento` conhece apenas a abstração `Observer` e o método `update()`. Ele não sabe quantos observadores existem nem o que cada um faz. As consequências diretas são:
+
+- **Acoplamento abstrato e mínimo:** sujeito e observadores podem evoluir de forma independente, porque a única dependência entre eles é a interface `update()`.
+- **Extensão sem modificação:** para incluir uma nova reação, como a emissão de nota fiscal, basta criar uma nova subclasse de `Observer` e registrá-la com `attach()`. A classe `Pagamento` não é alterada, o que está de acordo com o princípio aberto/fechado.
+- **Configuração em tempo de execução:** como a lista é gerenciada por `attach()` e `detach()`, observadores podem ser incluídos ou removidos com o sistema em funcionamento.
+- **Responsabilidades bem distribuídas:** as regras de negócio de cada reação ficam no observador responsável por ela, e não concentradas no pagamento.
+
+O padrão também tem custos. Como o sujeito não conhece seus observadores, uma única mudança de estado pode desencadear uma cadeia de atualizações difícil de prever. Além disso, a ordem em que os observadores são notificados não é garantida. Esses pontos devem ser considerados quando uma reação depende de outra, como a liberação do envio antes do aviso ao vendedor.
+
+#### 2.5.5 Diferenças em relação à implementação
+
+O diagrama é uma modelagem de projeto e não um espelho do código da seção 5. As diferenças são intencionais e estão resumidas abaixo:
+
+| Aspecto | Diagrama (seção 2.5) | Implementação (seção 5) |
+|---|---|---|
+| `Subject` e `Observer` | Classes abstratas, com herança | Interfaces Java (`PagamentoObservavel`, `ObservadorDePagamento`), com realização |
+| Referência ao sujeito | Cada observador guarda `subject` como atributo | O pagamento é recebido como parâmetro em `atualizar(Pagamento)`, o que permite observar vários pagamentos |
+| Estado do observador | Atributo `observerState` | Variável local dentro de `atualizar` |
+| Status | PENDENTE, APROVADO, RECUSADO, ESTORNADO | Inclui também `EM_ANALISE` |
+| Observadores concretos | `NotificacaoComprador`, `NotificacaoVendedor`, `LiberacaoEnvio`, `ReposicaoEstoque` | `NotificacaoComprador`, `LiberacaoPedido`, `EmissaoNotaFiscal`, `LiberacaoEstoque` |
+| Client | Não representado | `GatewayPagamento` |
+
+Nos dois casos o mecanismo é o mesmo: o sujeito avisa todos os observadores registrados pela abstração, e cada observador consulta o estado no modelo *pull* e decide sozinho se reage. A emissão de nota fiscal, citada no diagrama como exemplo de extensão, é justamente um dos observadores que a implementação acrescentou sem alterar o `Pagamento`.
 
 ---
 
@@ -682,3 +775,4 @@ ORACLE. **Creating a GUI with Swing**. The Java Tutorials. Disponível em: <http
 | 1.2 | 15/10/2026 | Substitui imagens dos diagramas por embed do Miro | Júlia Santana Campos | João Paulo Barbosa Pereira Nunes |
 | 1.3 | 15/10/2026 | Corrige caminhos das imagens e do vídeo e links para o Fluxo de Compra (State) | João Paulo Barbosa Pereira Nunes | -- |
 | 1.4 | 15/10/2026 | Detalha o passo a passo para baixar, compilar e executar o projeto | João Paulo Barbosa Pereira Nunes | José Joaquim da Silva Neto, Júlia Santana Campos e Pedro Henrique Gomes |
+| 1.5 | 16/10/2026 | Adiciona a seção 2.5 com o diagrama da modelagem genérica do Observer no pagamento, descrição dos participantes, leitura do diagrama e comparação com a implementação | Júlia Santana Campos | João Paulo Barbosa, José Joaquim da Silva Neto, Pedro Henrique Gomes |
