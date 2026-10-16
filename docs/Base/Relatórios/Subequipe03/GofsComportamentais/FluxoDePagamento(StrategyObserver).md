@@ -106,11 +106,9 @@ observer-pagamento/
 
 <div style="text-align:center;">
 
-![Diagrama de classes do Observer no Pagamento](../Assets/ObserverPagamento/DiagramaDeClasses.png)
+<iframe width="100%" height="500" src="https://miro.com/app/live-embed/uXjVEcxFgqg=/?embedMode=view_only_without_ui&moveToViewport=129,-4,2699,1475&embedId=196096675288" frameborder="0" scrolling="no" allow="fullscreen; clipboard-read; clipboard-write" allowfullscreen></iframe>
 
 <p><strong>Observer no Pagamento</strong>: diagrama de classes da modelagem aplicada. <em>Autores: João Paulo Barbosa Pereira Nunes e Júlia Santana Campos</em></p>
-
-[Clique aqui para baixar a imagem!](/Base/Subequipe03/Assets/ObserverPagamento/DiagramaDeClasses.png ':ignore')
 
 </div>
 
@@ -130,15 +128,11 @@ observer-pagamento/
 
 <div style="text-align:center;">
 
-![Modelagem genérica do Observer](../Assets/ObserverPagamento/Generico.png)
+<iframe width="100%" height="500" src="https://miro.com/app/live-embed/uXjVEZqfDxQ=/?embedMode=view_only_without_ui&moveToViewport=-1668,-573,2909,1589&embedId=866213809725" frameborder="0" scrolling="no" allow="fullscreen; clipboard-read; clipboard-write" allowfullscreen></iframe>
 
-<p><strong>Modelagem genérica</strong>: o Observer conforme o catálogo GoF. <em>Autores: João Paulo Barbosa Pereira Nunes e Júlia Santana Campos</em></p>
-
-[Clique aqui para baixar a imagem!](/Base/Subequipe03/Assets/ObserverPagamento/Generico.png ':ignore')
+<p><strong>Modelagem genérica</strong>: o Observer conforme o catálogo GoF. <em>Autores:Júlia Santana Campos e João Paulo Barbosa Pereira Nunes</em></p>
 
 </div>
-
-| Modelagem genérica | Modelagem aplicada (este sistema) |
 |---|---|
 | `Client` | `GatewayPagamento` |
 | `Subject` | `PagamentoObservavel` |
@@ -635,3 +629,4 @@ ORACLE. **Creating a GUI with Swing**. The Java Tutorials. Disponível em: <http
 | -- | -- | -- | -- | -- |
 | 1.0 | 15/10/2026 | Criação da página com a documentação do Observer no pagamento | João Paulo Barbosa Pereira Nunes | Júlia Santana Campos |
 | 1.1 | 15/10/2026 | Adiciona imagens da demonstração da interface gráfica | João Paulo Barbosa Pereira Nunes | Júlia Santana Campos |
+| 1.2 | 15/10/2026 | Substitui imagens dos diagramas por embed do Miro | Júlia Santana Campos | João Paulo Barbosa Pereira Nunes |
