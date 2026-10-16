@@ -22,6 +22,7 @@
       - [Uso de IA generativa e lições aprendidas](/Base/Relatórios/Subequipe03/IAGenerativa.md)
       - GoFs Comportamentais
         - [Fluxo de Compra (State)](</Base/Relatórios/Subequipe03/GofsComportamentais/FluxoDeCompra(State).md>)
+        - [Fluxo de Pagamento (Observer)](</Base/Relatórios/Subequipe03/GofsComportamentais/FluxoDePagamento(StrategyObserver).md>)
 
   - 1.2. Participações - Padrões de Projeto
     - [1.2.1 SubEquipe01](/Participacoes/Subequipe1.md)

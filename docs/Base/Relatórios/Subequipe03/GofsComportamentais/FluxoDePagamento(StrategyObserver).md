@@ -169,7 +169,7 @@ São 4 status alcançáveis × 4 observadores = **16 decisões**, e cada uma est
 * `PENDENTE` é o status inicial, definido no construtor. Como ele não é resultado de uma mudança, **não gera notificação**.
 * **Todos os observadores registrados são avisados em toda mudança**, inclusive os que vão ignorar. Quem filtra é o observador, não o `Pagamento`.
 * Se `setStatus` for chamado com o mesmo status atual, **ninguém é avisado**: não houve mudança.
-* O sistema **não valida as transições**. Nada impede, por exemplo, ir de `ESTORNADO` para `APROVADO`. Validar o ciclo de vida é a responsabilidade de outro padrão, o **State**, aplicado pela subequipe no documento [Fluxo de Compra (State)](docs/Base/Relatórios/Subequipe03/GofsComportamentais/FluxoDeCompra(State).md). Ver seção 4.5.
+* O sistema **não valida as transições**. Nada impede, por exemplo, ir de `ESTORNADO` para `APROVADO`. Validar o ciclo de vida é a responsabilidade de outro padrão, o **State**, aplicado pela subequipe no documento [Fluxo de Compra (State)](</Base/Relatórios/Subequipe03/GofsComportamentais/FluxoDeCompra(State).md>). Ver seção 4.5.
 
 ---
 
@@ -420,11 +420,11 @@ Essa ideia de envolver um objeto com outro de mesma interface lembra o padrão *
 
 <div style="text-align:center;">
 
-![Pagamento criado](../Assets/ObserverPagamento/01.png)
+![Pagamento criado](../ObserverPagamento/01.png)
 
 <p><strong>Interface Gráfica</strong>: pagamento criado, com quatro observadores registrados e o SMS fora da lista. <em>Autor: João Paulo Barbosa Pereira Nunes</em></p>
 
-[Clique aqui para baixar a imagem!](/Base/Subequipe03/Assets/ObserverPagamento/01.png ':ignore')
+[Clique aqui para baixar a imagem!](/Base/Relatórios/Subequipe03/ObserverPagamento/01.png ':ignore')
 
 </div>
 
@@ -432,11 +432,11 @@ Essa ideia de envolver um objeto com outro de mesma interface lembra o padrão *
 
 <div style="text-align:center;">
 
-![Pagamento em análise](../Assets/ObserverPagamento/02.png)
+![Pagamento em análise](../ObserverPagamento/02.png)
 
 <p><strong>Interface Gráfica</strong>: em análise. Só o comprador reage; os outros três são notificados e ignoram. <em>Autor: João Paulo Barbosa Pereira Nunes</em></p>
 
-[Clique aqui para baixar a imagem!](/Base/Subequipe03/Assets/ObserverPagamento/02.png ':ignore')
+[Clique aqui para baixar a imagem!](/Base/Relatórios/Subequipe03/ObserverPagamento/02.png ':ignore')
 
 </div>
 
@@ -444,11 +444,11 @@ Essa ideia de envolver um objeto com outro de mesma interface lembra o padrão *
 
 <div style="text-align:center;">
 
-![Pagamento aprovado](../Assets/ObserverPagamento/03.png)
+![Pagamento aprovado](../ObserverPagamento/03.png)
 
 <p><strong>Interface Gráfica</strong>: aprovado. Comprador, pedido e nota fiscal reagem; o estoque ignora. <em>Autor: João Paulo Barbosa Pereira Nunes</em></p>
 
-[Clique aqui para baixar a imagem!](/Base/Subequipe03/Assets/ObserverPagamento/03.png ':ignore')
+[Clique aqui para baixar a imagem!](/Base/Relatórios/Subequipe03/ObserverPagamento/03.png ':ignore')
 
 </div>
 
@@ -456,11 +456,11 @@ Essa ideia de envolver um objeto com outro de mesma interface lembra o padrão *
 
 <div style="text-align:center;">
 
-![Pagamento recusado](../Assets/ObserverPagamento/04.png)
+![Pagamento recusado](../ObserverPagamento/04.png)
 
 <p><strong>Interface Gráfica</strong>: recusado. O estoque reage, e pedido e nota fiscal ignoram: o oposto do aprovado. <em>Autor: João Paulo Barbosa Pereira Nunes</em></p>
 
-[Clique aqui para baixar a imagem!](/Base/Subequipe03/Assets/ObserverPagamento/04.png ':ignore')
+[Clique aqui para baixar a imagem!](/Base/Relatórios/Subequipe03/ObserverPagamento/04.png ':ignore')
 
 </div>
 
@@ -468,11 +468,11 @@ Essa ideia de envolver um objeto com outro de mesma interface lembra o padrão *
 
 <div style="text-align:center;">
 
-![Estorno com SMS](../Assets/ObserverPagamento/05.png)
+![Estorno com SMS](../ObserverPagamento/05.png)
 
 <p><strong>Interface Gráfica</strong>: estorno após remover o comprador e adicionar o SMS. O SMS reage sem nenhuma alteração no Pagamento. <em>Autor: João Paulo Barbosa Pereira Nunes</em></p>
 
-[Clique aqui para baixar a imagem!](/Base/Subequipe03/Assets/ObserverPagamento/05.png ':ignore')
+[Clique aqui para baixar a imagem!](/Base/Relatórios/Subequipe03/ObserverPagamento/05.png ':ignore')
 
 </div>
 
@@ -482,7 +482,7 @@ O vídeo não tem áudio. O passo a passo abaixo descreve cada ação feita na t
 
 <div style="text-align:center;">
 
-[ObserverPagamento.mp4](../Assets/ObserverPagamento/ObserverPagamento.mp4 ':include :type=video controls width=80%')
+[ObserverPagamento.mp4](../ObserverPagamento/ObserverPagamento.mp4 ':include :type=video controls width=80%')
 
 <p><strong>Interface Gráfica</strong>: demonstração do Observer no pagamento. <em>Autor: João Paulo Barbosa Pereira Nunes</em></p>
 
@@ -586,7 +586,7 @@ No ecossistema Java, além das classes depreciadas citadas na seção 9, o mesmo
 | 3. Avisos desnecessários | Registrar observadores por status de interesse, por exemplo um `Map<StatusPagamento, List<ObservadorDePagamento>>` |
 | 2. Notificação síncrona | Notificar de forma assíncrona com um `ExecutorService` ou com a API `Flow` |
 | 4. Falhas apenas registradas | Fila de reprocessamento para reações que falharam |
-| 6. Sem validação de transições | Combinar com o padrão **State**, aplicado pela subequipe no [Fluxo de Compra](docs/Base/Relatórios/Subequipe03/GofsComportamentais/FluxoDeCompra(State).md) |
+| 6. Sem validação de transições | Combinar com o padrão **State**, aplicado pela subequipe no [Fluxo de Compra](</Base/Relatórios/Subequipe03/GofsComportamentais/FluxoDeCompra(State).md>) |
 | 7. Concorrência | Usar `CopyOnWriteArrayList`, que já resolve também a cópia feita no laço |
 | 8. Interface acoplada ao console | Observadores devolverem ou publicarem um resultado, e o uso de um logger no lugar de `System.out` |
 | 9. Status anterior desconhecido | Passar um objeto de evento, como `EventoPagamento(statusAnterior, statusNovo)`, migrando para o modelo push |
@@ -630,3 +630,4 @@ ORACLE. **Creating a GUI with Swing**. The Java Tutorials. Disponível em: <http
 | 1.0 | 15/10/2026 | Criação da página com a documentação do Observer no pagamento | João Paulo Barbosa Pereira Nunes | Júlia Santana Campos |
 | 1.1 | 15/10/2026 | Adiciona imagens da demonstração da interface gráfica | João Paulo Barbosa Pereira Nunes | Júlia Santana Campos |
 | 1.2 | 15/10/2026 | Substitui imagens dos diagramas por embed do Miro | Júlia Santana Campos | João Paulo Barbosa Pereira Nunes |
+| 1.3 | 15/10/2026 | Corrige caminhos das imagens e do vídeo e links para o Fluxo de Compra (State) | João Paulo Barbosa Pereira Nunes | -- |
