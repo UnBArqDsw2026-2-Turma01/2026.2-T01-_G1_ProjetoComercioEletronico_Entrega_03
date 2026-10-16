@@ -508,13 +508,61 @@ O vídeo não tem áudio. O passo a passo abaixo descreve cada ação feita na t
 
 ## 8. Como compilar e executar
 
-Requer **Java 17 ou superior**. A partir da pasta do projeto (a que contém `src`):
+### 8.1 Conferir o Java
+
+É necessário o **Java 17 ou superior** (JDK). No terminal:
+
+```bash
+java -version
+```
+
+Se o comando não for reconhecido ou a versão for menor que 17, instale um JDK, por exemplo o [Eclipse Temurin](https://adoptium.net/).
+
+### 8.2 Baixar o código
+
+O GitHub não permite baixar uma pasta isolada, então é preciso baixar o repositório inteiro, de uma destas formas:
+
+* **Pelo navegador:** na [página do repositório](https://github.com/UnBArqDsw2026-2-Turma01/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_03), clique em **Code → Download ZIP** e descompacte o arquivo. A pasta descompactada recebe o sufixo `-main` no nome.
+* **Pelo Git:**
+  ```bash
+  git clone https://github.com/UnBArqDsw2026-2-Turma01/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_03.git
+  ```
+
+### 8.3 Entrar na pasta do projeto
+
+Dentro do repositório baixado, o projeto fica em:
+
+```
+docs/Base/Relatórios/Subequipe03/src/comportamentais/FluxoDeCompra(Observer)
+```
+
+No terminal (as aspas são necessárias por causa dos parênteses no nome da pasta):
+
+```bash
+cd "2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_03/docs/Base/Relatórios/Subequipe03/src/comportamentais/FluxoDeCompra(Observer)"
+```
+
+Se o repositório foi baixado pelo ZIP, use `2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_03-main` no início do caminho.
+
+### 8.4 Compilar e executar
+
+**macOS e Linux:**
 
 ```bash
 javac -encoding UTF-8 -d out $(find src -name "*.java")
 java -cp out Main              # versão no terminal
 java -cp out InterfaceGrafica  # versão com janela
 ```
+
+**Windows (PowerShell):**
+
+```powershell
+javac -encoding UTF-8 -d out (Get-ChildItem -Path src -Recurse -Filter *.java).FullName
+java -cp out Main
+java -cp out InterfaceGrafica
+```
+
+**Pela IDE:** também é possível abrir a pasta do projeto no IntelliJ IDEA ou no VS Code (com a extensão *Extension Pack for Java*) e executar diretamente as classes `Main` ou `InterfaceGrafica`.
 
 **Observação para macOS:** o sistema bloqueia o Terminal de ler as pastas Downloads, Mesa e Documentos até que a permissão seja concedida. Se aparecer `Operation not permitted`, mova o projeto para a pasta do usuário ou libere o Terminal em *Ajustes do Sistema, Privacidade e Segurança, Arquivos e Pastas*.
 
@@ -633,3 +681,4 @@ ORACLE. **Creating a GUI with Swing**. The Java Tutorials. Disponível em: <http
 | 1.1 | 15/10/2026 | Adiciona imagens da demonstração da interface gráfica | João Paulo Barbosa Pereira Nunes | Júlia Santana Campos |
 | 1.2 | 15/10/2026 | Substitui imagens dos diagramas por embed do Miro | Júlia Santana Campos | João Paulo Barbosa Pereira Nunes |
 | 1.3 | 15/10/2026 | Corrige caminhos das imagens e do vídeo e links para o Fluxo de Compra (State) | João Paulo Barbosa Pereira Nunes | -- |
+| 1.4 | 15/10/2026 | Detalha o passo a passo para baixar, compilar e executar o projeto | João Paulo Barbosa Pereira Nunes | José Joaquim da Silva Neto, Júlia Santana Campos e Pedro Henrique Gomes |
