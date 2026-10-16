@@ -133,6 +133,8 @@ observer-pagamento/
 <p><strong>Modelagem genérica</strong>: o Observer conforme o catálogo GoF. <em>Autores:Júlia Santana Campos e João Paulo Barbosa Pereira Nunes</em></p>
 
 </div>
+
+| Modelagem genérica | Modelagem aplicada (este sistema) |
 |---|---|
 | `Client` | `GatewayPagamento` |
 | `Subject` | `PagamentoObservavel` |
