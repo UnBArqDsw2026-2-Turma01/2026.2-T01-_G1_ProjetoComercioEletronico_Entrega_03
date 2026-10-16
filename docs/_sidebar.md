@@ -31,3 +31,4 @@
   - 1.3. Iniciativas Extras - Padrões de Projeto
     - [1.3.1 SubEquipe01](Base/Relatórios/IniciativasExtras/IniciativasExtrasSubequipe1.md)
     - [1.3.2 SubEquipe03](Base/Relatórios/IniciativasExtras/IniciativasExtrasSubequipe3.md)
+      - [Interface Gráfica do Fluxo de Pagamento (Observer)](</Base/Relatórios/IniciativasExtras/InterfaceGraficaObserver.md>)
