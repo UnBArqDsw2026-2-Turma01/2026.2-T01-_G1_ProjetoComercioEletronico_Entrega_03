@@ -921,6 +921,15 @@ Esse fluxo trata do ciclo de vida padrão de um pedido, partimos de um pedido qu
 
 </div>
 
+### Fluxo de compra com cancelamentos
+
+<div style="text-align:center;">
+
+[02.mp4](../Assets/FluxoDeCompra(State)/02.mp4 ':include :type=video controls width=80%')
+
+<p><strong>Interface Gráfica</strong> — Fluxo de compra com cancelamentos. <em>Autor: José Joaquim da Silva Neto</em></p>
+
+</div>
 
 ## Histórico de Versões
 
@@ -932,3 +941,4 @@ Esse fluxo trata do ciclo de vida padrão de um pedido, partimos de um pedido qu
 | 1.3 | 15/10/2026 | Adiciona documentação | José Joaquim da Silva Neto | -- |
 | 1.4 | 15/10/2026 | Adiciona a explicação dos diagramas de classes, decisões de projeto, literatura, visão crítica, melhorias, limitações e referências | José Joaquim da Silva Neto | -- |
 | 1.5 | 15/10/2026 | Revisão geral: corrige referências cruzadas, legendas, textos alternativos, links de download e digitação | José Joaquim da Silva Neto | -- |
+| 1.6 | 15/10/2026 | Adiciona segundo vídeo de apresentação da interface gráfica | José Joaquim da Silva Neto | -- |
