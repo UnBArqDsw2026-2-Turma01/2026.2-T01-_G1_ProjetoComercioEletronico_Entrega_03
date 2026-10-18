@@ -11,7 +11,7 @@ import produto.Comprovante;
  * que restou — informacao que so existe porque o comprovante le o mesmo
  * autorizador que acabou de debitar. Um ComprovanteSaldo ligado a outro
  * autorizador mostraria um saldo que nao foi debitado; e essa combinacao que a
- * FabricaSaldo impede ao criar os dois juntos.
+ * FabricaSaldoEmConta impede ao criar os dois juntos.
  *
  * O conteudo e simulado: a tela de pagamento nao foi observada na Entrega 1.
  *

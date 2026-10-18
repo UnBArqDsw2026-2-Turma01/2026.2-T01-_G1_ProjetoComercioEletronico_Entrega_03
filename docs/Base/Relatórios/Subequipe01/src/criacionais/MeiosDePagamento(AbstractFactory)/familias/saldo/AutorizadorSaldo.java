@@ -14,7 +14,7 @@ import produto.Autorizador;
  * e conhecido pela plataforma — saldo insuficiente —, e nao devolvido por um
  * terceiro.
  *
- * O autorizador e quem guarda o saldo. A FabricaSaldo entrega este mesmo
+ * O autorizador e quem guarda o saldo. A FabricaSaldoEmConta entrega este mesmo
  * objeto ao ComprovanteSaldo, que informa o saldo restante, e ao EstornoSaldo,
  * que credita de volta: os tres produtos falam da mesma conta.
  *

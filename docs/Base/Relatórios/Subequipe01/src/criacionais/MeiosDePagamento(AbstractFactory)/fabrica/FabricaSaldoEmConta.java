@@ -22,18 +22,18 @@ import produto.PoliticaEstorno;
  *
  * Autor: Guilherme Costa Zanella (familia Saldo em conta).
  */
-public final class FabricaSaldo implements FabricaMeioPagamento {
+public final class FabricaSaldoEmConta implements FabricaMeioPagamento {
 
     /** Saldo de demonstracao (R$ 500,00): o valor real nao foi observado. */
     private static final long SALDO_DE_DEMONSTRACAO_EM_CENTAVOS = 50000;
 
     private final AutorizadorSaldo autorizador;
 
-    public FabricaSaldo() {
+    public FabricaSaldoEmConta() {
         this(Dinheiro.emReais(SALDO_DE_DEMONSTRACAO_EM_CENTAVOS));
     }
 
-    public FabricaSaldo(Dinheiro saldoDisponivel) {
+    public FabricaSaldoEmConta(Dinheiro saldoDisponivel) {
         this.autorizador = new AutorizadorSaldo(saldoDisponivel);
     }
 
