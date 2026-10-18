@@ -34,11 +34,19 @@ Conforme o Foco 03 das Diretrizes, cada integrante registra aqui, individualment
 
 ### Lições aprendidas
 
---
+**A assimetria operacional é a justificativa mais forte para o Abstract Factory.** Enquanto no cartão ou Pix a devolução segue pelo mesmo canal ou chave de liquidação, o boleto bancário é naturalmente assimétrico: o dinheiro entra pela rede de compensação bancária e não pode ser "estornado" por um botão de reversão de boleto. Ele exige um depósito bancário em conta corrente indicada pelo comprador. Implementar o `AutorizadorBoleto` e o `EstornoBoleto` me mostrou que a família não agrupa apenas produtos de mesmo rótulo, mas encapsula e harmoniza assimetrias de processos de negócio que o cliente não deve tratar.
+
+**No Decorator, a ordenação mexe na sequência sem corromper o estado.** O `ComOrdenacao` reordena a lista sem tocar nas facetas calculadas pelos outros decoradores e sem descartar anúncios. A garantia de imutabilidade acordada pela equipe (`recebida.comItens(...)`) foi fundamental para que a composição dos filtros e enriquecimentos não sofresse efeitos colaterais. Se o método ordenasse a lista original in-place, uma chamada subsequente ou concorrente teria seu estado interno alterado de forma imprevisível.
 
 ### Uso da IA generativa (senso crítico)
 
---
+**Onde usei.** Como assistente técnico e de desenvolvimento, verificar a aderência aos contratos estipulados na reunião e estruturar a documentação técnica das seções.
+
+**Onde ajudou.** Na aceleração de código idiomático em Java 8+ sem dependências externas, na garantia de conformidade com os contratos abstratos definidos pela equipe.
+
+**Onde ela falha (senso crítico).** A IA tende a introduzir algoritmos sofisticados de ranqueamento de relevância baseados em similaridade de strings ou fórmulas arbitrárias que nunca foram observadas em nossas medições da Entrega 1. Tentar "adivinhar" o algoritmo de relevância da plataforma real criaria uma falsa sensação de precisão que não se sustenta na evidência empírica coletada. A intervenção humana foi essencial para descartar essas invenções plausíveis e manter a premissa acordada: `RELEVANCIA` preserva a ordem do catálogo subjacente e é documentada como inferência declarada. Além disso, ao gerar a linha digitável do boleto, a ferramenta tentou criar validações complexas de dígitos verificadores de módulos bancários que não agregavam valor à intenção do padrão de projeto e aumentavam a fragilidade do código de demonstração.
+
+**O que levo.** A inteligência artificial é uma excelente ferramenta de produtividade para geração de código estrutural e verificação de contratos sintáticos, mas o julgamento arquitetural sobre o que modelar, o que inferir conscientemente e onde manter a rastreabilidade estrita aos artefatos anteriores depende exclusivamente do desenvolvedor humano.
 
 ---
 
@@ -133,3 +141,4 @@ Há uma variante dessa falha específica de padrões de projeto: a IA é **entus
 | 1.2 | 18/10/2026 | Adiciona lições aprendidas e uso de IA generativa de Maria Clara | Maria Clara Sena de Lima | -- |
 | 1.3 | 18/10/2026 | Redação do ponto de vista de Patrick Anderson Carvalho dos Santos sobre lições aprendidas e uso de IA generativa | Patrick Anderson Carvalho dos Santos | -- |
 | 1.4 | 18/10/2026 | Redação do ponto de vista de Guilherme Costa Zanella sobre lições aprendidas e uso de IA generativa | Guilherme Costa Zanella | -- |
+| 1.5 | 18/10/2026 | Redação do ponto de vista de Guilherme Davila Rodrigues Carneiro Sampaio sobre lições aprendidas e uso de IA generativa | Guilherme Davila Rodrigues Carneiro Sampaio | -- |
