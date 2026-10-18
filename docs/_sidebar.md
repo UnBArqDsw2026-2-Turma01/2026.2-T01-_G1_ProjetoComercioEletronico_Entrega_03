@@ -6,6 +6,7 @@
 - Reuniões e Atas
   - [Modelo de Ata](/ReunioesAtas/ModeloAta.md)
   - SubEquipe 01
+    - [Ata de reunião do dia 16/10/26](/ReunioesAtas/Subequipe1/Ata16-10.md)
     - [Ata de reunião do dia 18/10/26](/ReunioesAtas/Subequipe1/Ata18_10.md)
   - SubEquipe 03
     - [Ata de reunião do dia 30/09/26](/ReunioesAtas/Subequipe3/Ata30_09.md)
