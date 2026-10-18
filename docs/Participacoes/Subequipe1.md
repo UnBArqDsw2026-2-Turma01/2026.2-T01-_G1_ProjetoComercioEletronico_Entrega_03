@@ -27,3 +27,4 @@ A divisão das fatias está registrada na [ata de 18/10/2026](/ReunioesAtas/Sube
 | 1.0 | 18/10/2026 | Criação da página com as fatias de cada integrante nos dois padrões | Pedro Luciano de Azevedo | -- |
 | 1.1 | 18/10/2026 | Preenchimento da participação de Pedro Luciano de Azevedo, com os artefatos entregues e os comprobatórios por commit | Pedro Luciano de Azevedo | -- |
 | 1.2 | 18/10/2026 | Preenchimento da participação de Maria Clara Sena de Lima, com a significância e os comprobatórios por commit | Maria Clara Sena de Lima | -- |
+| 1.3 | 18/10/2026 | Preenchimento da participação de Patrick Anderson Carvalho dos Santos, com a significância e os comprobatórios por commit | Patrick Anderson Carvalho dos Santos | -- |

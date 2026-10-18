@@ -371,3 +371,4 @@ FOWLER, Martin. **Patterns of Enterprise Application Architecture**. Boston: Add
 | 1.0 | 18/10/2026 | Criação da página: contexto, fundamentação, papéis no padrão e estrutura das seções por integrante | Pedro Luciano de Azevedo | -- |
 | 1.1 | 18/10/2026 | Modelagem UML genérica e aplicada; documentação do componente, do decorador abstrato e do domínio; rastreabilidade e visão crítica | Pedro Luciano de Azevedo | -- |
 | 1.2 | 18/10/2026 | Seção 5.2: refinamento `ComFiltroDeFacetas` (filtro cumulativo e contagem prévia por faceta disjuntiva), com trechos de código, exemplo de execução, custo registrado no SIG e elo com Casos de Uso e Máquina de Estados da Entrega 2 | Maria Clara Sena de Lima | -- |
+| 1.3 | 18/10/2026 | Seção 5.4: refinamento `ComFreteEPrazo`, com o elo a RN-A04 e à interface `IFrete` do Diagrama de Componentes da Entrega 2, e as nove asserções que verificam a fatia | Patrick Anderson Carvalho dos Santos | -- |

@@ -119,3 +119,4 @@ Há uma variante dessa falha específica de padrões de projeto: a IA é **entus
 | 1.0 | 18/10/2026 | Criação da página com a estrutura dos cinco relatos individuais | Pedro Luciano de Azevedo | -- |
 | 1.1 | 18/10/2026 | Redação do ponto de vista de Pedro Luciano de Azevedo sobre lições aprendidas e uso de IA generativa | Pedro Luciano de Azevedo | -- |
 | 1.2 | 18/10/2026 | Adiciona lições aprendidas e uso de IA generativa de Maria Clara | Maria Clara Sena de Lima | -- |
+| 1.3 | 18/10/2026 | Redação do ponto de vista de Patrick Anderson Carvalho dos Santos sobre lições aprendidas e uso de IA generativa | Patrick Anderson Carvalho dos Santos | -- |
