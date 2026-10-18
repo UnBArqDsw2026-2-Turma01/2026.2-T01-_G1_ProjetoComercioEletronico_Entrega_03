@@ -55,7 +55,75 @@ Código no repositório: [`src/criacionais/MeiosDePagamento(AbstractFactory)`](h
 
 ### 5.1. Contratos: fábrica e produtos abstratos — Pedro Luciano de Azevedo
 
-> _A preencher: `FabricaMeioPagamento`, `Autorizador`, `Comprovante` e `PoliticaEstorno`, com o trecho de código de cada contrato e a razão de o prazo de expiração e o caráter assíncrono estarem no autorizador — os dois vêm dos eventos de borda do BPMN 1._
+#### A fábrica abstrata
+
+```java
+public interface FabricaMeioPagamento {
+    MeioPagamento meio();
+    Autorizador criarAutorizador();
+    Comprovante criarComprovante();
+    PoliticaEstorno criarPoliticaEstorno();
+}
+```
+
+Três métodos de criação, um por produto da família. O cliente escolhe a fábrica uma única vez, no início do checkout, e dali em diante **nunca mais decide** qual autorizador, comprovante ou política de estorno usar — é isso que torna impossível, e não apenas improvável, combinar produtos de famílias diferentes.
+
+O método `meio()` não cria nada: devolve a constante de `MeioPagamento` que a família atende. Ele existe para o cliente registrar no pedido qual caminho foi seguido, sem precisar de `instanceof`.
+
+**A seleção da fábrica fica no cliente, não na interface.** Seria cômodo pôr aqui um `static FabricaMeioPagamento para(MeioPagamento meio)`, mas isso faria a fábrica abstrata conhecer todas as suas implementações concretas — exatamente a dependência que o padrão existe para eliminar. A escolha vive em `ServicoDeCheckout`, e está documentada na seção 5.6.
+
+#### Os três produtos abstratos
+
+```java
+public interface Autorizador {
+    Autorizacao autorizar(String pedido, Dinheiro valor);
+    int prazoLimiteEmMinutos();
+    boolean ehAssincrono();
+}
+```
+
+Os dois métodos além de `autorizar` vêm diretamente da Entrega 1, e não de conveniência de projeto:
+
+- **`prazoLimiteEmMinutos()`** é o evento de borda de temporizador que o BPMN 1 colocou sobre *Informar meio de pagamento*, e que a Máquina de Estados do Pedido traduziu como `after(tempo limite) → Expirado`. O prazo varia com o meio — um boleto não expira no mesmo tempo que um Pix —, então pertence à família, e não ao checkout.
+- **`ehAssincrono()`** distingue o meio cujo desfecho chega depois (boleto) daquele que responde na hora (Pix, saldo). É a diferença que decide se o pedido vai direto a `Pago` ou fica aguardando confirmação externa.
+
+```java
+public interface Comprovante {
+    String gerar(String pedido, Dinheiro valor, Autorizacao autorizacao);
+    String formato();
+}
+```
+
+`formato()` devolve o tipo do comprovante — "QR Code", "linha digitável", "recibo de parcelamento". É o método que torna visível, na demonstração, que o comprovante acompanha o meio: trocada a fábrica, o formato muda sem que o cliente peça.
+
+```java
+public interface PoliticaEstorno {
+    boolean podeEstornar(Autorizacao autorizacao);
+    String estornar(String pedido, Dinheiro valor);
+    int prazoDeDevolucaoEmDias();
+}
+```
+
+**Este é o produto que torna o Abstract Factory necessário.** Com apenas autorizador e comprovante, um Factory Method por meio resolveria. O estorno muda o quadro porque o caminho de volta do dinheiro **depende do caminho de ida**: não existe "estornar um boleto" — a devolução é por depósito; já o saldo em conta volta na hora. Autorizador e política de estorno precisam nascer juntos, e é exatamente isso que uma fábrica de famílias garante.
+
+A origem está no fluxo de reclamação do Rich Picture (Entrega 1), na ação *Estornar pagamento via operadora* do Diagrama de Atividades e na transição `Em disputa → Reembolsado` da Máquina de Estados (Entrega 2) — três artefatos, de três autores diferentes, apontando para a mesma operação.
+
+#### A classe de apoio `Autorizacao`
+
+```java
+public final class Autorizacao {
+    public enum Status { APROVADO, RECUSADO, EXPIRADO }
+    public static Autorizacao aprovada(String identificador, String detalhe) { ... }
+    public static Autorizacao recusada(String detalhe) { ... }
+    public static Autorizacao expirada(String detalhe) { ... }
+}
+```
+
+Os três estados não foram inventados: são os desfechos que a Máquina de Estados do Pedido já registrava. `APROVADO` leva a `Pago`, `RECUSADO` ao estado `Recusado` (evento de borda de erro do BPMN 1) e `EXPIRADO` ao estado `Expirado` (evento de borda de temporizador). As fábricas estáticas existem para que cada família não precise repetir a montagem do objeto.
+
+#### Domínio reaproveitado da Entrega 2
+
+`Dinheiro` (valor em centavos, com `parcelar(n)` sem perda de arredondamento) e `MeioPagamento` (as quatro constantes) vêm do Diagrama de Classes da Entrega 2, decisões 10 e 8 respectivamente. Nenhum dos dois foi criado para esta entrega — e é esse reaproveitamento que mantém o elo entre os três módulos do projeto.
 
 ### 5.2. Família Cartão de crédito — Patrick Anderson Carvalho dos Santos
 
@@ -118,3 +186,4 @@ FOWLER, Martin. **Patterns of Enterprise Application Architecture**. Boston: Add
 | Versão | Data | Descrição | Autor(es) | Revisor(es) |
 | -- | -- | -- | -- | -- |
 | 1.0 | 18/10/2026 | Criação da página: contexto, fundamentação, papéis no padrão e estrutura das seções por integrante | Pedro Luciano de Azevedo | -- |
+| 1.1 | 18/10/2026 | Documentação dos contratos: fábrica abstrata, os três produtos abstratos, a classe de apoio `Autorizacao` e o domínio reaproveitado da Entrega 2 | Pedro Luciano de Azevedo | -- |
