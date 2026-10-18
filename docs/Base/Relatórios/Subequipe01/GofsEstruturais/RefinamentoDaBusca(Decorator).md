@@ -457,16 +457,35 @@ Código: [`decorador/ComReputacaoDoVendedor.java`](https://github.com/UnBArqDsw2
 
 ## 6. Execução (vídeo com o padrão em execução)
 
-> _A preencher por **Pedro Luciano de Azevedo**, depois que as quatro fatias subirem: vídeo mostrando a mesma consulta respondida pelo catálogo cru e pela cadeia completa, com a composição exibida por `descricao()`._
+<div style="text-align:center;">
+
+[apresentacao-GOF-estrutural-subgrupo1.mp4](../Assets/apresentacao-GOF-estrutural-subgrupo1.mp4 ':include :type=video controls width=80%')
+
+<p><strong>Vídeo 1</strong> — O Decorator em execução: o catálogo cru, a cadeia completa de refinamentos, a aplicação de uma faceta, a reordenação e o ciclo da URL. <em>Autor: Pedro Luciano de Azevedo</em></p>
+
+</div>
+
+**O que o vídeo demonstra, bloco a bloco:**
+
+| Bloco | O que aparece | Regra |
+| -- | -- | -- |
+| 1 | O catálogo cru devolve 7 resultados sem faceta, sem ordem, sem frete e sem reputação — o componente concreto é pobre de propósito | — |
+| 2 | A mesma consulta pela cadeia completa: surgem as facetas com contagem prévia e cada cartão ganha frete, prazo e reputação. A linha `cadeia` exibe a pilha montada | RN-A03, RN-A04, RN-A05 |
+| 3 | O comprador aplica a faceta *categoria = Eletronicos*: de 7 para 4 resultados, exatamente o número que a contagem prévia antecipava, e as contagens de condição se recalculam | RN-A03, RF-A02 |
+| 4 | Reordenação por menor preço, com o filtro ainda aplicado — os refinamentos são cumulativos, não se substituem | RN-A02, RF-A03 |
+| 5 | A consulta inteira cabe na URL e é reconstruída idêntica a partir dela | RN-A06 |
+
+No bloco 2, repare que o anúncio mais pesado tem frete de **R$ 49,40** contra **R$ 39,40** dos demais: `ComFreteEPrazo` calcula por faixa de peso, e não aplica um valor fixo.
 
 **Como compilar e executar:**
 
-```bash
-cd "docs/Base/Relatórios/Subequipe01/src/estruturais/RefinamentoDaBusca(Decorator)"
-make run
+```powershell
+cd "docs\Base\Relatórios\Subequipe01\src\estruturais\RefinamentoDaBusca(Decorator)"
+javac -encoding UTF-8 -d out (Get-ChildItem -Recurse -Filter *.java | ForEach-Object FullName)
+java "-Dstdout.encoding=UTF-8" -cp out cliente.Main
 ```
 
-Pré-requisito: JDK 8 ou superior. Instruções completas no [README do artefato](https://github.com/UnBArqDsw2026-2-Turma01/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_03/tree/main/docs/Base/Relat%C3%B3rios/Subequipe01/src/estruturais).
+Pré-requisito: **JDK 8 ou superior**. O `-Dstdout.encoding=UTF-8` é necessário para que os acentos da saída apareçam corretamente no console do Windows — a partir do Java 19, `file.encoding` deixou de controlar a saída padrão. Quem tiver `make` instalado pode usar `make run`; as instruções completas, inclusive para Linux e para Git Bash, estão no [README do artefato](https://github.com/UnBArqDsw2026-2-Turma01/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_03/tree/main/docs/Base/Relat%C3%B3rios/Subequipe01/src/estruturais).
 
 ---
 
@@ -524,4 +543,5 @@ FOWLER, Martin. **Patterns of Enterprise Application Architecture**. Boston: Add
 | 1.3 | 18/10/2026 | Seção 5.4: refinamento `ComFreteEPrazo`, com o elo a RN-A04 e à interface `IFrete` do Diagrama de Componentes da Entrega 2, e as nove asserções que verificam a fatia | Patrick Anderson Carvalho dos Santos | -- |
 | 1.4 | 18/10/2026 | Seção 5.5: refinamento `ComReputacaoDoVendedor` (selo de reputação com nota, número de avaliações e tipo de vendedor, sem reordenar nem filtrar), com trecho de código, saída da cadeia com frete e reputação empilhados e elo com RN-A05 / RF-A05 e o Rich Picture; limite da fatia acrescentado à visão crítica | Guilherme Costa Zanella | -- |
 | 1.5 | 18/10/2026 | Seção 5.3: refinamento `ComOrdenacao` (ordenação por relevância, menor e maior preço, preservando ordem do catálogo para relevância como inferência declarada), saída real de execução, elo com Casos de Uso, Atividades e Componentes da Entrega 2 e limite na visão crítica | Guilherme Davila Rodrigues Carneiro Sampaio | -- |
+| 1.6 | 18/10/2026 | Seção 6: vídeo do padrão em execução, com a tabela do que cada bloco demonstra e as instruções de compilação atualizadas para o ambiente real da subequipe | Pedro Luciano de Azevedo | -- |
 
