@@ -60,11 +60,27 @@ Conforme o Foco 03 das Diretrizes, cada integrante registra aqui, individualment
 
 ### Lições aprendidas
 
---
+**O padrão não impede a combinação errada: ele faz com que ela não exista.** Eu entrei achando que o Abstract Factory *protegia* contra misturar um comprovante de boleto com uma autorização de cartão — como se houvesse uma checagem em algum lugar. Não há. O `ServicoDeCheckout` cria os três produtos no construtor, da mesma fábrica, e simplesmente não existe no código uma expressão que produza um produto isolado. A combinação inválida não é rejeitada; ela é **inalcançável**. É uma diferença que só ficou clara ao escrever o cliente e procurar onde colocar a validação — e descobrir que não havia onde.
+
+**A família do cartão foi a que mais ensinou porque é a única com três desfechos.** Pix, boleto e saldo respondem sim ou não. O cartão percorre os dois eventos de borda que eu mesmo tinha modelado no BPMN 1 da Entrega 1 — erro e temporizador — e que viraram `Recusado` e `Expirado` na Máquina de Estados. Implementar obrigou a ordenar as verificações: a janela é checada **antes** da operadora, porque um pedido expirado nunca chega a ser recusado. Essa ordem estava implícita no diagrama e só virou decisão explícita no código.
+
+**Um artefato de demonstração tem um problema que um sistema real não tem: como exercitar um caminho sem quebrar o padrão.** O desfecho expirado depende do tempo, e o contrato não tem parâmetro para isso. Fazer o `Main` instanciar um autorizador configurado resolveria — e destruiria a demonstração, porque o cliente passaria a conhecer uma classe concreta. A saída foi tornar a *fábrica* configurável: escolher a família é o que o padrão permite ao cliente. Aprendi que, num artefato que também serve para explicar, a forma de testar faz parte do que está sendo explicado.
+
+**Escrever para cinco pessoas em paralelo é um requisito de projeto, não um detalhe de processo.** Metade das famílias não existia quando escrevi o cliente. Uma referência direta a `FabricaBoleto` impediria o artefato de compilar, e registrar a família nova exigiria editar o meu arquivo — o que a ata proíbe. A solução, resolver as fábricas pelo nome da classe, é tecnicamente pior que um `switch`: troca uma verificação do compilador por uma falha em tempo de execução. Foi a decisão certa aqui e seria a errada em produção, e o que aprendi foi a registrar isso na página em vez de deixar parecer descuido.
+
+**O meu diagrama recusou três versões antes de sair.** Escrevi o gerador com três verificações — caixa contra caixa, nota contra caixa e **aresta contra caixa** — e as três acusaram erro que eu não tinha visto olhando a imagem: setas de realização atravessando classificadores, uma nota cobrindo uma fábrica. Na Entrega 2 eu tinha aprendido a conferir o texto contra o artefato; aqui aprendi que o artefato também pode se conferir, e que uma verificação automática encontra o que o olho perde em desenho denso.
 
 ### Uso da IA generativa (senso crítico)
 
---
+**O que pedi.** Tradução de notação e conferência, nunca escolha de padrão nem conteúdo de domínio. A evidência era nossa: os achados codificados da Entrega 1, os diagramas da Entrega 2 e os contratos que o Pedro fixou na reunião. A IA ajudou a manter o código no estilo dos contratos já publicados e a redigir no mesmo registro das outras seções da página.
+
+**Onde foi boa.** Em regra formal. Apontou que um `Class.forName(...).newInstance()` está depreciado desde o Java 9 e sugeriu a forma que funciona no JDK 8 sem avisos — o tipo de detalhe que não muda o desenho e faz o artefato compilar limpo. E foi útil como contraditora: pedir o argumento contrário a uma decisão minha produziu objeções melhores do que eu teria levantado sozinho.
+
+**Onde falhou, e é sempre o mesmo lugar.** Ao pedir a família do cartão, ela devolveu antifraude, tokenização e retentativa automática — plausíveis, convincentes e ausentes de qualquer coisa que a gente tenha observado. Nenhuma veio marcada como invenção. É a terceira entrega seguida em que registro exatamente isso, e o padrão não mudou: a fluência é idêntica quando ela cita RN-A04 e quando inventa um fluxo inteiro.
+
+**O erro que me pegou de novo foi de verificação, não de conteúdo.** Na Entrega 2, uma conferência que eu mesmo formulei deu "tudo certo" e havia três divergências, porque eu só olhava numa direção. Aqui aconteceu o equivalente em outro meio: olhei a imagem do diagrama, achei que estava boa, e só o verificador que eu escrevi depois mostrou arestas cruzando caixas. A lição que consolido é que o problema raramente é a ferramenta errar — é a pergunta ser estreita demais. A IA faz exatamente o que se pede, e uma pergunta mal formulada devolve um "tudo certo" indistinguível do verdadeiro.
+
+**A conclusão.** A IA foi útil na proporção direta da evidência que eu tinha para dar a ela. Sobre os meus recortes e os meus diagramas, acertou quase tudo e me corrigiu duas vezes. Sobre o que ninguém observou — tarifa de frete, prazo de fatura, limite de cartão —, produziu números igualmente fluentes e inteiramente inventados. Por isso os três estão no código com `DE_DEMONSTRACAO` no nome: não para enfeitar, mas porque a diferença entre observado e inventado não sobrevive sozinha ao texto.
 
 ---
 
