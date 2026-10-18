@@ -10,11 +10,23 @@ Conforme o Foco 03 das Diretrizes, cada integrante registra aqui, individualment
 
 ### Lições aprendidas
 
---
+**Uma família pode ser coerente por estado, e não só por tipo.** Na família Pix, o comprovante combina com o autorizador porque cita o identificador que ele gerou. No saldo em conta isso não basta: o autorizador debita o saldo, o comprovante informa quanto restou e o estorno credita de volta. Se cada produto tivesse o seu próprio saldo, os três implementariam as interfaces certas, e mesmo assim o comprovante mostraria um valor que não foi debitado. A `FabricaSaldoEmConta` resolve isso criando um único autorizador e entregando-o aos outros dois produtos. Aprendi que a "família" do Abstract Factory pode ser mais do que uma convenção de nomes: aqui, a fábrica é o único lugar do código que sabe que os três produtos falam do mesmo dinheiro.
+
+**Implementar o padrão revisou o meu próprio diagrama.** No Diagrama de Atividades da Entrega 2, modelei o reembolso como *Estornar pagamento via operadora*, em `fork` com a notificação, por ser uma chamada externa e demorada. Ao escrever o `EstornoSaldo` percebi que essa suposição não vale para todo meio: no saldo em conta não há operadora, e o estorno é um lançamento interno e imediato. O diagrama não estava errado para o cartão, mas tratava como regra geral algo que depende do meio. É o mesmo argumento que justifica o Abstract Factory no lugar do Factory Method — o caminho de volta do dinheiro depende do caminho de ida —, e eu só o enxerguei quando precisei escrever o caminho de volta de uma família específica.
+
+**No Decorator, a decisão mais importante da minha fatia foi o que ela não faz.** O `ComReputacaoDoVendedor` acrescenta o selo e não mexe na ordem nem no conjunto. Promover os mais bem avaliados seria fácil e pareceria útil, mas, no acervo, as lojas oficiais têm muito mais avaliações que os autônomos. Ordenar por reputação seria transformar em regra do sistema a vantagem de que o vendedor autônomo reclama no meu Rich Picture, sem nenhuma regra observada que sustentasse isso. Aprendi que um refinamento "só de exibição" carrega uma posição sobre o domínio, e que o padrão não protege essa posição: a mesma interface aceitaria um decorador que reordenasse.
+
+**Um contrato entre pessoas vale tanto quanto o contrato entre classes.** O meu roteiro dizia `FabricaSaldo`; o `CatalogoDeFabricas` do Patrick procurava `FabricaSaldoEmConta`. As duas versões compilavam, e a família simplesmente não aparecia na demonstração, com a mensagem "família ainda não entregue". Só rodando o `Main` dele o problema apareceu. Como a fábrica é resolvida pelo nome, o nome da classe virou parte do contrato da equipe, sem estar escrito em nenhuma interface.
 
 ### Uso da IA generativa (senso crítico)
 
---
+**Onde usei.** Como assistente de programação no terminal, com acesso ao repositório: para ler os contratos e as fatias já publicadas pelos colegas, implementar a família Saldo em conta e o `ComReputacaoDoVendedor`, testar as duas fatias isoladamente e redigir as minhas seções a partir dos meus artefatos das Entregas 1 e 2.
+
+**Onde ajudou.** Em conferir o meu trabalho contra o dos outros, que é onde eu sozinho teria demorado mais. Foi rodando o `Main` do Patrick, e não só a minha família isolada, que apareceu a diferença entre `FabricaSaldo` e `FabricaSaldoEmConta`. Também foi útil para testar a regra combinada na reunião — nenhum decorador altera a listagem recebida —, com uma verificação objetiva, e não só lendo o código: depois de decorada, a listagem de baixo continua sem selos.
+
+**Onde ela falha: vai além do combinado e completa com o plausível.** Na primeira versão, a IA acrescentou à família uma quinta classe, que não estava no contrato combinado. Funcionava, mas fugia do que a equipe tinha acertado; recusei, e a família foi refeita nos quatro arquivos do roteiro. Por isso trabalhei por partes: a IA escrevia e testava uma parte, e eu revisava e commitava antes de seguir para a próxima. No texto da seção do Decorator, escreveu que as lojas oficiais têm mais avaliações "como na plataforma observada" e citou "a medalha por volume de vendas" como dimensão da reputação: nenhuma das duas coisas está em qualquer registro nosso. Soavam como conhecimento de domínio e passariam numa leitura rápida. Saíram na conferência contra o acervo de demonstração e contra a tabela de RN-A da Engenharia Reversa.
+
+**O que levo.** A IA foi mais útil quando a usei para **conferir** — o meu código contra o dos colegas, o texto contra o acervo, a regra contra a execução — do que quando a deixei **produzir e decidir** sozinha. As saídas copiadas nas minhas seções são as reais, os números vêm do `CatalogoEmMemoria`, e o que não tem fonte ficou marcado como **inferido**, no código e no texto. No saldo em conta isso é quase tudo, e prefiro dizer isso a esconder.
 
 ---
 
@@ -120,3 +132,4 @@ Há uma variante dessa falha específica de padrões de projeto: a IA é **entus
 | 1.1 | 18/10/2026 | Redação do ponto de vista de Pedro Luciano de Azevedo sobre lições aprendidas e uso de IA generativa | Pedro Luciano de Azevedo | -- |
 | 1.2 | 18/10/2026 | Adiciona lições aprendidas e uso de IA generativa de Maria Clara | Maria Clara Sena de Lima | -- |
 | 1.3 | 18/10/2026 | Redação do ponto de vista de Patrick Anderson Carvalho dos Santos sobre lições aprendidas e uso de IA generativa | Patrick Anderson Carvalho dos Santos | -- |
+| 1.4 | 18/10/2026 | Redação do ponto de vista de Guilherme Costa Zanella sobre lições aprendidas e uso de IA generativa | Guilherme Costa Zanella | -- |
