@@ -131,7 +131,86 @@ Os três estados não foram inventados: são os desfechos que a Máquina de Esta
 
 ### 5.3. Família Pix — Maria Clara Sena de Lima
 
-> _A preencher: autorização imediata, comprovante em QR Code e estorno por devolução; trecho de código; o que foi observado e o que é inferido._
+A família Pix existe na demonstração para fazer **contraste com o boleto**. Os dois meios respondem às mesmas três perguntas da `FabricaMeioPagamento` com respostas opostas. Esse contraste mostra que a fábrica abstrata separa famílias diferentes de fato, e não variações cosméticas de uma mesma família.
+
+| Produto | Classe | Resposta do Pix | Contraste com o boleto |
+| -- | -- | -- | -- |
+| Fábrica concreta | `FabricaPix` | `meio()` devolve `MeioPagamento.PIX` | `FabricaBoleto` |
+| Autorizador | `AutorizadorPix` | Síncrono: `ehAssincrono()` é `false` e o desfecho volta na mesma chamada | O boleto fica em `Autorizando` até a compensação |
+| Comprovante | `ComprovantePix` | `formato()` é `"QR Code"` e o texto cita o identificador da transação gerado pelo `AutorizadorPix` | Linha digitável |
+| Política de estorno | `EstornoPix` | Devolução para a conta de origem, no mesmo dia (`prazoDeDevolucaoEmDias()` é `0`) | Depósito em conta informada pelo comprador |
+
+**A fábrica.** É a única classe da família que o `ServicoDeCheckout` chega a ver, e mesmo assim só como `FabricaMeioPagamento`. As classes do pacote `familias.pix` ficam invisíveis para o cliente:
+
+```java
+public final class FabricaPix implements FabricaMeioPagamento {
+
+    @Override public MeioPagamento meio()                   { return MeioPagamento.PIX; }
+    @Override public Autorizador criarAutorizador()         { return new AutorizadorPix(); }
+    @Override public Comprovante criarComprovante()         { return new ComprovantePix(); }
+    @Override public PoliticaEstorno criarPoliticaEstorno() { return new EstornoPix(); }
+}
+```
+
+**De onde vem o Pix como família.** O Pix não aparece pela primeira vez nesta entrega. Na Entrega 2, ele é uma das quatro constantes da enumeração `MeioPagamento` no Diagrama de Classes da Subequipe 01. No [Diagrama de Classes da Subequipe 03](https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_02/#/Base/Relat%C3%B3rios/Subequipe03/ModelagemEstatica/DiagramaDeClasses), ele já tinha comportamento próprio: um `ProcessadorPix` separado do `ProcessadorCartao`, para que `Pagamento` não precisasse de `if metodo == PIX ... else if metodo == CARTAO`. O `AutorizadorPix` é esse processador. A diferença é que agora ele não vem sozinho: nasce na mesma fábrica que o comprovante e o estorno que precisam combinar com ele.
+
+**Autorização imediata.** No Pix o desfecho volta na mesma chamada. Por isso o pedido passa direto de `Autorizando` para `Pago`, ou para `Recusado`, na [Máquina de Estados do Pedido](https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_02/#/Base/Relat%C3%B3rios/Subequipe01/ModelagemDinamica/DiagramaDeMaquinaDeEstados) (Entrega 2), sem ficar esperando compensação:
+
+```java
+@Override
+public Autorizacao autorizar(String pedido, Dinheiro valor) {
+    if (valor.centavos() == 0) {
+        return Autorizacao.recusada("Pix sem valor nao pode ser gerado");
+    }
+    return Autorizacao.aprovada("PIX-" + pedido,
+            "Pix confirmado na hora; sem espera por compensacao");
+}
+
+@Override public int prazoLimiteEmMinutos() { return PRAZO_DE_DEMONSTRACAO_EM_MINUTOS; }
+@Override public boolean ehAssincrono()     { return false; }
+```
+
+**Por que o prazo é "de demonstração".** A Máquina de Estados do Pedido deixou `after(tempo limite)` **sem valor numérico de propósito**: "escrever `after(30min)` seria inventar um número" (Entrega 2, decisão 2). O prazo nunca foi observado, porque o Recorte B da Entrega 1 parou antes da tela de pagamento. Como o contrato `Autorizador` exige um `int`, a família devolve uma constante cujo nome diz o que ela é: um parâmetro para a demonstração rodar, e não uma afirmação sobre a plataforma. O mesmo vale para `prazoDeDevolucaoEmDias()` no `EstornoPix`.
+
+**Por que comprovante e estorno precisam ser da mesma família.** O `ComprovantePix` imprime o identificador que o `AutorizadorPix` gerou. O `EstornoPix` devolve o dinheiro para a conta de origem e só aceita estornar quando o Pix original foi confirmado:
+
+```java
+@Override
+public boolean podeEstornar(Autorizacao autorizacao) {
+    // So existe o que devolver se o Pix original foi confirmado.
+    return autorizacao.aprovada();
+}
+```
+
+Um `ComprovantePix` aplicado a uma autorização de boleto apontaria para uma transação Pix que não existe. Um `EstornoPix` aplicado a um cartão devolveria o dinheiro por um caminho diferente do de ida. São exatamente as combinações que a `FabricaPix` impede ao criar os três produtos juntos.
+
+**Saída da família em execução**: chamada isolada dos três produtos, antes de o `Main` integrar as quatro famílias, para o pedido `PED-1001` de R$ 159,90:
+
+```text
+Pix | assincrono=false | prazo=30min | QR Code
+APROVADO (PIX-PED-1001) - Pix confirmado na hora; sem espera por compensacao
+Comprovante Pix
+  Pedido ........: PED-1001
+  Valor .........: R$ 159,90
+  Transacao .....: PIX-PED-1001
+  QR Code .......: [PIX-PED-1001|15990]
+  Situacao ......: pago na hora
+Devolucao Pix de R$ 159,90 do pedido PED-1001 enviada para a conta de origem
+```
+
+**De onde vem cada decisão da família.** Cada elemento tem uma de três fontes: um modelo das Entregas 1 e 2, uma decisão da reunião de 18/10 ou um parâmetro de demonstração. Os parâmetros de demonstração existem só porque o contrato exige um valor que nenhuma entrega observou.
+
+| Elemento | Fonte |
+| -- | -- |
+| Pix como família própria | Enumeração `MeioPagamento`, Diagrama de Classes da Subequipe 01 (Entrega 2); `ProcessadorPix`, Diagrama de Classes da Subequipe 03 (Entrega 2) |
+| Desfechos `APROVADO` e `RECUSADO` | Estados `Pago` e `Recusado` da Máquina de Estados do Pedido (Entrega 2); evento de borda de erro do BPMN 1 (Entrega 1) |
+| Existência de um prazo para pagar | `after(tempo limite) → Expirado` na Máquina de Estados do Pedido; evento de borda de temporizador do BPMN 1 |
+| Estorno pelo caminho de ida | Estorno via instituição financeira no Rich Picture (Entrega 1); *Estornar pagamento via operadora* por `IPagamento` no Diagrama de Atividades e no de Componentes; `Em disputa → Reembolsado / estornar pagamento` (Entrega 2) |
+| `ehAssincrono() == false` e formato `"QR Code"` | Contratos fixados na [reunião de 18/10/2026](/ReunioesAtas/Subequipe1/Ata18_10.md): o Pix é o contraste com o boleto |
+| 30 minutos de prazo e devolução em 0 dias | Parâmetros de demonstração. O valor real não foi observado, porque o Recorte B parou antes da tela de pagamento, e a Entrega 2 deixou `after(tempo limite)` sem número pelo mesmo motivo |
+| Conteúdo do QR Code e identificador `PIX-<pedido>` | Simulação, para que a demonstração seja reproduzível |
+
+Código: [`fabrica/FabricaPix.java`](https://github.com/UnBArqDsw2026-2-Turma01/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_03/tree/main/docs/Base/Relat%C3%B3rios/Subequipe01/src/criacionais/MeiosDePagamento(AbstractFactory)/fabrica/FabricaPix.java) e [`familias/pix/`](https://github.com/UnBArqDsw2026-2-Turma01/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_03/tree/main/docs/Base/Relat%C3%B3rios/Subequipe01/src/criacionais/MeiosDePagamento(AbstractFactory)/familias/pix).
 
 ### 5.4. Família Boleto — Guilherme Davila Rodrigues Carneiro Sampaio
 
@@ -187,3 +266,4 @@ FOWLER, Martin. **Patterns of Enterprise Application Architecture**. Boston: Add
 | -- | -- | -- | -- | -- |
 | 1.0 | 18/10/2026 | Criação da página: contexto, fundamentação, papéis no padrão e estrutura das seções por integrante | Pedro Luciano de Azevedo | -- |
 | 1.1 | 18/10/2026 | Documentação dos contratos: fábrica abstrata, os três produtos abstratos, a classe de apoio `Autorizacao` e o domínio reaproveitado da Entrega 2 | Pedro Luciano de Azevedo | -- |
+| 1.2 | 18/10/2026 | Seção 5.3: família Pix (fábrica, autorizador síncrono, comprovante em QR Code e devolução), com trechos de código e rastreabilidade de cada decisão às Entregas 1 e 2 (`ProcessadorPix`, Máquina de Estados do Pedido) | Maria Clara Sena de Lima | -- |

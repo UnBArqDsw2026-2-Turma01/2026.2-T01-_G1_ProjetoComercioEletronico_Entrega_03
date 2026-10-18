@@ -173,7 +173,76 @@ Três decisões neste trecho:
 
 ### 5.2. `ComFiltroDeFacetas` — Maria Clara Sena de Lima
 
-> _A preencher: como o refinamento filtra os itens pelos filtros da consulta e monta as facetas com a contagem prévia (RN-A03 / RF-A02); trecho de código; por que a contagem é calculada antes de o comprador filtrar e o que isso custa, conforme o SIG da Entrega 1._
+`ComFiltroDeFacetas` é o refinamento que carrega **RN-A03 / RF-A02**: as facetas são cumulativas, e cada opção exibe **antes do clique** quantos resultados restarão. O decorador tem duas responsabilidades, sempre nesta ordem:
+
+1. **montar as facetas** contando sobre a listagem que recebeu, antes de filtrar;
+2. **filtrar os itens** pelos filtros da consulta: `categoria` (por exemplo, `Eletronicos`) e `condicao` (`NOVO` / `USADO`).
+
+```java
+@Override
+public Listagem buscar(ConsultaCatalogo consulta) {
+    Listagem recebida = super.buscar(consulta);
+
+    // 1) contagem previa, calculada sobre a listagem recebida
+    List<Faceta> facetas = new ArrayList<Faceta>();
+    for (String dimensao : DIMENSOES) {
+        facetas.addAll(contar(dimensao, recebida.itens(), consulta));
+    }
+
+    // 2) filtro cumulativo: o item precisa passar em todas as dimensoes
+    List<ItemListagem> filtrados = new ArrayList<ItemListagem>();
+    for (ItemListagem item : recebida.itens()) {
+        if (passaNosFiltros(item, consulta, null)) {
+            filtrados.add(item);
+        }
+    }
+
+    return recebida.comItens(filtrados).comFacetas(facetas);
+}
+```
+
+**Nunca altera o que recebeu.** O retorno é `recebida.comItens(...).comFacetas(...)`, uma `Listagem` nova. A listagem de quem está embaixo na cadeia continua intacta, conforme a regra combinada na reunião de 18/10.
+
+**Contagem prévia em filtros cumulativos.** Contar as opções sobre todos os itens recebidos funcionaria quando nenhum filtro está ativo, mas daria um número errado quando há um: com `categoria=Eletronicos` aplicado, "condição: USADO" deve dizer quantos **eletrônicos** usados existem, porque é isso que resta se o comprador clicar. Por isso cada dimensão é contada sobre os itens que passam nos filtros **das outras dimensões**, e o filtro da própria dimensão é ignorado:
+
+```java
+private static List<Faceta> contar(String dimensao, List<ItemListagem> itens, ConsultaCatalogo consulta) {
+    Map<String, Integer> contagem = new LinkedHashMap<String, Integer>();
+    for (ItemListagem item : itens) {
+        if (!passaNosFiltros(item, consulta, dimensao)) {   // ignora so a propria dimensao
+            continue;
+        }
+        String opcao = valor(item, dimensao);
+        Integer atual = contagem.get(opcao);
+        contagem.put(opcao, atual == null ? 1 : atual + 1);
+    }
+    ...
+}
+```
+
+Ignorar a própria dimensão é o que mantém as outras categorias visíveis, cada uma com a sua contagem, depois que o comprador escolhe uma. Assim ele pode trocar de categoria sem desfazer a busca. Na busca por "fone de ouvido":
+
+| Consulta | Itens | Facetas devolvidas |
+| -- | -- | -- |
+| sem filtro | 7 | categoria: Eletronicos (4), Games (1), Esportes (1), Acessorios (1) · condicao: NOVO (6), USADO (1) |
+| `categoria=Eletronicos` | 4 | categoria: Eletronicos (4), Games (1), Esportes (1), Acessorios (1) · condicao: **NOVO (3)**, USADO (1) |
+| `categoria=Eletronicos&condicao=USADO` | 1 | categoria: **Eletronicos (1)** · condicao: NOVO (3), USADO (1) |
+
+Na segunda linha, NOVO (3) + USADO (1) somam exatamente os 4 eletrônicos listados. Na terceira, cada número é o que o comprador veria ao trocar a opção daquela dimensão.
+
+**Por que contar antes de filtrar, e o que isso custa.** Foi o que a observação registrou: a contagem chega pronta na resposta da busca, e não é calculada depois do clique. Por isso `Faceta.contagemPrevia` é atributo, e não cálculo sob demanda. O preço está no SIG da Entrega 1, como contribuição negativa sobre *Tempo de Resposta*: o decorador percorre a listagem uma vez por dimensão de faceta, mais uma vez para filtrar. Com duas dimensões e um acervo em memória o custo é desprezível. Em um catálogo real, ele cresce com o número de dimensões e é o primeiro candidato a ir para um índice.
+
+**Elo com a Entrega 2.**
+
+| Elemento | Entrega 2 |
+| -- | -- |
+| O decorador é opcional e só atua sobre uma busca que já trouxe resultados | Caso de uso *Filtrar Resultados*, `«extend»` de *Buscar Produtos* no [Diagrama de Casos de Uso](https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_02/#/Base/Relat%C3%B3rios/Subequipe02/ModelagemEstatica/DiagramaDeCasosDeUso) |
+| Alterar um filtro gera uma nova chamada a `buscar()`, que atravessa a cadeia inteira | Transição `ExibindoResultados → Buscando → ExibindoResultados` da [Máquina de Estados da busca](https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_02/#/Base/Relat%C3%B3rios/Subequipe02/ModelagemDinamica/DiagramaDeMaquinaDeEstados); a decisão de reutilizar `Buscando` para filtros, ordenação e paginação é a mesma que faz todos os refinamentos rodarem dentro de uma única chamada |
+| O filtro escolhido vive na consulta, e não no decorador | `ConsultaCatalogo` imutável e serializável na URL (RN-A06): o decorador lê `consulta.filtro(...)` e não guarda estado entre buscas |
+
+**Limites desta fatia.** O caso de uso *Filtrar Resultados* cita categoria, preço, condição e frete. Esta fatia implementa as duas dimensões combinadas na reunião, categoria e condição. Faixa de preço e frete grátis ficam de fora: a faixa de preço pede intervalos em vez de valores discretos, e o frete depende de `ComFreteEPrazo` estar **abaixo** deste decorador na cadeia. Filtros com chaves que o decorador não conhece são ignorados por ele, sem erro, e ficam disponíveis para outro refinamento tratar.
+
+Código: [`decorador/ComFiltroDeFacetas.java`](https://github.com/UnBArqDsw2026-2-Turma01/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_03/tree/main/docs/Base/Relat%C3%B3rios/Subequipe01/src/estruturais/RefinamentoDaBusca(Decorator)/decorador/ComFiltroDeFacetas.java).
 
 ### 5.3. `ComOrdenacao` — Guilherme Davila Rodrigues Carneiro Sampaio
 
@@ -252,3 +321,4 @@ FOWLER, Martin. **Patterns of Enterprise Application Architecture**. Boston: Add
 | -- | -- | -- | -- | -- |
 | 1.0 | 18/10/2026 | Criação da página: contexto, fundamentação, papéis no padrão e estrutura das seções por integrante | Pedro Luciano de Azevedo | -- |
 | 1.1 | 18/10/2026 | Modelagem UML genérica e aplicada; documentação do componente, do decorador abstrato e do domínio; rastreabilidade e visão crítica | Pedro Luciano de Azevedo | -- |
+| 1.2 | 18/10/2026 | Seção 5.2: refinamento `ComFiltroDeFacetas` (filtro cumulativo e contagem prévia por faceta disjuntiva), com trechos de código, exemplo de execução, custo registrado no SIG e elo com Casos de Uso e Máquina de Estados da Entrega 2 | Maria Clara Sena de Lima | -- |

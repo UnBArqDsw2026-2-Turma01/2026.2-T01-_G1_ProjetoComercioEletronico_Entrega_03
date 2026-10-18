@@ -34,11 +34,25 @@ Conforme o Foco 03 das Diretrizes, cada integrante registra aqui, individualment
 
 ### Lições aprendidas
 
---
+**O Abstract Factory protege a coerência, e não a criação.** Instanciar um `AutorizadorPix` é trivial; qualquer `new` resolve. O que a `FabricaPix` garante é outra coisa: que esse autorizador nunca chegue ao checkout acompanhado de um comprovante ou de uma política de estorno de outro meio. Ficou claro quando o `ComprovantePix` passou a citar o identificador gerado pelo `AutorizadorPix` — os dois só fazem sentido juntos, e a fábrica é o único lugar que os cria. É por isso que o Factory Method não bastava: ele resolveria a criação de cada produto, mas não o vínculo entre eles.
+
+**Uma família só mostra o padrão em contraste com outra.** Sozinha, a família Pix parece apenas uma implementação de três interfaces. É ao lado do boleto que ela mostra o padrão funcionando: as mesmas três perguntas do contrato — a autorização sai na hora? o que o comprador recebe? em quanto tempo o dinheiro volta? — recebem respostas opostas. Aprendi que, num padrão de famílias, a diferença entre as famílias é o que justifica a abstração; quatro famílias quase iguais seriam só variações cosméticas.
+
+**O `«extend»` que eu modelei virou código.** No Diagrama de Casos de Uso da Entrega 2, *Filtrar Resultados* é `«extend»` de *Buscar Produtos*: opcional, e só faz sentido depois que a busca trouxe resultados. O `ComFiltroDeFacetas` é exatamente isso — envolve uma fonte que já devolve resultados e acrescenta o filtro sobre ela, sem que o catálogo saiba que ele existe. A implementação também deu razão a uma decisão da minha Máquina de Estados da busca: reutilizar o estado `Buscando` para filtros, ordenação e paginação. No código, todos os refinamentos rodam dentro de uma única chamada a `buscar()`; não haveria por que ter um estado de espera para cada um.
+
+**Uma regra simples pode esconder um detalhe que só aparece ao implementar.** "A contagem prévia é calculada antes de filtrar" parece suficiente até haver um filtro ativo. Com `categoria=Eletronicos` aplicado, a opção "USADO" precisa dizer quantos *eletrônicos* usados restam, e não quantos usados existem no total. A solução foi contar cada dimensão aplicando os filtros das outras. A regra RN-A03 estava certa; o que faltava era descobrir o que ela exige quando os filtros se acumulam — e isso só apareceu testando com consultas reais.
+
+**A imutabilidade é o que torna a pilha segura.** Como cada decorador devolve uma `Listagem` nova, o meu refinamento não precisa saber quem está embaixo nem em cima dele. Foi a regra combinada na reunião que mais simplificou o meu trabalho: pude implementar e testar a minha fatia sem esperar a dos outros.
 
 ### Uso da IA generativa (senso crítico)
 
---
+**Onde usei.** Como apoio na implementação e na redação: para ler os contratos já publicados, implementar a família Pix e o `ComFiltroDeFacetas`, testar o código e estruturar as minhas seções nas páginas dos padrões.
+
+**Onde ajudou.** Em apontar casos que eu não tinha considerado. Foi a IA que levantou que a contagem prévia ficaria errada com filtros ativos e propôs contar cada dimensão separadamente — e essa proposta eu consegui conferir de forma objetiva, rodando três consultas e somando as contagens à mão. Também foi útil para manter o código no estilo dos contratos que o Pedro já tinha publicado.
+
+**Onde ela falha.** Ao preencher lacunas com o que é plausível, sem avisar que está preenchendo. O caso mais claro foi no meu próprio artefato: ao citar a Máquina de Estados da busca, a IA escreveu nomes de estados que soavam certos e não existem no diagrama que eu fiz na Entrega 2. Em outro ponto, descreveu uma "primeira versão" do decorador que nunca foi implementada, como se fosse histórico do trabalho. Nos dois casos, o texto estava bem escrito e coerente, e era exatamente isso que tornava o erro difícil de ver.
+
+**O que levo.** A IA escreve com a mesma segurança quando acerta e quando inventa, então a revisão não pode ser feita em cima da própria resposta dela. O que funcionou foi conferir cada afirmação contra a fonte — o diagrama da Entrega 2, a ata, a saída do programa. 
 
 ---
 
@@ -88,3 +102,4 @@ Há uma variante dessa falha específica de padrões de projeto: a IA é **entus
 | -- | -- | -- | -- | -- |
 | 1.0 | 18/10/2026 | Criação da página com a estrutura dos cinco relatos individuais | Pedro Luciano de Azevedo | -- |
 | 1.1 | 18/10/2026 | Redação do ponto de vista de Pedro Luciano de Azevedo sobre lições aprendidas e uso de IA generativa | Pedro Luciano de Azevedo | -- |
+| 1.2 | 18/10/2026 | Adiciona lições aprendidas e uso de IA generativa de Maria Clara | Maria Clara Sena de Lima | -- |
