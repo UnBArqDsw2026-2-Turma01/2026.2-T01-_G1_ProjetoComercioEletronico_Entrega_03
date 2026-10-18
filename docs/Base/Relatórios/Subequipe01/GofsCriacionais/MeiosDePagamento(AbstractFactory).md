@@ -321,7 +321,105 @@ Código: [`fabrica/FabricaPix.java`](https://github.com/UnBArqDsw2026-2-Turma01/
 
 ### 5.4. Família Boleto — Guilherme Davila Rodrigues Carneiro Sampaio
 
-> _A preencher: autorização assíncrona (compensação), comprovante com linha digitável e estorno por depósito; trecho de código; elo com o componente externo `Operadora de Pagamento` do Diagrama de Componentes._
+O boleto bancário é a família que materializa o comportamento **essencialmente assíncrono** do pagamento e a **assimetria do estorno**. Enquanto no Pix e no saldo a autorização sai na mesma chamada e o cartão obtém desfecho síncrono com a adquirente, o boleto bancário depende do tempo de compensação da rede bancária. Além disso, a devolução não volta pelo mesmo canal de ida — não existe a operação técnica de "estornar um boleto bancário", exigindo depósito em conta corrente indicada pelo comprador. Essa assimetria operacional entre autorização e devolução é precisamente o tipo de problema que justifica a adoção do padrão Abstract Factory: os três produtos precisam nascer com garantias de compatibilidade mútua.
+
+| Produto | Classe | Resposta do Boleto | Contraste com os demais meios |
+| -- | -- | -- | -- |
+| Fábrica concreta | `FabricaBoleto` | `meio()` devolve `MeioPagamento.BOLETO` | `FabricaCartao`, `FabricaPix`, `FabricaSaldoEmConta` |
+| Autorizador | `AutorizadorBoleto` | Assíncrono (`ehAssincrono()` é `true`): pedido fica em `Autorizando` até liquidação | Pix e Saldo respondem na hora; Cartão contata adquirente no momento |
+| Comprovante | `ComprovanteBoleto` | `formato()` é `"linha digitável"` com representação numérica para pagamento | QR Code (Pix), recibo com parcelamento (Cartão), recibo de débito (Saldo) |
+| Política de estorno | `EstornoBoleto` | Devolução por depósito bancário (`prazoDeDevolucaoEmDias()` é `3`) | Cartão estorna na fatura; Pix devolve na conta de origem; Saldo credita na hora |
+
+**A fábrica concreta.** O cliente (`ServicoDeCheckout`) interage apenas através da interface `FabricaMeioPagamento`, desconhecendo completamente a existência das classes em `familias.boleto`:
+
+```java
+public final class FabricaBoleto implements FabricaMeioPagamento {
+
+    @Override public MeioPagamento meio()                   { return MeioPagamento.BOLETO; }
+    @Override public Autorizador criarAutorizador()         { return new AutorizadorBoleto(); }
+    @Override public Comprovante criarComprovante()         { return new ComprovanteBoleto(); }
+    @Override public PoliticaEstorno criarPoliticaEstorno() { return new EstornoBoleto(); }
+}
+```
+
+**Autorização assíncrona.** A emissão do boleto gera uma autorização com status aprovado para fins de geração da cobrança, mas declara explicitamente `ehAssincrono() == true`. Na [Máquina de Estados do Pedido](https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_02/#/Base/Relat%C3%B3rios/Subequipe01/ModelagemDinamica/DiagramaDeMaquinaDeEstados) (Entrega 2), isso significa que o pedido permanece em `Autorizando` até que o evento assíncrono de conciliação bancária traga a confirmação do pagamento:
+
+```java
+@Override
+public Autorizacao autorizar(String pedido, Dinheiro valor) {
+    if (valor.centavos() == 0) {
+        return Autorizacao.recusada("Boleto com valor zero nao pode ser emitido");
+    }
+    return Autorizacao.aprovada("BOL-" + pedido,
+            "Boleto gerado aguardando compensacao bancaria (assincrono)");
+}
+
+@Override public int prazoLimiteEmMinutos() { return PRAZO_DE_DEMONSTRACAO_EM_MINUTOS; } // 4320 min (3 dias)
+@Override public boolean ehAssincrono()     { return true; }
+```
+
+**Comprovante com linha digitável.** Ao contrário de um comprovante pós-pago ou QR Code dinâmico, o boleto entrega a linha digitável simulada que permite o pagamento na rede bancária:
+
+```java
+@Override
+public String gerar(String pedido, Dinheiro valor, Autorizacao autorizacao) {
+    if (!autorizacao.aprovada()) {
+        return "Boleto do pedido " + pedido + " nao pode ser emitido: " + autorizacao.detalhe();
+    }
+    String codigoBanco = "341";
+    String linhaDigitavel = String.format("%s91.00000 00000.000000 00000.000000 8 %010d",
+            codigoBanco, valor.centavos());
+
+    return "Boleto Bancario\n"
+            + "  Pedido ........: " + pedido + "\n"
+            + "  Valor .........: " + valor + "\n"
+            + "  Transacao .....: " + autorizacao.identificador() + "\n"
+            + "  Linha digitavel: " + linhaDigitavel + "\n"
+            + "  Situacao ......: emitido, aguardando compensacao";
+}
+
+@Override public String formato() { return "linha digitavel"; }
+```
+
+**Política de estorno e a assimetria do boleto.** O `EstornoBoleto` evidencia o porquê da necessidade do Abstract Factory. Um comprador não pode receber estorno de boleto no mesmo canal da emissão; é mandatório solicitar os dados bancários para depósito em conta corrente. A coerência entre os produtos impede que o checkout aplique uma rotina de estorno automático via gateway ou de crédito em fatura:
+
+```java
+@Override
+public boolean podeEstornar(Autorizacao autorizacao) {
+    return autorizacao.aprovada();
+}
+
+@Override
+public String estornar(String pedido, Dinheiro valor) {
+    return "Devolucao de " + valor + " do pedido " + pedido
+            + " solicitada via deposito em conta corrente indicada pelo comprador";
+}
+
+@Override public int prazoDeDevolucaoEmDias() { return PRAZO_DE_DEMONSTRACAO_EM_DIAS; } // 3 dias
+```
+
+**Elo com a modelagem das Entregas 1 e 2.**
+- **Diagrama de Componentes (Subequipe 02, Entrega 2):** o componente externo `Operadora de Pagamento` e a integração com sistemas bancários externos refletem a dependência de serviços externos para a liquidação do título.
+- **Diagrama de Classes (Subequipe 01, Entrega 2):** constante `BOLETO` na enumeração `MeioPagamento`.
+- **Diagrama de Atividades (Entrega 2):** a ação *Estornar pagamento via operadora* no encerramento da disputa/reclamação recebe aqui a especialização concreta adequada ao meio não rastreável de devolução.
+
+**Saída real da família em execução no `cliente.Main`:**
+
+```text
+- Boleto bancario | comprovante em linha digitavel | janela de 4320 min | compensacao assincrona | devolucao em 3 dia(s)
+  autorizacao: APROVADO (BOL-PED-2026-0001) - Boleto gerado aguardando compensacao bancaria (assincrono)
+  Boleto Bancario
+    Pedido ........: PED-2026-0001
+    Valor .........: R$ 299,90
+    Transacao .....: BOL-PED-2026-0001
+    Linha digitavel: 34191.00000 00000.000000 00000.000000 8 0000029990
+    Situacao ......: emitido, aguardando compensacao
+  reembolso: Devolucao de R$ 299,90 do pedido PED-2026-0001 solicitada via deposito em conta corrente indicada pelo comprador (prazo de 3 dia(s))
+```
+
+**O que é inferido nesta família:** o prazo de vencimento de 3 dias (4320 minutos), o prazo de depósito de 3 dias úteis e o formato exato da linha digitável simulada. Como o Recorte B da Engenharia Reversa (Entrega 1) encerrou antes da emissão definitiva da cobrança para não gerar custo financeiro real, esses detalhes foram inferidos com base nas práticas mercadológicas e declarados explicitamente no código como parâmetros de demonstração.
+
+Código: [`fabrica/FabricaBoleto.java`](https://github.com/UnBArqDsw2026-2-Turma01/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_03/tree/main/docs/Base/Relat%C3%B3rios/Subequipe01/src/criacionais/MeiosDePagamento(AbstractFactory)/fabrica/FabricaBoleto.java) e [`familias/boleto/`](https://github.com/UnBArqDsw2026-2-Turma01/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_03/tree/main/docs/Base/Relat%C3%B3rios/Subequipe01/src/criacionais/MeiosDePagamento(AbstractFactory)/familias/boleto).
 
 ### 5.5. Família Saldo em conta — Guilherme Costa Zanella
 
@@ -543,3 +641,5 @@ FOWLER, Martin. **Patterns of Enterprise Application Architecture**. Boston: Add
 | 1.2 | 18/10/2026 | Seção 5.3: família Pix (fábrica, autorizador síncrono, comprovante em QR Code e devolução), com trechos de código e rastreabilidade de cada decisão às Entregas 1 e 2 (`ProcessadorPix`, Máquina de Estados do Pedido) | Maria Clara Sena de Lima | -- |
 | 1.3 | 18/10/2026 | Seções 2, 3, 5.2, 5.6 e 6: consequências do GoF e contraste com Builder e Prototype; modelagem UML genérica e aplicada; família Cartão de crédito com os três desfechos; cliente `ServicoDeCheckout` e seleção de família; roteiro de execução | Patrick Anderson Carvalho dos Santos | -- |
 | 1.4 | 18/10/2026 | Seção 5.5: família Saldo em conta (fábrica que entrega o mesmo autorizador ao comprovante e ao estorno, autorização interna, recibo de débito em conta e estorno imediato), com trechos de código, saída de execução, fonte de cada decisão e o limite que a família revela no Diagrama de Atividades da Entrega 2 | Guilherme Costa Zanella | -- |
+| 1.5 | 18/10/2026 | Seção 5.4: família Boleto bancário (autorização assíncrona, comprovante com linha digitável e estorno assimétrico por depósito), com trechos de código, saída real de execução, elo com o componente externo do Diagrama de Componentes e parâmetros de demonstração | Guilherme Davila Rodrigues Carneiro Sampaio | -- |
+
