@@ -1,0 +1,27 @@
+# Relatório de Participações da Subequipe 01
+
+Contribuições individuais à **Entrega 3 (Padrões de Projeto GoF)**, com a significância de cada uma e os comprobatórios por commit.
+
+A divisão das fatias está registrada na [ata de 18/10/2026](/ReunioesAtas/Subequipe1/Ata18_10.md). A subequipe assumiu os **dois focos** — GoFs Criacionais e GoFs Estruturais —, e **cada integrante tem uma fatia em cada um dos dois padrões**.
+
+---
+
+## Tabela de Contribuições
+
+| Nome do Membro | Contribuição | Significância da Contribuição para o Projeto (Excelente/Boa/Regular/Ruim/Nula) | Comprobatórios Claros (com link) |
+| -- | -- | -- | -- |
+| Guilherme Costa Zanella | 1. **Criacional** — família Saldo em conta do [Abstract Factory](</Base/Relatórios/Subequipe01/GofsCriacionais/MeiosDePagamento(AbstractFactory).md>) & 2. **Estrutural** — refinamento `ComReputacaoDoVendedor` do [Decorator](</Base/Relatórios/Subequipe01/GofsEstruturais/RefinamentoDaBusca(Decorator).md>) & 3. Seções próprias nas duas páginas & 4. [Ponto de vista sobre IA Generativa](/Base/Relatórios/Subequipe01/IAGenerativa.md) | -- | -- |
+| Guilherme Davila Rodrigues Carneiro Sampaio | 1. **Criacional** — família Boleto do [Abstract Factory](</Base/Relatórios/Subequipe01/GofsCriacionais/MeiosDePagamento(AbstractFactory).md>) & 2. **Estrutural** — refinamento `ComOrdenacao` do [Decorator](</Base/Relatórios/Subequipe01/GofsEstruturais/RefinamentoDaBusca(Decorator).md>) & 3. Seções próprias nas duas páginas & 4. [Ponto de vista sobre IA Generativa](/Base/Relatórios/Subequipe01/IAGenerativa.md) | -- | -- |
+| Maria Clara Sena de Lima | 1. **Criacional** — família Pix do [Abstract Factory](</Base/Relatórios/Subequipe01/GofsCriacionais/MeiosDePagamento(AbstractFactory).md>) & 2. **Estrutural** — refinamento `ComFiltroDeFacetas` do [Decorator](</Base/Relatórios/Subequipe01/GofsEstruturais/RefinamentoDaBusca(Decorator).md>) & 3. Seções próprias nas duas páginas & 4. [Ponto de vista sobre IA Generativa](/Base/Relatórios/Subequipe01/IAGenerativa.md) | -- | -- |
+| Patrick Anderson Carvalho dos Santos | 1. **Criacional** — dono do artefato: modelagem UML, família Cartão de crédito, cliente `ServicoDeCheckout`, demonstração e vídeo & 2. **Estrutural** — refinamento `ComFreteEPrazo` do [Decorator](</Base/Relatórios/Subequipe01/GofsEstruturais/RefinamentoDaBusca(Decorator).md>) & 3. Seções próprias nas duas páginas & 4. [Ponto de vista sobre IA Generativa](/Base/Relatórios/Subequipe01/IAGenerativa.md) | -- | -- |
+| Pedro Luciano de Azevedo | 1. Estruturação da Subequipe 01 no repositório da Entrega 3 (pastas, `makefile`, `README`, sidebar) & 2. Contratos dos dois padrões, derivados do Diagrama de Classes da Entrega 2 & 3. **Estrutural** — dono do artefato: modelagem UML, componente base, decorador abstrato, demonstração e vídeo & 4. Redação da [ata de 18/10/2026](/ReunioesAtas/Subequipe1/Ata18_10.md) & 5. [Ponto de vista sobre IA Generativa](/Base/Relatórios/Subequipe01/IAGenerativa.md) | -- | -- |
+
+> Cada integrante preenche a própria significância e os próprios links de commit, como nas entregas anteriores.
+
+---
+
+## Histórico de Versões
+
+| Versão | Data | Descrição | Autor(es) | Revisor(es) |
+| -- | -- | -- | -- | -- |
+| 1.0 | 18/10/2026 | Criação da página com as fatias de cada integrante nos dois padrões | Pedro Luciano de Azevedo | -- |
