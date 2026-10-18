@@ -325,7 +325,115 @@ Código: [`fabrica/FabricaPix.java`](https://github.com/UnBArqDsw2026-2-Turma01/
 
 ### 5.5. Família Saldo em conta — Guilherme Costa Zanella
 
-> _A preencher: autorização contra o saldo, comprovante de débito em conta e estorno imediato; trecho de código; elo com o fluxo de reclamação e mediação do Diagrama de Atividades, em que o estorno é um dos dois desfechos._
+O saldo em conta é a família em que **o dinheiro nunca sai da plataforma**: não há operadora, banco nem compensação do outro lado. Isso muda as respostas às três perguntas da `FabricaMeioPagamento`, e muda principalmente a última. O estorno desta família é o fecho do [Diagrama de Atividades](https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_02/#/Base/Relat%C3%B3rios/Subequipe01/ModelagemDinamica/DiagramaDeAtividades) que modelei na Entrega 2: a mediação decide pelo reembolso, a reclamação encerra como `REEMBOLSADA`, e o dinheiro volta.
+
+| Produto | Classe | Resposta do saldo em conta | Em contraste com |
+| -- | -- | -- | -- |
+| Fábrica concreta | `FabricaSaldoEmConta` | `meio()` devolve `MeioPagamento.SALDO_EM_CONTA`; cria **um** autorizador e o entrega também ao comprovante e ao estorno | As outras fábricas, em que os produtos não compartilham estado |
+| Autorizador | `AutorizadorSaldo` | Síncrono e **interno**: a decisão é uma consulta ao saldo, e a recusa tem motivo conhecido (saldo insuficiente) | Pix, também síncrono, mas porque a resposta vem rápido **de fora**; boleto, que espera a compensação |
+| Comprovante | `ComprovanteSaldo` | `formato()` é `"recibo de debito em conta"` e informa o **saldo restante** | QR Code (Pix), recibo de parcelamento (cartão), linha digitável (boleto) |
+| Política de estorno | `EstornoSaldo` | Crédito de volta no **mesmo saldo**, na hora (`prazoDeDevolucaoEmDias()` é `0`) | Cartão, que devolve na fatura em 30 dias; boleto, que só devolve por depósito |
+
+**A fábrica: os três produtos sobre o mesmo saldo.** Nas outras famílias, a coerência entre os produtos é de tipo: o comprovante do Pix combina com o autorizador do Pix porque cita o identificador que ele gerou. No saldo em conta ela é também de **estado**. O autorizador debita o saldo, o comprovante informa quanto restou e o estorno credita de volta. Se cada produto tivesse o seu saldo, o comprovante mostraria um valor que não foi debitado, e o estorno devolveria o dinheiro a um saldo que não pagou nada. A fábrica impede isso criando um único `AutorizadorSaldo`, que guarda o saldo, e entregando esse mesmo objeto aos outros dois produtos:
+
+```java
+public final class FabricaSaldoEmConta implements FabricaMeioPagamento {
+
+    private final AutorizadorSaldo autorizador;
+
+    public FabricaSaldoEmConta()                         { this(Dinheiro.emReais(SALDO_DE_DEMONSTRACAO_EM_CENTAVOS)); }
+    public FabricaSaldoEmConta(Dinheiro saldoDisponivel) { this.autorizador = new AutorizadorSaldo(saldoDisponivel); }
+
+    @Override public MeioPagamento meio()                   { return MeioPagamento.SALDO_EM_CONTA; }
+    @Override public Autorizador criarAutorizador()         { return autorizador; }
+    @Override public Comprovante criarComprovante()         { return new ComprovanteSaldo(autorizador); }
+    @Override public PoliticaEstorno criarPoliticaEstorno() { return new EstornoSaldo(autorizador); }
+}
+```
+
+O construtor sem argumentos é o que o `CatalogoDeFabricas` usa para instanciar a fábrica pelo nome, do mesmo jeito que as outras três. O segundo existe para exercitar o caso de saldo insuficiente. Em nenhum dos dois o `ServicoDeCheckout` enxerga a ligação entre os produtos: ele recebe uma `FabricaMeioPagamento`, e só.
+
+**Autorização interna.** O desfecho sai na mesma chamada, como no Pix, mas por outro motivo: no Pix a resposta vem rápido de fora; aqui ela nem precisa sair da plataforma. É também a única família em que o **motivo** da recusa é conhecido pela própria plataforma, e não devolvido por um terceiro:
+
+```java
+@Override
+public Autorizacao autorizar(String pedido, Dinheiro valor) {
+    if (valor.centavos() == 0) {
+        return Autorizacao.recusada("Pagamento com saldo sem valor nao pode ser autorizado");
+    }
+    if (saldo.centavos() < valor.centavos()) {
+        return Autorizacao.recusada("Saldo insuficiente: disponivel " + saldo
+                + ", necessario " + valor);
+    }
+    // Dinheiro nao tem subtracao (valores negativos sao recusados): debito em centavos.
+    saldo = new Dinheiro(saldo.centavos() - valor.centavos(), saldo.moeda());
+    return Autorizacao.aprovada("SALDO-" + pedido,
+            "Debitado do saldo em conta; nenhuma operadora envolvida");
+}
+
+@Override public int prazoLimiteEmMinutos() { return PRAZO_DE_DEMONSTRACAO_EM_MINUTOS; } // 10
+@Override public boolean ehAssincrono()     { return false; }
+```
+
+O prazo segue a regra das demais famílias: a Máquina de Estados do Pedido deixou `after(tempo limite)` sem número, porque ele nunca foi observado. O valor é, portanto, um parâmetro de demonstração, com um nome que diz isso. É menor que o do Pix só porque não há nada externo a esperar.
+
+**O estorno, e o que ele revela sobre o meu próprio diagrama.** No Diagrama de Atividades, o desfecho `REEMBOLSADA` passa por *Estornar pagamento via operadora*, que sai por `IPagamento`. Modelei essa ação em `fork` com a notificação justamente por ser uma chamada externa, que leva tempo, e para que a reclamação só encerrasse quando o estorno fosse efetivado (decisão 5 daquela página). No saldo em conta essa suposição não vale: não existe operadora, o estorno é um lançamento interno, e o dinheiro volta na hora para o saldo de onde saiu.
+
+```java
+@Override
+public boolean podeEstornar(Autorizacao autorizacao) {
+    // So ha o que devolver se o debito original aconteceu.
+    return autorizacao.aprovada();
+}
+
+@Override
+public String estornar(String pedido, Dinheiro valor) {
+    autorizador.creditar(valor);
+    return "Estorno de " + valor + " do pedido " + pedido
+            + " creditado de volta no saldo em conta; saldo atual " + autorizador.saldo();
+}
+```
+
+Isso não invalida o diagrama, mas mostra um limite dele: modelei o reembolso como se todo estorno saísse pela operadora, e o caminho de volta do dinheiro **depende do meio por onde ele veio**. É o mesmo argumento que a seção 5.1 usa para justificar o Abstract Factory no lugar do Factory Method. A pergunta que o diagrama deixou implícita, "estornar por onde?", passa a ser respondida pela fábrica de cada família.
+
+**Elo com o Rich Picture.** O achado que registrei como não previsto na Entrega 1 foi que "produto, dinheiro, informação e reclamação passam todos pela plataforma". O saldo em conta é a forma extrema dessa centralidade: o dinheiro não sai da plataforma nem na ida nem na volta. É por isso que a recusa e o estorno são decididos dentro dela.
+
+**Saída da família em execução**, no `cliente.Main` (seção 6), para o pedido `PED-2026-0001` de R$ 299,90, com o saldo de demonstração de R$ 500,00:
+
+```text
+- Saldo em conta | comprovante em recibo de debito em conta | janela de 10 min | resposta imediata | devolucao em 0 dia(s)
+  autorizacao: APROVADO (SALDO-PED-2026-0001) - Debitado do saldo em conta; nenhuma operadora envolvida
+  Recibo de debito em conta
+    Pedido ........: PED-2026-0001
+    Valor .........: R$ 299,90
+    Transacao .....: SALDO-PED-2026-0001
+    Saldo restante : R$ 200,10
+    Situacao ......: pago na hora, sem sair da plataforma
+  reembolso: Estorno de R$ 299,90 do pedido PED-2026-0001 creditado de volta no saldo em conta; saldo atual R$ 500,00 (prazo de 0 dia(s))
+```
+
+O saldo restante do comprovante (R$ 200,10) e o saldo depois do estorno (R$ 500,00) só batem porque os três produtos leem e escrevem no mesmo saldo. Essa é a coerência que a `FabricaSaldoEmConta` garante. Com um saldo de R$ 50,00, o mesmo pedido é recusado com `Saldo insuficiente: disponivel R$ 50,00, necessario R$ 299,90`, o comprovante informa que nenhum valor foi debitado e `podeEstornar` devolve `false`.
+
+**De onde vem cada decisão da família.** Esta é a família com a origem mais fraca das quatro, e isso precisa estar dito. A Entrega 1 não observou saldo em conta em nenhum ponto, porque o Recorte B parou antes da tela de pagamento, e a existência do meio vem só da enumeração da Entrega 2. Todo o comportamento é inferido e está marcado como tal no código (`INFERIDO` nos comentários de `AutorizadorSaldo` e `EstornoSaldo`).
+
+| Elemento | Fonte |
+| -- | -- |
+| Saldo em conta como família própria | Constante `SALDO_EM_CONTA` da enumeração `MeioPagamento`, Diagrama de Classes (Entrega 2) |
+| Desfechos `APROVADO` e `RECUSADO` | Estados `Pago` e `Recusado` da Máquina de Estados do Pedido (Entrega 2); tarefa *Autorizar pagamento* e evento de borda de erro do BPMN 1 (Entrega 1) |
+| Estorno como fecho da reclamação | Processo 3 do Rich Picture, "resposta ou reembolso" (Entrega 1); desfecho `REEMBOLSADA` do Diagrama de Atividades e transição `Em disputa → Reembolsado` da Máquina de Estados (Entrega 2) |
+| Dinheiro que não sai da plataforma | Achado da centralidade da plataforma no Rich Picture (Entrega 1) |
+| Recusa por saldo insuficiente | **Inferido**: é a regra mínima para que um meio chamado "saldo" faça sentido |
+| Estorno interno, imediato, no mesmo saldo | **Inferido**: decorre de não haver operadora no caminho de ida |
+| 10 minutos de prazo, devolução em 0 dias e saldo de R$ 500,00 | Parâmetros de demonstração; os valores reais não foram observados |
+| Identificador `SALDO-<pedido>` e texto do recibo | Simulação, para que a demonstração seja reproduzível |
+
+**Limites desta fatia.**
+
+- **Pagamento combinado não é modelado.** Pagar parte em saldo e parte em outro meio exigiria duas famílias no mesmo pedido, que é justamente a combinação que a fábrica abstrata existe para impedir.
+- **O autorizador acumula duas responsabilidades.** Ele autoriza e também guarda o saldo. Foi uma escolha para manter a família nos quatro arquivos combinados; num sistema real, o saldo seria uma conta própria, fora do autorizador.
+- **Não há tratamento de concorrência.** Dois pedidos debitando o mesmo saldo ao mesmo tempo poderiam passar os dois pela verificação. Na demonstração, com um pedido por vez, isso não aparece; num sistema real, o débito teria de ser atômico.
+
+Código: [`fabrica/FabricaSaldoEmConta.java`](https://github.com/UnBArqDsw2026-2-Turma01/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_03/tree/main/docs/Base/Relat%C3%B3rios/Subequipe01/src/criacionais/MeiosDePagamento(AbstractFactory)/fabrica/FabricaSaldoEmConta.java) e [`familias/saldo/`](https://github.com/UnBArqDsw2026-2-Turma01/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_03/tree/main/docs/Base/Relat%C3%B3rios/Subequipe01/src/criacionais/MeiosDePagamento(AbstractFactory)/familias/saldo).
 
 ### 5.6. Cliente: `ServicoDeCheckout` — Patrick Anderson Carvalho dos Santos
 
@@ -434,3 +542,4 @@ FOWLER, Martin. **Patterns of Enterprise Application Architecture**. Boston: Add
 | 1.1 | 18/10/2026 | Documentação dos contratos: fábrica abstrata, os três produtos abstratos, a classe de apoio `Autorizacao` e o domínio reaproveitado da Entrega 2 | Pedro Luciano de Azevedo | -- |
 | 1.2 | 18/10/2026 | Seção 5.3: família Pix (fábrica, autorizador síncrono, comprovante em QR Code e devolução), com trechos de código e rastreabilidade de cada decisão às Entregas 1 e 2 (`ProcessadorPix`, Máquina de Estados do Pedido) | Maria Clara Sena de Lima | -- |
 | 1.3 | 18/10/2026 | Seções 2, 3, 5.2, 5.6 e 6: consequências do GoF e contraste com Builder e Prototype; modelagem UML genérica e aplicada; família Cartão de crédito com os três desfechos; cliente `ServicoDeCheckout` e seleção de família; roteiro de execução | Patrick Anderson Carvalho dos Santos | -- |
+| 1.4 | 18/10/2026 | Seção 5.5: família Saldo em conta (fábrica que entrega o mesmo autorizador ao comprovante e ao estorno, autorização interna, recibo de débito em conta e estorno imediato), com trechos de código, saída de execução, fonte de cada decisão e o limite que a família revela no Diagrama de Atividades da Entrega 2 | Guilherme Costa Zanella | -- |
