@@ -250,7 +250,56 @@ Código: [`decorador/ComFiltroDeFacetas.java`](https://github.com/UnBArqDsw2026-
 
 ### 5.4. `ComFreteEPrazo` — Patrick Anderson Carvalho dos Santos
 
-> _A preencher: como o refinamento acrescenta os selos de frete e prazo a cada item a partir do CEP (RN-A04); trecho de código; elo com o `Serviço de Entrega` e a interface `IFrete` do Diagrama de Componentes da Entrega 2._
+RN-A04 da Entrega 1 registrou que **frete e prazo dependem do CEP e são calculados ainda na listagem, antes do carrinho**. Foi esse achado que, no [Diagrama de Componentes da Entrega 2](https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_02/#/Base/Relat%C3%B3rios/Subequipe01/ModelagemEstatica/DiagramaDeComponentes), obrigou o `Serviço de Catálogo` a requerer `IFrete` do `Serviço de Entrega` — a decisão 2 daquela página chamou isso de "uma decisão de produto com custo arquitetural": mostrar o frete cedo reduz o abandono no fim do funil, mas empurra uma dependência para o componente mais consultado do sistema. Este refinamento é aquela dependência, agora em código.
+
+**Um decorador de enriquecimento.** Diferente do `ComFiltroDeFacetas`, que muda o conjunto de resultados, e do `ComOrdenacao`, que muda a sequência, este não remove nem reordena nada: só acrescenta dois selos a cada item.
+
+| Selo | Exemplo | De onde vem |
+| -- | -- | -- |
+| `frete` | `R$ 39,40` | Faixa de peso de `Anuncio.pesoEmGramas()` mais acréscimo por região do CEP |
+| `prazo` | `9 dia(s) util(eis)` | Região do CEP |
+
+**A condição é a mesma do `«extend»`.** No [Diagrama de Sequência](https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_02/#/Base/Relat%C3%B3rios/Subequipe01/ModelagemDinamica/DiagramaDeSequencia) o cálculo está dentro de um fragmento `opt` com a guarda *informa CEP*; no [Diagrama de Casos de Uso](https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_02/#/Base/Relat%C3%B3rios/Subequipe01/ModelagemEstatica/DiagramaDeCasosDeUso), *Calcular frete por CEP* é `«extend»` de *Ver ficha do produto*, por RF-A04 ser opcional. Em código, isso é uma saída antecipada:
+
+```java
+@Override
+public Listagem buscar(ConsultaCatalogo consulta) {
+    Listagem recebida = super.buscar(consulta);
+
+    // RN-A04 so se aplica quando ha CEP. Sem ele, nada a acrescentar: o
+    // fragmento opt do Diagrama de Sequencia simplesmente nao executa.
+    String cep = consulta.cep();
+    if (cep == null || cep.trim().isEmpty()) {
+        return recebida;
+    }
+
+    int regiao = regiaoDoCep(cep);
+    List<ItemListagem> enriquecidos = new ArrayList<ItemListagem>(recebida.total());
+    for (ItemListagem item : recebida.itens()) {
+        int peso = item.anuncio().pesoEmGramas();
+        enriquecidos.add(item
+                .comSelo(SELO_FRETE, formatarCentavos(freteEmCentavos(peso, regiao)))
+                .comSelo(SELO_PRAZO, prazoEmDias(regiao) + " dia(s) util(eis)"));
+    }
+    return recebida.comItens(enriquecidos);
+}
+```
+
+Sem CEP, a listagem atravessa o decorador **sem alteração nenhuma** — não uma cópia vazia, a mesma listagem. É a tradução direta do `«extend»` da UML para o código: o comportamento opcional simplesmente não acontece.
+
+**O CEP é usado só até onde a Entrega 1 permite.** A região sai do **primeiro dígito**, e nada além disso. RN-B04 registrou que o CEP é armazenado como oito dígitos sem separador, e foi só isso que se observou. Usar faixa de CEP real exigiria uma tabela que nunca vimos.
+
+**O que é inferido, e está dito no código.** As tarifas — R$ 14,90, R$ 24,90 e R$ 39,90 por faixa de peso, mais R$ 3,50 por região — e o prazo de `2 + região` dias. Nenhum número desses foi observado: o Recorte A registrou que o frete é calculado por CEP na listagem, **não os valores nem a fórmula da transportadora**. O cabeçalho da classe marca os três blocos com `INFERIDO`, e as constantes têm `DEMONSTRACAO` no nome.
+
+**Posição na cadeia: indiferente para o resultado, não para o custo.** Como só acrescenta informação, este decorador pode ficar em qualquer posição sem mudar o conjunto de itens. Mas colocado **depois** do `ComFiltroDeFacetas`, calcula frete apenas dos itens que sobraram. É um caso em que a ordem é irrelevante para a semântica e relevante para o desempenho — o oposto do par filtrar/ordenar.
+
+**Verificação.** Como o `Main` ainda monta só o catálogo cru, a fatia foi exercitada por um conjunto de asserções à parte, com nove verificações, todas passando: a cadeia aparece em `descricao()`; a quantidade de itens não muda; com CEP todo item ganha os dois selos; sem CEP nenhum item ganha; **a listagem de origem não é alterada**; o item mais pesado não custa menos que o mais leve; um CEP de região distante tem prazo maior; e empilhar o decorador duas vezes não quebra.
+
+Resultado de um item, com `cep=72230-130`:
+
+```text
+Fone de ouvido bluetooth XZ-200 - R$ 249,90 (AudioStore) | frete: R$ 39,40 | prazo: 9 dia(s) util(eis)
+```
 
 ### 5.5. `ComReputacaoDoVendedor` — Guilherme Costa Zanella
 

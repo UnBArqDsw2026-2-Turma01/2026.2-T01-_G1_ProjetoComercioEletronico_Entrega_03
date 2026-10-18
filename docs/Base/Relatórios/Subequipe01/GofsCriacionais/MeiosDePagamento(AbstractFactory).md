@@ -25,13 +25,49 @@ Juntando-os, aparece o problema: escolhido um meio de pagamento, o checkout prec
 
 **Por que ele, e não o Factory Method.** O Factory Method criaria *um* produto por meio de pagamento, e não daria conta da coerência entre os três. O que torna o Abstract Factory necessário aqui é a `PoliticaEstorno`: o caminho de volta do dinheiro depende do caminho de ida, e os dois objetos precisam nascer juntos.
 
-> _Patrick: completar com as consequências descritas pelo GoF e com o contraste em relação ao Builder e ao Prototype._
+**As consequências que o GoF descreve, e o que elas significam aqui.**
+
+| Consequência (GAMMA et al., 2000) | Como ela aparece nos meios de pagamento |
+| -- | -- |
+| Isola as classes concretas | O `ServicoDeCheckout` não escreve `new AutorizadorCartao()` em lugar nenhum. Ele conhece quatro interfaces e nada mais |
+| Facilita trocar famílias inteiras | Trocar o meio de pagamento é trocar **um** objeto — a fábrica. Nenhuma outra linha do checkout muda |
+| Promove a coerência entre produtos | É a razão de termos escolhido este padrão: comprovante, autorizador e política de estorno nascem juntos e combinam por construção |
+| Dificulta acrescentar um **novo tipo de produto** | Se amanhã a família precisar de um quarto produto — digamos, uma política de antifraude —, a interface `FabricaMeioPagamento` muda e **as quatro fábricas** precisam mudar junto |
+
+A quarta linha é o preço que pagamos conscientemente. Acrescentar uma *família* é barato: uma classe de fábrica e três produtos, sem tocar em nada existente — foi exatamente assim que as famílias Pix e Cartão entraram em paralelo, por pessoas diferentes. Acrescentar um *produto à família* é caro, e isso está na seção de visão crítica.
+
+**Por que não o Builder.** O Builder monta **um** objeto complexo por etapas, e a variação está no processo de construção. Aqui não há objeto complexo: há três objetos simples que precisam ser do mesmo tipo. O Builder foi, aliás, o outro finalista criacional da reunião de 16/10 — mas para a `ConsultaCatalogo`, e não para o pagamento; caiu porque as suas peças são sequencialmente dependentes e dividiam mal entre cinco pessoas.
+
+**Por que não o Prototype.** O Prototype cria por cópia de um exemplar já configurado, e serve quando instanciar é caro ou quando a configuração do objeto é o que varia. Os nossos produtos são leves e sem estado; o que varia não é a configuração de um objeto, é **qual conjunto de classes** usar. Clonar um `AutorizadorCartao` não produziria um `AutorizadorPix`.
+
+**Por que não o Factory Method, em uma frase.** Ele resolve "qual subclasse criar", uma decisão de cada vez. O nosso problema é "quais três classes criar **juntas**", e é a `PoliticaEstorno` que torna isso obrigatório: o caminho de volta do dinheiro depende do caminho de ida.
 
 ---
 
 ## 3. Modelagem (Notação UML)
 
-> _A preencher por **Patrick Anderson Carvalho dos Santos**: modelagem genérica do padrão (AbstractFactory, ConcreteFactory, AbstractProduct, ConcreteProduct, Client) e modelagem aplicada ao G1, com a legenda de rastreabilidade embutida._
+### 3.1. Modelagem genérica
+
+[![Estrutura genérica do padrão Abstract Factory](../Assets/AbstractFactoryGenerico.svg)](../Assets/AbstractFactoryGenerico.svg ":ignore")
+
+<sub>Clique na imagem para abrir em tela cheia, com zoom.</sub>
+
+> _Figura 1 — Estrutura genérica do padrão Abstract Factory. As interfaces ficam na linha de cima e as classes concretas embaixo, lado a lado: cada fábrica concreta realiza a fábrica abstrata, e cada produto concreto realiza o seu produto abstrato. A legenda ao pé mapeia cada papel do padrão para a classe correspondente neste projeto. Fonte: Subequipe 01, 2026, a partir de GAMMA et al. (2000)._
+
+### 3.2. Modelagem aplicada
+
+[![Abstract Factory aplicado aos meios de pagamento](../Assets/AbstractFactoryAplicado.svg)](../Assets/AbstractFactoryAplicado.svg ":ignore")
+
+<sub>Clique na imagem para abrir em tela cheia, com zoom.</sub>
+
+> _Figura 2 — Abstract Factory aplicado aos meios de pagamento. As quatro fábricas concretas aparecem lado a lado sob `FabricaMeioPagamento`; abaixo, um bloco por produto abstrato, com as classes concretas de cada família. As famílias Boleto e Saldo em conta estão tracejadas e em cinza porque ainda não chegaram ao repositório. A legenda embutida rastreia cada elemento ao achado da Entrega 1 ou 2 que o sustenta. Fonte: Subequipe 01, 2026._
+
+**Decisões de modelagem.**
+
+- **As fábricas concretas estão lado a lado, e não empilhadas.** Não é estética: empilhadas, a seta de realização de uma atravessaria a caixa da outra. Os dois diagramas foram gerados por um script que recusa a imagem quando uma aresta cruza um classificador, e esta disposição é a que passou nessa verificação.
+- **Um bloco por produto abstrato, e não por família.** A alternativa — agrupar as três classes de cada família — deixava as setas de realização cruzando o desenho inteiro. Agrupando por produto, cada concreta fica logo abaixo da sua interface. O custo é que a família deixa de ser visível como bloco, e por isso ela aparece no rótulo de cada caixa.
+- **As famílias não entregues estão no desenho, tracejadas.** Omiti-las daria a impressão de um padrão com duas famílias, quando o modelo prevê quatro. O tracejado diz o que é projeto e o que é código.
+- **A relação `«cria»` aparece só no diagrama genérico.** Nas quatro famílias seriam doze setas partindo de quatro origens, cobrindo o desenho. A nota do diagrama aplicado registra a omissão em vez de deixá-la implícita.
 
 ---
 
@@ -127,7 +163,78 @@ Os três estados não foram inventados: são os desfechos que a Máquina de Esta
 
 ### 5.2. Família Cartão de crédito — Patrick Anderson Carvalho dos Santos
 
-> _A preencher: autorização com os três desfechos, comprovante com parcelamento (`Dinheiro.parcelar`) e estorno pela operadora; trecho de código; elo com o BPMN 1 e com a Máquina de Estados do Pedido._
+O cartão é a família com **os três desfechos**. As outras três respondem sim ou não; só o cartão percorre os dois eventos de borda que o [BPMN 1 da Entrega 1](https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_02/#/Base/Relat%C3%B3rios/Subequipe01/BPMN) modelou sobre a tarefa *Autorizar pagamento* — o de erro e o de temporizador — e que a [Máquina de Estados do Pedido](https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_02/#/Base/Relat%C3%B3rios/Subequipe01/ModelagemDinamica/DiagramaDeMaquinaDeEstados) transformou em dois estados distintos.
+
+| Produto | Classe | O que o cartão responde |
+| -- | -- | -- |
+| Fábrica concreta | `FabricaCartao` | `meio()` devolve `MeioPagamento.CARTAO` |
+| Autorizador | `AutorizadorCartao` | Síncrono, com três desfechos possíveis |
+| Comprovante | `ComprovanteCartao` | Recibo com o rateio das parcelas |
+| Política de estorno | `EstornoCartao` | Crédito na próxima fatura, em 30 dias |
+
+**Os três desfechos, e por que são três e não dois.** `Recusado` e `Expirado` são estados diferentes na Máquina de Estados do Pedido, e a página daquela entrega explica por quê: um é resposta da operadora, o outro é passagem do tempo. A ordem das verificações no código reflete isso — a janela é checada **antes** da operadora, porque um pedido expirado nunca chega a ser recusado:
+
+```java
+@Override
+public Autorizacao autorizar(String pedido, Dinheiro valor) {
+    // Evento de borda de temporizador do BPMN 1: a janela fecha antes de a
+    // operadora ser consultada, entao nao ha o que recusar - ha o que expirar.
+    if (minutosDecorridosNaTentativa > PRAZO_LIMITE_DE_DEMONSTRACAO_EM_MINUTOS) {
+        return Autorizacao.expirada("Janela de " + PRAZO_LIMITE_DE_DEMONSTRACAO_EM_MINUTOS
+                + " min encerrada apos " + minutosDecorridosNaTentativa
+                + " min; pedido expirado antes da autorizacao");
+    }
+    if (valor.centavos() == 0) {
+        return Autorizacao.recusada("Cobranca de valor zero nao e aceita pela operadora");
+    }
+    // Evento de borda de erro do BPMN 1.
+    if (valor.centavos() > LIMITE_DE_DEMONSTRACAO_EM_CENTAVOS) {
+        return Autorizacao.recusada("Limite do cartao insuficiente para " + valor);
+    }
+    return Autorizacao.aprovada("CARTAO-" + pedido, ...);
+}
+```
+
+**Como o `Main` exercita os três sem quebrar o padrão.** O desfecho expirado depende do tempo, e o contrato `Autorizador` não tem parâmetro para isso. A saída foi tornar a **fábrica** configurável, e não o produto: o cliente escolhe a família — o que o padrão permite — e nunca instancia um produto:
+
+```java
+desfecho("aprovado",                  new FabricaCartao(),            VALOR);
+desfecho("recusado (acima do limite)", new FabricaCartao(),            Dinheiro.emReais(900000));
+desfecho("expirado (fora da janela)",  FabricaCartao.aposMinutos(45),  VALOR);
+```
+
+Saída real dos três:
+
+```text
+- aprovado -> APROVADO
+  Autorizada pela operadora em 0 min
+  reembolso: Estorno de R$ 299,90 do pedido PED-2026-0001 solicitado a operadora; credito aparece na proxima fatura (prazo de 30 dia(s))
+
+- recusado (acima do limite) -> RECUSADO
+  Limite do cartao insuficiente para R$ 9000,00
+  reembolso: Nada a estornar no pedido PED-2026-0001: a cobranca nao chegou a ser capturada (RECUSADO)
+
+- expirado (fora da janela) -> EXPIRADO
+  Janela de 15 min encerrada apos 45 min; pedido expirado antes da autorizacao
+  reembolso: Nada a estornar no pedido PED-2026-0001: a cobranca nao chegou a ser capturada (EXPIRADO)
+```
+
+Repare na terceira linha de cada bloco: a política de estorno **recusa** os dois desfechos que não capturaram valor. É `podeEstornar(autorizacao)` devolvendo `false` — a família inteira se comportando de forma coerente, não uma validação espalhada pelo checkout.
+
+**O parcelamento.** É o que distingue o comprovante do cartão dos demais. O rateio usa `Dinheiro.parcelar(n)`, do domínio do Pedro, que distribui o resto da divisão inteira uma unidade por vez:
+
+```text
+  Parcelamento ..: 3x
+    parcela 1/3 ...: R$ 99,97
+    parcela 2/3 ...: R$ 99,97
+    parcela 3/3 ...: R$ 99,96
+```
+
+99,97 + 99,97 + 99,96 = 299,90. Nenhum centavo se perde, e é por isso que a decisão 10 do [Diagrama de Classes da Entrega 2](https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_02/#/Base/Relat%C3%B3rios/Subequipe01/ModelagemEstatica/DiagramaDeClasses) guardou dinheiro como inteiro em centavos, e não como ponto flutuante.
+
+**O estorno, e por que ele precisa ser da mesma família.** O `EstornoCartao` devolve pela fatura, em 30 dias; o `EstornoPix` devolve na conta de origem, no mesmo dia. O mesmo pedido, estornado pela política errada, informaria ao comprador um prazo que não existe. A ação *Estornar pagamento via operadora* do [Diagrama de Atividades](https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_02/#/Base/Relat%C3%B3rios/Subequipe01/ModelagemDinamica/DiagramaDeAtividades) é uma só no desenho; aqui ela tem quatro implementações, e a fábrica garante que a executada seja a do meio pelo qual o dinheiro entrou.
+
+**O que é parâmetro de demonstração nesta família.** Três números: a janela de 15 minutos, o limite de R$ 5.000,00 e o prazo de 30 dias. Nenhum foi observado — o Recorte B da Entrega 1 parou antes da tela de pagamento, de propósito, porque avançar exigiria confirmar uma compra real. Os três estão nomeados no código com `DE_DEMONSTRACAO` para que ninguém os leia como afirmação sobre a plataforma.
 
 ### 5.3. Família Pix — Maria Clara Sena de Lima
 
@@ -222,13 +329,72 @@ Código: [`fabrica/FabricaPix.java`](https://github.com/UnBArqDsw2026-2-Turma01/
 
 ### 5.6. Cliente: `ServicoDeCheckout` — Patrick Anderson Carvalho dos Santos
 
-> _A preencher: como o cliente escolhe a família uma única vez e nunca mais decide qual produto usar; trecho de código; por que a seleção da fábrica fica no cliente e não na interface da fábrica._
+O cliente é onde o padrão se prova. Se ele conseguir escrever o nome de uma classe concreta, o Abstract Factory não está fazendo nada.
+
+**Uma escolha, no construtor.** Os três produtos são criados de uma vez, da **mesma** fábrica, e guardados:
+
+```java
+public ServicoDeCheckout(FabricaMeioPagamento fabrica) {
+    this.meio             = fabrica.meio();
+    this.autorizador      = fabrica.criarAutorizador();
+    this.comprovante      = fabrica.criarComprovante();
+    this.politicaEstorno  = fabrica.criarPoliticaEstorno();
+}
+```
+
+Daí em diante o checkout nunca mais decide nada sobre meio de pagamento. `pagar`, `comprovanteDe` e `reembolsar` só delegam. Não existe no código um caminho que crie um produto isolado — e é essa ausência, e não uma validação, que torna a combinação inválida **inalcançável**. Não há `if` de meio de pagamento em lugar nenhum do cliente.
+
+**Por que a seleção da fábrica não fica na interface da fábrica.** Seria tentador dar a `FabricaMeioPagamento` um método `static para(MeioPagamento)`. Isso faria a fábrica abstrata conhecer todas as suas implementações — exatamente a dependência que o padrão existe para remover. No GoF a fábrica concreta é escolhida **uma única vez, na inicialização**, e é o que faz o `CatalogoDeFabricas`, uma classe do pacote `cliente`.
+
+**Uma decisão de organização, não de arquitetura.** O `CatalogoDeFabricas` resolve as fábricas pelo nome da classe, e não por referência direta:
+
+```java
+private static FabricaMeioPagamento instanciar(MeioPagamento meio) {
+    String nome = CLASSES.get(meio);
+    try {
+        Class<?> tipo = Class.forName(nome);
+        return (FabricaMeioPagamento) tipo.getDeclaredConstructor().newInstance();
+    } catch (ClassNotFoundException ausente) {
+        return null;                 // familia ainda nao entregue
+    } ...
+}
+```
+
+O motivo é a forma como a subequipe trabalha, e está registrado como tal no código. As quatro famílias são escritas por quatro pessoas, em paralelo, na mesma branch (decisão 9 da ata de 18/10). Uma referência direta a `FabricaBoleto` impediria o artefato de compilar até o Guilherme Davila commitar a dele; e registrar a família nova exigiria editar este arquivo, o que a decisão 10 da mesma ata proíbe. Resolvendo por nome, o artefato compila e roda hoje, mostra quais famílias faltam e de quem são, e passa a mostrar quatro assim que as duas restantes chegarem — sem ninguém tocar no arquivo de ninguém.
+
+É uma concessão consciente: reflexão é mais frágil que uma referência verificada pelo compilador. Em um sistema real, com as quatro famílias prontas, um `switch` explícito seria melhor. A troca está registrada aqui para que ela seja lida como decisão, e não como descuido.
+
+**A saída que mostra o estado da integração.** O `Main` percorre as quatro constantes de `MeioPagamento` e exibe o que existe:
+
+```text
+- Cartao de credito | comprovante em recibo de parcelamento | janela de 15 min | resposta imediata | devolucao em 30 dia(s)
+- Pix | comprovante em QR Code | janela de 30 min | resposta imediata | devolucao em 0 dia(s)
+- Boleto bancario: familia ainda nao entregue (responsavel: Guilherme Davila Rodrigues Carneiro Sampaio)
+- Saldo em conta: familia ainda nao entregue (responsavel: Guilherme Costa Zanella)
+```
+
+Duas famílias, dois comportamentos distintos, o mesmo cliente — e a terceira e a quarta entram sem que uma linha do `ServicoDeCheckout` mude.
 
 ---
 
 ## 6. Execução (vídeo com o padrão em execução)
 
-> _A preencher por **Patrick Anderson Carvalho dos Santos**: vídeo mostrando o mesmo pedido pago pelos quatro meios, com autorização, comprovante e estorno coerentes em cada família._
+> **Vídeo a gravar por Patrick Anderson Carvalho dos Santos.** O artefato já compila e roda; o vídeo será gravado quando as famílias Boleto e Saldo em conta estiverem no repositório, para que a demonstração mostre as quatro.
+
+**Como reproduzir, para quem quiser conferir sem o vídeo.** O artefato é autocontido e não tem dependência externa além do JDK:
+
+```bash
+cd "docs/Base/Relatórios/Subequipe01/src/criacionais/MeiosDePagamento(AbstractFactory)"
+make run
+```
+
+**O que a execução mostra, em três partes:**
+
+1. **O mesmo pedido pelas quatro famílias** — `PED-2026-0001`, R$ 299,90. Cada família imprime o seu resumo, a autorização, o comprovante no seu formato e o estorno com o seu prazo. As famílias ainda não entregues aparecem nomeadas, com o responsável.
+2. **Os três desfechos do cartão** — aprovado, recusado por limite e expirado por tempo, com o estorno recusando os dois últimos.
+3. **Por que a combinação inválida não acontece** — o resumo lado a lado das famílias disponíveis, mostrando que cada trio é coerente de ponta a ponta.
+
+Verificado com `javac 21.0.11`, sem avisos de compilação.
 
 ---
 
