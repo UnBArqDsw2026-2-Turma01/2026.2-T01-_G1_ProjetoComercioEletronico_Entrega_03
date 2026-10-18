@@ -163,7 +163,7 @@ Os três estados não foram inventados: são os desfechos que a Máquina de Esta
 
 ### 5.2. Família Cartão de crédito — Patrick Anderson Carvalho dos Santos
 
-O cartão é a família com **os três desfechos**. As outras três respondem sim ou não; só o cartão percorre os dois eventos de borda que o [BPMN 1 da Entrega 1](https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_02/#/Base/Relat%C3%B3rios/Subequipe01/BPMN) modelou sobre a tarefa *Autorizar pagamento* — o de erro e o de temporizador — e que a [Máquina de Estados do Pedido](https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_02/#/Base/Relat%C3%B3rios/Subequipe01/ModelagemDinamica/DiagramaDeMaquinaDeEstados) transformou em dois estados distintos.
+O cartão é a família com **os três desfechos**. As outras três respondem sim ou não; só o cartão percorre os dois eventos de borda que o [BPMN 1 da Entrega 1](https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_01/#/Base/Relat%C3%B3rios/SubEquipe01/BPMN) modelou sobre a tarefa *Autorizar pagamento* — o de erro e o de temporizador — e que a [Máquina de Estados do Pedido](https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_02/#/Base/Relat%C3%B3rios/Subequipe01/ModelagemDinamica/DiagramaDeMaquinaDeEstados) transformou em dois estados distintos.
 
 | Produto | Classe | O que o cartão responde |
 | -- | -- | -- |
@@ -585,22 +585,67 @@ Duas famílias, dois comportamentos distintos, o mesmo cliente — e a terceira 
 
 ## 6. Execução (vídeo com o padrão em execução)
 
-> **Vídeo a gravar por Patrick Anderson Carvalho dos Santos.** O artefato já compila e roda; o vídeo será gravado quando as famílias Boleto e Saldo em conta estiverem no repositório, para que a demonstração mostre as quatro.
+A demonstração é uma janela Swing — `cliente.Demonstracao` —, sem dependência externa além do JDK. Ela existe porque a saída em texto não consegue mostrar o que este padrão realmente faz: **ao trocar a família, os três produtos mudam ao mesmo tempo**. Num terminal isso é uma lista que rola; na janela são três cartões lado a lado que viram outra coisa de uma vez só.
 
-**Como reproduzir, para quem quiser conferir sem o vídeo.** O artefato é autocontido e não tem dependência externa além do JDK:
+A tela desenha a estrutura do padrão em vez de descrevê-la: a **fábrica escolhida** fica no alto, ligada por três curvas aos **três produtos** que ela criou — que é o diagrama da seção 3, agora com valores reais correndo dentro dele. Cada família tem uma **cor de identidade**, e é essa cor que torna a garantia visível: ao marcar outra família, a caixa da fábrica, as três curvas e os três cartões trocam de cor juntos. Não existe um instante sequer em que metade da tela esteja de uma família e metade de outra.
+
+A janela nunca nomeia uma classe concreta. Ela entrega uma `FabricaMeioPagamento` ao `ServicoDeCheckout` e **pergunta a ele** o que recebeu.
+
+[AbstractFactoryMeiosDePagamento.mp4](../AbstractFactoryMeiosDePagamento/AbstractFactoryMeiosDePagamento.mp4 ':include :type=video controls width=90%')
+
+> _Vídeo 1 — A demonstração do Abstract Factory em execução: as quatro famílias sobre o mesmo pedido, os três desfechos da família Cartão e a tentativa de misturar famílias. Sem áudio; o passo a passo abaixo acompanha a ordem do vídeo. Fonte: Subequipe 01, 2026._
+
+**Passo a passo do vídeo**
+
+| Trecho | O que acontece na tela | O que isso prova sobre o padrão |
+| -- | -- | -- |
+| Estado inicial | A caixa da fábrica está vazia, as curvas saem cinzas e o console diz que o `ServicoDeCheckout` ainda não existe | O cliente não tem construtor sem fábrica: ele só nasce quando recebe uma |
+| Cartão de crédito | A caixa vira `FabricaCartao` e os três cartões preenchem juntos — `AutorizadorCartao`, `ComprovanteCartao`, `EstornoCartao` —, tudo em violeta; o console registra `new ServicoDeCheckout(FabricaCartao)` | Uma única escolha produziu o trio inteiro. O cliente descobriu o que recebeu; não escolheu peça por peça |
+| Autorizar | `APROVADO`, e o comprovante sai com `99,97 + 99,97 + 99,96` | `Dinheiro` guarda centavos em inteiro (decisão 10 do Diagrama de Classes da Entrega 2): nenhum centavo se perde na divisão |
+| **Troca para Pix** | A tela inteira vira verde-azulada de uma vez: fábrica, curvas e os três cartões — `AutorizadorPix`, `ComprovantePix`, `EstornoPix`. O formato muda para QR Code e a devolução cai de 30 dias para 0 | Este é o padrão, e é o momento que justifica a janela existir. Não há estado intermediário em que o comprovante seja de uma família e o autorizador de outra |
+| Boleto e saldo em conta | Mesmo movimento: linha digitável com devolução por depósito em 3 dias; recibo de débito com `Saldo restante` e estorno imediato | O boleto é o único assíncrono; o saldo é o único em que a coerência é também de **estado**, porque a fábrica entrega o mesmo `AutorizadorSaldo` aos três produtos |
+| Valor acima do limite | `RECUSADO`, e o estorno responde `Nada a estornar: a cobrança não chegou a ser capturada` | A política de estorno é da mesma família do autorizador e enxerga o desfecho dele |
+| Fora da janela (45 min) | `EXPIRADO`, com a janela de 15 min encerrada após 45 | Os dois eventos de borda que o BPMN 1 da Entrega 1 pendurou em *Autorizar pagamento* viram estados distintos na Máquina de Estados do Pedido |
+| Tentar misturar famílias | O aviso diz que não há o que clicar | A combinação inválida não é bloqueada em tempo de execução: ela **não existe no código**. Não há construtor público de produto alcançável a partir do cliente |
+
+[![A estrutura do padrão com valores reais](../AbstractFactoryMeiosDePagamento/01-fabrica-e-trio.png)](../AbstractFactoryMeiosDePagamento/01-fabrica-e-trio.png ":ignore")
+
+<sub>Clique na imagem para abrir em tela cheia, com zoom.</sub>
+
+> _Figura 3 — A estrutura do padrão com valores reais. `FabricaCartao` no alto, ligada às três classes que ela criou — `AutorizadorCartao`, `ComprovanteCartao` e `EstornoCartao` —, todas na cor da família. O console mostra a única linha que importa: `new ServicoDeCheckout(FabricaCartao)`. Fonte: Subequipe 01, 2026._
+
+[![A troca de família](../AbstractFactoryMeiosDePagamento/02-troca-de-familia.png)](../AbstractFactoryMeiosDePagamento/02-troca-de-familia.png ":ignore")
+
+<sub>Clique na imagem para abrir em tela cheia, com zoom.</sub>
+
+> _Figura 4 — A troca de família. A mesma tela depois de marcar *Pix*: a fábrica, as três curvas e os três produtos trocaram na mesma ação, cor inclusive. É a garantia do padrão, e o que a saída em texto não consegue mostrar. Fonte: Subequipe 01, 2026._
+
+[![Desfecho recusado](../AbstractFactoryMeiosDePagamento/03-desfecho-recusado.png)](../AbstractFactoryMeiosDePagamento/03-desfecho-recusado.png ":ignore")
+
+<sub>Clique na imagem para abrir em tela cheia, com zoom.</sub>
+
+> _Figura 5 — Desfecho recusado. Com valor acima do limite, o autorizador responde `RECUSADO` e a política de estorno — da mesma família — recusa junto, porque a cobrança não chegou a ser capturada. Fonte: Subequipe 01, 2026._
+
+[![A combinação inválida](../AbstractFactoryMeiosDePagamento/04-combinacao-invalida.png)](../AbstractFactoryMeiosDePagamento/04-combinacao-invalida.png ":ignore")
+
+<sub>Clique na imagem para abrir em tela cheia, com zoom.</sub>
+
+> _Figura 6 — A combinação inválida. A tentativa de misturar famílias não é bloqueada em tempo de execução: não há caminho no código. Nenhum construtor público de produto é alcançável a partir do cliente. Fonte: Subequipe 01, 2026._
+
+**O que a janela acrescenta ao padrão, e fica registrado como acréscimo.** Para mostrar *qual* trio a fábrica entregou, o `ServicoDeCheckout` ganhou quatro métodos de leitura — `classesDoTrio()`, `descricaoDoAutorizador()`, `descricaoDoComprovante()` e `descricaoDoEstorno()`. Eles não fazem parte do Abstract Factory: existem para a janela perguntar ao cliente o que ele recebeu, sem precisar conhecer uma classe concreta. É o mesmo tipo de acréscimo que a subequipe registrou no Decorator com `descricao()`.
+
+**Como o vídeo foi produzido.** Quem pinta os quadros é a própria aplicação. Em `--filmar`, a janela é montada de verdade e passa por `pack()`, para que os gerentes de layout distribuam o espaço exatamente como na execução interativa; ela apenas não é exibida, e cada estado do roteiro é gravado como PNG. O script em `Assets/src/video_demonstracao_abstract_factory.py` só costura os quadros no ffmpeg. Nada no vídeo é encenado: é a mesma janela que `make gui` abre.
+
+**Como reproduzir.** Sem dependência externa além do JDK (Java 8 ou superior):
 
 ```bash
 cd "docs/Base/Relatórios/Subequipe01/src/criacionais/MeiosDePagamento(AbstractFactory)"
-make run
+make gui      # a janela da demonstração
+make run      # a mesma execução em texto, no terminal
+make filmar   # regera o vídeo a partir da janela
 ```
 
-**O que a execução mostra, em três partes:**
-
-1. **O mesmo pedido pelas quatro famílias** — `PED-2026-0001`, R$ 299,90. Cada família imprime o seu resumo, a autorização, o comprovante no seu formato e o estorno com o seu prazo. As famílias ainda não entregues aparecem nomeadas, com o responsável.
-2. **Os três desfechos do cartão** — aprovado, recusado por limite e expirado por tempo, com o estorno recusando os dois últimos.
-3. **Por que a combinação inválida não acontece** — o resumo lado a lado das famílias disponíveis, mostrando que cada trio é coerente de ponta a ponta.
-
-Verificado com `javac 21.0.11`, sem avisos de compilação.
+Verificado com `javac 21.0.11`, sem avisos — inclusive com `-Xlint:all`.
 
 ---
 
@@ -642,4 +687,5 @@ FOWLER, Martin. **Patterns of Enterprise Application Architecture**. Boston: Add
 | 1.3 | 18/10/2026 | Seções 2, 3, 5.2, 5.6 e 6: consequências do GoF e contraste com Builder e Prototype; modelagem UML genérica e aplicada; família Cartão de crédito com os três desfechos; cliente `ServicoDeCheckout` e seleção de família; roteiro de execução | Patrick Anderson Carvalho dos Santos | -- |
 | 1.4 | 18/10/2026 | Seção 5.5: família Saldo em conta (fábrica que entrega o mesmo autorizador ao comprovante e ao estorno, autorização interna, recibo de débito em conta e estorno imediato), com trechos de código, saída de execução, fonte de cada decisão e o limite que a família revela no Diagrama de Atividades da Entrega 2 | Guilherme Costa Zanella | -- |
 | 1.5 | 18/10/2026 | Seção 5.4: família Boleto bancário (autorização assíncrona, comprovante com linha digitável e estorno assimétrico por depósito), com trechos de código, saída real de execução, elo com o componente externo do Diagrama de Componentes e parâmetros de demonstração | Guilherme Davila Rodrigues Carneiro Sampaio | -- |
+| 1.6 | 18/10/2026 | Seção 6: demonstração gráfica `cliente.Demonstracao` e vídeo com o padrão em execução nas quatro famílias, com passo a passo do que cada trecho prova, quatro capturas e os alvos `gui` e `filmar` no makefile; acréscimos de leitura no `ServicoDeCheckout` registrados como fora do padrão | Patrick Anderson Carvalho dos Santos | -- |
 

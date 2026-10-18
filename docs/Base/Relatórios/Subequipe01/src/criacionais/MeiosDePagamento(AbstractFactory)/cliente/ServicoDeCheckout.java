@@ -76,6 +76,35 @@ public final class ServicoDeCheckout {
     }
 
     /** Resumo da familia montada, para a demonstracao. */
+    /*
+     * Os quatro metodos abaixo nao fazem parte do padrao: existem para a
+     * demonstracao grafica mostrar QUAL trio a fabrica entregou e com que
+     * caracteristicas, sem que a janela precise conhecer uma classe concreta.
+     * Ela pergunta ao cliente o que ele recebeu; nao escolhe nada. E o mesmo
+     * acrescimo registrado no Decorator desta subequipe com `descricao()`.
+     */
+
+    public String[] classesDoTrio() {
+        return new String[] {
+            autorizador.getClass().getSimpleName(),
+            comprovante.getClass().getSimpleName(),
+            politicaEstorno.getClass().getSimpleName()
+        };
+    }
+
+    public String descricaoDoAutorizador() {
+        return "janela de " + autorizador.prazoLimiteEmMinutos() + " min, "
+                + (autorizador.ehAssincrono() ? "compensacao assincrona" : "resposta imediata");
+    }
+
+    public String descricaoDoComprovante() {
+        return "formato: " + comprovante.formato();
+    }
+
+    public String descricaoDoEstorno() {
+        return "devolucao em " + politicaEstorno.prazoDeDevolucaoEmDias() + " dia(s)";
+    }
+
     public String resumoDaFamilia() {
         return meio.rotulo()
                 + " | comprovante em " + comprovante.formato()
