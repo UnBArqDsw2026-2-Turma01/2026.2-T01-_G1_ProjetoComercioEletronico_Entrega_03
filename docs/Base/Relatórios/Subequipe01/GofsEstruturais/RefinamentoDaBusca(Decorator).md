@@ -303,7 +303,79 @@ Fone de ouvido bluetooth XZ-200 - R$ 249,90 (AudioStore) | frete: R$ 39,40 | pra
 
 ### 5.5. `ComReputacaoDoVendedor` — Guilherme Costa Zanella
 
-> _A preencher: como o refinamento acrescenta nota, número de avaliações e tipo de vendedor a cada item (RN-A05); trecho de código; elo com o Rich Picture — a tensão entre loja oficial e vendedor autônomo e a concern de confiança da compradora._
+`ComReputacaoDoVendedor` é o refinamento que carrega **RN-A05 / RF-A05**: todo produto de marketplace exibe a reputação do vendedor junto ao preço, já na listagem, com nota e número de avaliações por oferta. É um comportamento **observado**: a Engenharia Reversa registrou no cartão de produto "nota, número de avaliações e reputação do vendedor". O decorador acrescenta a cada item o selo `reputação`, com as três informações:
+
+| Parte do selo | Exemplo | De onde vem |
+| -- | -- | -- |
+| Nota | `4,8 de 5` | `Anuncio.notaVendedor()`; RF-A05 |
+| Número de avaliações | `(1532 avaliacoes)` | `Anuncio.quantidadeAvaliacoes()`; RF-A05 |
+| Tipo de vendedor | `loja oficial` / `vendedor autonomo` | `Anuncio.TipoVendedor`; tensão do Rich Picture e decisão 8 do Diagrama de Classes |
+
+```java
+@Override
+public Listagem buscar(ConsultaCatalogo consulta) {
+    Listagem recebida = super.buscar(consulta);
+
+    List<ItemListagem> enriquecidos = new ArrayList<ItemListagem>();
+    for (ItemListagem item : recebida.itens()) {
+        enriquecidos.add(item.comSelo(SELO, reputacao(item.anuncio())));
+    }
+
+    return recebida.comItens(enriquecidos);
+}
+
+/** "4,8 de 5 (1532 avaliacoes), loja oficial" — nota, volume e tipo (RF-A05). */
+private static String reputacao(Anuncio anuncio) {
+    return String.format(PT_BR, "%.1f de 5 (%d avaliacoes), %s",
+            anuncio.notaVendedor(), anuncio.quantidadeAvaliacoes(),
+            rotulo(anuncio.tipoVendedor()));
+}
+```
+
+**Nunca altera o que recebeu.** Cada `comSelo` devolve uma cópia do item, e `comItens` devolve uma `Listagem` nova, que mantém as facetas de quem está embaixo na cadeia. Foi conferido em execução: depois de decorada, a listagem recebida continua com os itens sem nenhum selo, e as seis facetas montadas pelo `ComFiltroDeFacetas` passam intactas.
+
+**Por que nota e número de avaliações juntos.** RF-A05 pede os dois, e o acervo mostra por quê: a `AudioStore` tem 4,8 em 1532 avaliações; a `Marcia Usados`, 3,6 em 41. Uma nota sozinha não diz quanto ela vale: é o volume que diz se a compradora pode confiar nela. O selo responde, **antes do clique**, à concern que desenhei para a Jenny no Rich Picture da Entrega 1: "o produto é confiável?".
+
+**Exibe, mas não reordena nem filtra. Essa é a decisão principal desta fatia.** Seria fácil fazer este decorador "ajudar" a compradora, promovendo os vendedores mais bem avaliados. Não fiz, por dois motivos:
+
+1. **Não há regra observada que sustente isso.** RN-A05 diz que a reputação é *exibida* na listagem. A ordem padrão é por relevância (RN-A02), e quem cuida dela na cadeia é o `ComOrdenacao`. Um decorador de enriquecimento que mexesse na ordem duplicaria uma responsabilidade que já tem dono.
+2. **Tomaria partido na tensão do Rich Picture.** O conflito que registrei na Entrega 1 opõe a loja oficial ("eu pago mais, então apareço mais") e o vendedor autônomo ("por que meu anúncio nunca aparece na 1ª página?"). No acervo da demonstração, as lojas oficiais têm entre 903 e 1532 avaliações, e os autônomos entre 41 e 210. Ordenar por reputação empurraria todos os autônomos para baixo, e isso transformaria em regra do sistema exatamente a vantagem de que o vendedor autônomo reclama, sem nenhuma evidência de que a plataforma faça isso.
+
+O tipo de vendedor entra no selo como **informação**, e não como critério: um vendedor autônomo pode ter nota melhor que uma loja oficial, e o selo mostra as duas coisas lado a lado sem sugerir que uma implique a outra.
+
+Na busca por "fone de ouvido", com CEP informado e a cadeia `CatalogoEmMemoria + ComFiltroDeFacetas + ComFreteEPrazo + ComReputacaoDoVendedor` (todas as fatias já no repositório, exceto o `ComOrdenacao`):
+
+```text
+- Fone de ouvido bluetooth XZ-200 - R$ 249,90 (AudioStore) | frete: R$ 39,40 | prazo: 9 dia(s) util(eis) | reputação: 4,8 de 5 (1532 avaliacoes), loja oficial
+- Fone de ouvido bluetooth XZ-200 - R$ 219,90 (Carlos Eletro) | frete: R$ 39,40 | prazo: 9 dia(s) util(eis) | reputação: 4,1 de 5 (87 avaliacoes), vendedor autonomo
+- Fone de ouvido bluetooth XZ-200 (usado) - R$ 135,00 (Marcia Usados) | frete: R$ 39,40 | prazo: 9 dia(s) util(eis) | reputação: 3,6 de 5 (41 avaliacoes), vendedor autonomo
+- Fone de ouvido com fio P2 - R$ 49,90 (AudioStore) | frete: R$ 39,40 | prazo: 9 dia(s) util(eis) | reputação: 4,8 de 5 (1532 avaliacoes), loja oficial
+- Fone de ouvido gamer RGB - R$ 319,90 (GameHouse) | frete: R$ 39,40 | prazo: 9 dia(s) util(eis) | reputação: 4,6 de 5 (903 avaliacoes), loja oficial
+- Fone de ouvido esportivo a prova dagua - R$ 179,00 (FitSound) | frete: R$ 39,40 | prazo: 9 dia(s) util(eis) | reputação: 4,3 de 5 (210 avaliacoes), vendedor autonomo
+- Capa para fone de ouvido - R$ 29,90 (AcessoriosBR) | frete: R$ 39,40 | prazo: 9 dia(s) util(eis) | reputação: 3,9 de 5 (64 avaliacoes), vendedor autonomo
+```
+
+Duas coisas aparecem nessa saída:
+
+- **Os selos se acumulam.** O `ComReputacaoDoVendedor` recebe os itens já com frete e prazo e acrescenta o seu selo sem apagar os anteriores, porque `comSelo` copia os selos existentes. É o empilhamento que o padrão promete, visível em uma linha.
+- **A tensão do Rich Picture fica à vista.** As três primeiras linhas são o **mesmo** fone (RN-B09, várias ofertas para o mesmo item): a loja oficial é mais cara e mais bem avaliada; os dois autônomos são mais baratos e têm menos avaliações. O selo põe a informação na mesa, e a escolha entre preço e confiança fica com a compradora, sem que o sistema decida por ela. O conjunto e a ordem são idênticos aos do catálogo cru, o que também foi conferido em execução.
+
+**Elo com as Entregas 1 e 2.**
+
+| Elemento | Origem |
+| -- | -- |
+| Reputação na listagem, junto ao preço | RN-A05 e RF-A05, Recorte A da [Engenharia Reversa](https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_01/#/Base/Relat%C3%B3rios/SubEquipe01/EngenhariaReversa) (Entrega 1) — observado |
+| Tipo de vendedor no selo | Tensão loja oficial × vendedor autônomo no [Rich Picture](https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_01/#/Base/Relat%C3%B3rios/SubEquipe01/ArtefatoGeneralista) (Entrega 1); `TipoVendedor` como enumeração, decisão 8 do Diagrama de Classes (Entrega 2) |
+| O selo responde antes do clique | Concern da Jenny no Rich Picture: "o produto é confiável?" |
+| Não reordena nem filtra | RN-A02 (a ordem é por relevância e pertence ao `ComOrdenacao`); ausência de regra observada que promova reputação |
+
+**Limites desta fatia.**
+
+- **A reputação é um número pronto.** A nota e o número de avaliações são atributos fixos do `Anuncio`, e não um cálculo sobre avaliações individuais: de caixa-preta, a Entrega 1 viu o número pronto, e não como ele é calculado.
+- **Outras dimensões ficaram de fora.** A reputação na plataforma real pode incluir outras, como volume de vendas ou histórico de reclamações. Elas não foram registradas no Recorte A e, por isso, não estão aqui.
+- **O selo é texto.** Um `Map<String, String>` em `ItemListagem` serve à demonstração, mas um consumidor que quisesse filtrar por nota teria de interpretar a string de volta. É sinal de que, em produção, a reputação deveria ser um tipo próprio.
+
+Código: [`decorador/ComReputacaoDoVendedor.java`](https://github.com/UnBArqDsw2026-2-Turma01/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_03/tree/main/docs/Base/Relat%C3%B3rios/Subequipe01/src/estruturais/RefinamentoDaBusca(Decorator)/decorador/ComReputacaoDoVendedor.java).
 
 ---
 
@@ -352,6 +424,8 @@ Pré-requisito: JDK 8 ou superior. Instruções completas no [README do artefato
 
 > _Cada integrante acrescenta aqui o limite que enxerga na própria fatia._
 
+**Um refinamento de enriquecimento pode ser neutro, mas a cadeia não garante isso** (Guilherme Costa Zanella, `ComReputacaoDoVendedor`). Nada no padrão impede que um refinamento "só de exibição" passe a reordenar ou filtrar: a interface é a mesma, e a diferença está apenas no corpo de `buscar()`. A neutralidade do `ComReputacaoDoVendedor` diante da tensão entre loja oficial e vendedor autônomo é uma decisão documentada, e não uma garantia estrutural. É a mesma observação sobre os dois tipos de refinamento, vista de dentro de uma fatia: com uma interface própria de enriquecimento, que só recebesse e devolvesse `ItemListagem`, essa garantia viria do tipo.
+
 ---
 
 ## 9. Referências
@@ -372,3 +446,4 @@ FOWLER, Martin. **Patterns of Enterprise Application Architecture**. Boston: Add
 | 1.1 | 18/10/2026 | Modelagem UML genérica e aplicada; documentação do componente, do decorador abstrato e do domínio; rastreabilidade e visão crítica | Pedro Luciano de Azevedo | -- |
 | 1.2 | 18/10/2026 | Seção 5.2: refinamento `ComFiltroDeFacetas` (filtro cumulativo e contagem prévia por faceta disjuntiva), com trechos de código, exemplo de execução, custo registrado no SIG e elo com Casos de Uso e Máquina de Estados da Entrega 2 | Maria Clara Sena de Lima | -- |
 | 1.3 | 18/10/2026 | Seção 5.4: refinamento `ComFreteEPrazo`, com o elo a RN-A04 e à interface `IFrete` do Diagrama de Componentes da Entrega 2, e as nove asserções que verificam a fatia | Patrick Anderson Carvalho dos Santos | -- |
+| 1.4 | 18/10/2026 | Seção 5.5: refinamento `ComReputacaoDoVendedor` (selo de reputação com nota, número de avaliações e tipo de vendedor, sem reordenar nem filtrar), com trecho de código, saída da cadeia com frete e reputação empilhados e elo com RN-A05 / RF-A05 e o Rich Picture; limite da fatia acrescentado à visão crítica | Guilherme Costa Zanella | -- |
