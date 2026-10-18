@@ -246,7 +246,83 @@ Código: [`decorador/ComFiltroDeFacetas.java`](https://github.com/UnBArqDsw2026-
 
 ### 5.3. `ComOrdenacao` — Guilherme Davila Rodrigues Carneiro Sampaio
 
-> _A preencher: como o refinamento reordena conforme `consulta.ordenacao()` (RN-A02 / RF-A03); trecho de código; por que `RELEVANCIA` preserva a ordem do catálogo e por que isso é inferência declarada._
+`ComOrdenacao` é o refinamento que carrega **RN-A02 e RF-A03**: a ordenação padrão da busca é por relevância, e o comprador pode alternar para menor ou maior preço. Enquanto o `ComFiltroDeFacetas` altera o conjunto de itens retornados e os decoradores de enriquecimento acrescentam selos, o `ComOrdenacao` altera a **sequência** dos itens sem descartar nenhum elemento.
+
+```java
+@Override
+public Listagem buscar(ConsultaCatalogo consulta) {
+    Listagem recebida = super.buscar(consulta);
+
+    List<ItemListagem> listaParaOrdenar = new ArrayList<ItemListagem>(recebida.itens());
+    Ordenacao ordem = consulta.ordenacao();
+
+    if (ordem == null || ordem == Ordenacao.RELEVANCIA) {
+        // Preserva a ordem original do catalogo/fonte subjacente (inferencia declarada)
+        return recebida.comItens(listaParaOrdenar);
+    }
+
+    if (ordem == Ordenacao.MENOR_PRECO) {
+        Collections.sort(listaParaOrdenar, new Comparator<ItemListagem>() {
+            @Override
+            public int compare(ItemListagem a, ItemListagem b) {
+                return Long.compare(a.anuncio().preco().centavos(), b.anuncio().preco().centavos());
+            }
+        });
+    } else if (ordem == Ordenacao.MAIOR_PRECO) {
+        Collections.sort(listaParaOrdenar, new Comparator<ItemListagem>() {
+            @Override
+            public int compare(ItemListagem a, ItemListagem b) {
+                return Long.compare(b.anuncio().preco().centavos(), a.anuncio().preco().centavos());
+            }
+        });
+    }
+
+    return recebida.comItens(listaParaOrdenar);
+}
+```
+
+**Nunca altera a listagem recebida.** Seguindo rigorosamente a regra combinada na reunião de 18/10, o decorador cria uma cópia da lista de itens (`new ArrayList<>(recebida.itens())`), realiza a ordenação sobre essa cópia e retorna uma nova `Listagem` via `recebida.comItens(...)`. A listagem recebida da fonte envolvida permanece imutável e preserva integralmente as facetas e termos alternativos previamente calculados.
+
+**Por que `RELEVANCIA` preserva a ordem do catálogo e por que isso é inferência declarada.**
+O critério real de relevância de um grande marketplace envolve cálculos internos complexos e proprietários (score textual ponderado por tf-idf / BM25, densidade de palavras-chave no anúncio, histórico de conversão e engajamento da oferta). Como a Engenharia Reversa da Entrega 1 foi estritamente de caixa-preta, não temos visibilidade da fórmula interna de ranqueamento. Assim, declarar que `Ordenacao.RELEVANCIA` aceita a ordem original emitida pelo motor do catálogo é uma **inferência declarada e deliberada**, e não uma omissão ou esquecimento de implementação.
+
+**Elo com os modelos das Entregas 1 e 2.**
+- **Diagrama de Casos de Uso (Entrega 2):** a ação *Ordenar listagem* foi modelada como uma extensão `«extend»` de *Buscar produtos*. O padrão Decorator reflete exatamente essa relação: um comportamento opcional que empilha sobre a busca básica sem acoplar o catálogo à lógica de classificação.
+- **Diagrama de Atividades (Subequipe 02, Entrega 2):** o fluxo de busca e filtragem modelado na Subequipe 02 prevê a etapa de ranqueamento de ofertas após o join da busca concorrente.
+- **Diagrama de Componentes (Subequipe 02, Entrega 2):** a responsabilidade equivale à do componente interno *Motor de Ranqueamento*, que recebe a lista e devolve ordenada.
+
+**Saída de execução demonstrando as ordenações no catálogo:**
+
+```text
+RELEVANCIA (preservada):
+  R$ 249,90 - Fone de ouvido bluetooth XZ-200
+  R$ 219,90 - Fone de ouvido bluetooth XZ-200
+  R$ 135,00 - Fone de ouvido bluetooth XZ-200 (usado)
+  R$ 49,90 - Fone de ouvido com fio P2
+  R$ 319,90 - Fone de ouvido gamer RGB
+  R$ 179,00 - Fone de ouvido esportivo a prova dagua
+  R$ 29,90 - Capa para fone de ouvido
+
+MENOR PRECO:
+  R$ 29,90 - Capa para fone de ouvido
+  R$ 49,90 - Fone de ouvido com fio P2
+  R$ 135,00 - Fone de ouvido bluetooth XZ-200 (usado)
+  R$ 179,00 - Fone de ouvido esportivo a prova dagua
+  R$ 219,90 - Fone de ouvido bluetooth XZ-200
+  R$ 249,90 - Fone de ouvido bluetooth XZ-200
+  R$ 319,90 - Fone de ouvido gamer RGB
+
+MAIOR PRECO:
+  R$ 319,90 - Fone de ouvido gamer RGB
+  R$ 249,90 - Fone de ouvido bluetooth XZ-200
+  R$ 219,90 - Fone de ouvido bluetooth XZ-200
+  R$ 179,00 - Fone de ouvido esportivo a prova dagua
+  R$ 135,00 - Fone de ouvido bluetooth XZ-200 (usado)
+  R$ 49,90 - Fone de ouvido com fio P2
+  R$ 29,90 - Capa para fone de ouvido
+```
+
+Código: [`decorador/ComOrdenacao.java`](https://github.com/UnBArqDsw2026-2-Turma01/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_03/tree/main/docs/Base/Relat%C3%B3rios/Subequipe01/src/estruturais/RefinamentoDaBusca(Decorator)/decorador/ComOrdenacao.java).
 
 ### 5.4. `ComFreteEPrazo` — Patrick Anderson Carvalho dos Santos
 
@@ -422,7 +498,7 @@ Pré-requisito: JDK 8 ou superior. Instruções completas no [README do artefato
 
 **O que o artefato não cobre.** A rolagem infinita (e o RNF-A02 não satisfeito, que o Diagrama de Sequência da Entrega 2 explicou) não virou refinamento, embora coubesse como um. Ficou de fora por decisão de escopo: são cinco fatias para cinco pessoas, e um quinto refinamento desequilibraria a divisão. Está anotado como a evolução natural deste artefato.
 
-> _Cada integrante acrescenta aqui o limite que enxerga na própria fatia._
+**Ordenação em memória não escala para acervos massivos** (Guilherme Davila Rodrigues Carneiro Sampaio, `ComOrdenacao`). O decorador realiza `Collections.sort` em memória sobre a listagem de resultados já trazida da fonte. Em um catálogo de produção com centenas de milhares de produtos, ordenar em memória após recuperar itens inviabiliza a latência; a ordenação precisa ser delegada ao motor de busca/índice (como Elasticsearch) antes da paginação. O decorador atende ao escopo didático e à semântica do GoF, mas em grande escala a ordenação tende a ser parâmetro nativo do índice, e não um pós-processamento em camada de apresentação.
 
 **Um refinamento de enriquecimento pode ser neutro, mas a cadeia não garante isso** (Guilherme Costa Zanella, `ComReputacaoDoVendedor`). Nada no padrão impede que um refinamento "só de exibição" passe a reordenar ou filtrar: a interface é a mesma, e a diferença está apenas no corpo de `buscar()`. A neutralidade do `ComReputacaoDoVendedor` diante da tensão entre loja oficial e vendedor autônomo é uma decisão documentada, e não uma garantia estrutural. É a mesma observação sobre os dois tipos de refinamento, vista de dentro de uma fatia: com uma interface própria de enriquecimento, que só recebesse e devolvesse `ItemListagem`, essa garantia viria do tipo.
 
@@ -447,3 +523,5 @@ FOWLER, Martin. **Patterns of Enterprise Application Architecture**. Boston: Add
 | 1.2 | 18/10/2026 | Seção 5.2: refinamento `ComFiltroDeFacetas` (filtro cumulativo e contagem prévia por faceta disjuntiva), com trechos de código, exemplo de execução, custo registrado no SIG e elo com Casos de Uso e Máquina de Estados da Entrega 2 | Maria Clara Sena de Lima | -- |
 | 1.3 | 18/10/2026 | Seção 5.4: refinamento `ComFreteEPrazo`, com o elo a RN-A04 e à interface `IFrete` do Diagrama de Componentes da Entrega 2, e as nove asserções que verificam a fatia | Patrick Anderson Carvalho dos Santos | -- |
 | 1.4 | 18/10/2026 | Seção 5.5: refinamento `ComReputacaoDoVendedor` (selo de reputação com nota, número de avaliações e tipo de vendedor, sem reordenar nem filtrar), com trecho de código, saída da cadeia com frete e reputação empilhados e elo com RN-A05 / RF-A05 e o Rich Picture; limite da fatia acrescentado à visão crítica | Guilherme Costa Zanella | -- |
+| 1.5 | 18/10/2026 | Seção 5.3: refinamento `ComOrdenacao` (ordenação por relevância, menor e maior preço, preservando ordem do catálogo para relevância como inferência declarada), saída real de execução, elo com Casos de Uso, Atividades e Componentes da Entrega 2 e limite na visão crítica | Guilherme Davila Rodrigues Carneiro Sampaio | -- |
+
