@@ -1,0 +1,13 @@
+# Saída de compilação Java
+out/
+bin/
+*.class
+
+# Arquivos de IDE
+.idea/
+*.iml
+.vscode/settings.json
+
+# Sistema operacional
+Thumbs.db
+.DS_Store

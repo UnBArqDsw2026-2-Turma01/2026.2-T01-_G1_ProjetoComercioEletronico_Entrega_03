@@ -66,7 +66,7 @@ public final class CatalogoEmMemoria implements FonteDeResultados {
         anuncios.add(new Anuncio("Fone de ouvido com fio P2", "AudioStore", Anuncio.TipoVendedor.LOJA_OFICIAL,
                 Dinheiro.emReais(4990), "Eletronicos", Anuncio.Condicao.NOVO, 4.8, 1532, 120));
         anuncios.add(new Anuncio("Fone de ouvido gamer RGB", "GameHouse", Anuncio.TipoVendedor.LOJA_OFICIAL,
-                Dinheiro.emReais(31990), "Games", Anuncio.Condicao.NOVO, 4.6, 903, 480));
+                Dinheiro.emReais(31990), "Games", Anuncio.Condicao.NOVO, 4.6, 903, 1200));
         anuncios.add(new Anuncio("Fone de ouvido esportivo a prova dagua", "FitSound", Anuncio.TipoVendedor.AUTONOMO,
                 Dinheiro.emReais(17900), "Esportes", Anuncio.Condicao.NOVO, 4.3, 210, 180));
         anuncios.add(new Anuncio("Capa para fone de ouvido", "AcessoriosBR", Anuncio.TipoVendedor.AUTONOMO,
