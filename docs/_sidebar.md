@@ -35,6 +35,8 @@
         - [Fluxo de Login (Chain Of Responsibility)](</Base/Relatórios/Subequipe03/GofsComportamentais/FluxoDeLogin(ChainOfResponsibility).md>)
       - GoFs Criacionais
         - [Fluxo de Login e Sessão (Builder)](</Base/Relatórios/Subequipe03/GofsCriacionais/FluxoLogin(Builder).md>)
+      - GRASP
+        - [Controller (Controlador)](/Base/Relatórios/Subequipe03/GRASP/Controller.md)
 
   - 1.2. Participações - Padrões de Projeto
     - [1.2.1 SubEquipe01](/Participacoes/Subequipe1.md)
