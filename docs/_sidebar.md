@@ -6,6 +6,8 @@
 - Reuniões e Atas
   - [Modelo de Ata](/ReunioesAtas/ModeloAta.md)
   - SubEquipe 01
+    - [Ata de reunião do dia 16/10/26](/ReunioesAtas/Subequipe1/Ata16-10.md)
+    - [Ata de reunião do dia 18/10/26](/ReunioesAtas/Subequipe1/Ata18_10.md)
   - SubEquipe 03
     - [Ata de reunião do dia 30/09/26](/ReunioesAtas/Subequipe3/Ata30_09.md)
     - [Gravação da reunião do dia 30/09/26](/ReunioesAtas/Subequipe3/Gravacao30_09.md)
@@ -16,6 +18,11 @@
   - [1. Desenho de Software (Padrões de Projeto)](/Base/1.PadroesDeProjeto.md)
   - Relatórios
     - [1.1.1. SubEquipe_01](/Base/Relatórios/1.1.1.SubEquipe_01.md)
+      - [Uso de IA generativa e lições aprendidas](/Base/Relatórios/Subequipe01/IAGenerativa.md)
+      - GoFs Criacionais
+        - [Meios de Pagamento (Abstract Factory)](</Base/Relatórios/Subequipe01/GofsCriacionais/MeiosDePagamento(AbstractFactory).md>)
+      - GoFs Estruturais
+        - [Refinamento da Busca (Decorator)](</Base/Relatórios/Subequipe01/GofsEstruturais/RefinamentoDaBusca(Decorator).md>)
     - 1.1.3. SubEquipe_03
       - [Metodologia](/Base/Relatórios/Subequipe03/Metodologia.md)
       - [Rastreabilidade da Metodologia](/Base/Relatórios/Subequipe03/RastreabilidadeMetodologia.md)
