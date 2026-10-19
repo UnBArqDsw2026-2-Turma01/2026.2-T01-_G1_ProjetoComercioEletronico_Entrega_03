@@ -79,46 +79,45 @@ projeto/
 
 <div style="text-align:center;">
 
-![Diagrama de classes do sistema de compras](../Assets/FluxoDeCompra(State)/DiagramaDeClasses.png)
+![Diagrama de classes do sistema de compras](<../assets/FluxoDeCompra(State)/DiagramaDeClasses.png>)
 
 <p><strong>Sistema de Compras</strong> — Diagrama de Classes do sistema <em>Autor: José Joaquim da Silva Neto</em></p>
 
-[Clique aqui para baixar a imagem!](/Base/Subequipe03/Assets/FluxoDeCompraState/DiagramaDeClasses.png ':ignore')
+[Clique aqui para baixar a imagem!](/Base/Subequipe03/assets/FluxoDeCompraState/DiagramaDeClasses.png ":ignore")
 
 </div>
 
 ### 2.3 Papéis no padrão
 
-| Papel (GoF) | Classe | Responsabilidade |
-|---|---|---|
-| **Context** | `Pedido` | Guarda o estado atual e delega a ele toda operação. |
-| **State** | `EstadoPedido` | Declara as operações que dependem do estado. |
+| Papel (GoF)       | Classe                                                                                                               | Responsabilidade                                                    |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| **Context**       | `Pedido`                                                                                                             | Guarda o estado atual e delega a ele toda operação.                 |
+| **State**         | `EstadoPedido`                                                                                                       | Declara as operações que dependem do estado.                        |
 | **ConcreteState** | `EstadoAguardandoPagamento`, `EstadoPago`, `EstadoEmSeparacao`, `EstadoEnviado`, `EstadoEntregue`, `EstadoCancelado` | Implementam o comportamento de cada estado e definem as transições. |
-| **Cliente** | `PedidoGUI` | Chama as operações do `Pedido` sem conhecer as regras. |
+| **Cliente**       | `PedidoGUI`                                                                                                          | Chama as operações do `Pedido` sem conhecer as regras.              |
 
 ### 2.4 Modelagem genérica
 
 <div style="text-align:center;">
 
-
-![Modelagem genérica do padrão State](../Assets/FluxoDeCompra(State)/Generico.png)
+![Modelagem genérica do padrão State](<../assets/FluxoDeCompra(State)/Generico.png>)
 
 <p><strong>Modelagem genérica</strong> — Modelagem genérica do sistema <em>Autor: José Joaquim da Silva Neto</em></p>
 
-[Clique aqui para baixar a imagem!](/Base/Subequipe03/Assets/FluxoDeCompraState/Generico.png ':ignore')
+[Clique aqui para baixar a imagem!](/Base/Subequipe03/assets/FluxoDeCompraState\Generico.png ":ignore")
 
 </div>
 
-| Modelagem genérica | Modelagem aplicada (este sistema) |
-|---|---|
-| `Client` | `PedidoGUI` |
-| `Context` | `Pedido` |
-| `request()` | `confirmarPagamento()`, `cancelar()`, `avancar()` |
-| `State` | `EstadoPedido` |
-| `handle(context)` | `confirmarPagamento(pedido)`, `cancelar(pedido)`, `avancar(pedido)` |
-| `ConcreteStateA/B` | Os seis `Estado*` |
-| `setState(State)` | `mudarEstado(EstadoPedido)` |
-| — | `StatusPedido` (elemento adicional, sem equivalente na aula) |
+| Modelagem genérica | Modelagem aplicada (este sistema)                                   |
+| ------------------ | ------------------------------------------------------------------- |
+| `Client`           | `PedidoGUI`                                                         |
+| `Context`          | `Pedido`                                                            |
+| `request()`        | `confirmarPagamento()`, `cancelar()`, `avancar()`                   |
+| `State`            | `EstadoPedido`                                                      |
+| `handle(context)`  | `confirmarPagamento(pedido)`, `cancelar(pedido)`, `avancar(pedido)` |
+| `ConcreteStateA/B` | Os seis `Estado*`                                                   |
+| `setState(State)`  | `mudarEstado(EstadoPedido)`                                         |
+| —                  | `StatusPedido` (elemento adicional, sem equivalente na aula)        |
 
 **Notação seguida (a mesma dos slides):** seta tracejada `<<usa>>` do Client para o Context; **agregação** (losango) entre Context e State; `<<cria>>` para criação de objetos (slides de Command e Iterator); as transições aparecem como **notas** nos ConcreteStates (como `context.setState(StateTwo);` na aula); cores: Context azul, State vermelho e ConcreteState amarelo, como nos slides de Strategy e Template Method.
 
@@ -132,12 +131,11 @@ O diagrama aplicado, com a legenda de cores e as notas das transições, é o da
 
 <div style="text-align:center;">
 
-
-![Diagrama de estados](../Assets/FluxoDeCompra(State)/DiagramaDeEstados.png)
+![Diagrama de estados](<../assets/FluxoDeCompra(State)/DiagramaDeEstados.png>)
 
 <p><strong>Diagrama de estados</strong> — Diagrama de estados do sistema <em>Autor: José Joaquim da Silva Neto</em></p>
 
-[Clique aqui para baixar a imagem!](/Base/Subequipe03/Assets/FluxoDeCompraState/DiagramaDeEstados.png ':ignore')
+[Clique aqui para baixar a imagem!](/Base/Subequipe03/assets/FluxoDeCompraState/DiagramaDeEstados.png ":ignore")
 
 </div>
 
@@ -145,21 +143,21 @@ O diagrama aplicado, com a legenda de cores e as notas das transições, é o da
 
 Esta tabela foi montada a partir da leitura do código de cada `ConcreteState`. "Erro" significa que o estado lança `IllegalStateException`.
 
-| Estado atual | `confirmarPagamento` | `avancar` | `cancelar` |
-|---|---|---|---|
-| `AGUARDANDO_PAGAMENTO` | → `PAGO` | Erro | → `CANCELADO` |
-| `PAGO` | Erro | → `EM_SEPARACAO` | → `CANCELADO` |
-| `EM_SEPARACAO` | Erro | → `ENVIADO` | → `CANCELADO` |
-| `ENVIADO` | Erro | → `ENTREGUE` | → `CANCELADO` |
-| `ENTREGUE` | Erro | Erro | → `CANCELADO` |
-| `CANCELADO` | Erro | Erro | Erro |
+| Estado atual           | `confirmarPagamento` | `avancar`        | `cancelar`    |
+| ---------------------- | -------------------- | ---------------- | ------------- |
+| `AGUARDANDO_PAGAMENTO` | → `PAGO`             | Erro             | → `CANCELADO` |
+| `PAGO`                 | Erro                 | → `EM_SEPARACAO` | → `CANCELADO` |
+| `EM_SEPARACAO`         | Erro                 | → `ENVIADO`      | → `CANCELADO` |
+| `ENVIADO`              | Erro                 | → `ENTREGUE`     | → `CANCELADO` |
+| `ENTREGUE`             | Erro                 | Erro             | → `CANCELADO` |
+| `CANCELADO`            | Erro                 | Erro             | Erro          |
 
 São 6 estados × 3 operações = **18 células**, e cada uma está implementada em exatamente um método de exatamente uma classe.
 
 ### 3.3 Observações sobre o modelo
 
 - `CANCELADO` é o único **estado terminal** de fato: nenhuma operação é válida a partir dele.
-- `ENTREGUE` encerra o fluxo *normal*, mas aceita `cancelar`. O comentário no código explica que esse cancelamento representa o fluxo de **devolução e estorno** (citado como "Diagrama de Atividades", que não faz parte dos arquivos analisados), e não um cancelamento espontâneo do cliente.
+- `ENTREGUE` encerra o fluxo _normal_, mas aceita `cancelar`. O comentário no código explica que esse cancelamento representa o fluxo de **devolução e estorno** (citado como "Diagrama de Atividades", que não faz parte dos arquivos analisados), e não um cancelamento espontâneo do cliente.
 - Cancelar um pedido `ENVIADO` é permitido "por simplicidade do exemplo", conforme o comentário no código. Num sistema real, isso exigiria logística reversa.
 
 ---
@@ -181,12 +179,12 @@ O segundo caso é exatamente o que apareceria aqui. Sem o padrão, `confirmarPag
 
 ### 4.3 Consequências descritas pelo GoF
 
-| Consequência | Presente neste sistema? |
-|---|---|
-| Localiza o comportamento específico de cada estado e o separa por estado | Sim: cada estado é uma classe |
-| Torna explícitas as transições entre estados | Sim: cada `mudarEstado(new ...)` mostra o destino |
+| Consequência                                                                     | Presente neste sistema?                                                |
+| -------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Localiza o comportamento específico de cada estado e o separa por estado         | Sim: cada estado é uma classe                                          |
+| Torna explícitas as transições entre estados                                     | Sim: cada `mudarEstado(new ...)` mostra o destino                      |
 | Objetos de estado podem ser compartilhados quando não têm atributos de instância | **Não aproveitado**: cada transição cria um objeto novo (ver seção 11) |
-| Aumenta o número de classes | Sim: 7 classes/interfaces para um modelo de 6 estados |
+| Aumenta o número de classes                                                      | Sim: 7 classes/interfaces para um modelo de 6 estados                  |
 
 ### 4.4 Quem define as transições
 
@@ -208,7 +206,7 @@ public enum StatusPedido {
 }
 ```
 
-É uma **identificação** do estado, usada para exibição, log e testes. Um `enum` é a forma idiomática em Java de representar um conjunto fixo de constantes (ver o tutorial oficial *Enum Types*, da Oracle).
+É uma **identificação** do estado, usada para exibição, log e testes. Um `enum` é a forma idiomática em Java de representar um conjunto fixo de constantes (ver o tutorial oficial _Enum Types_, da Oracle).
 
 ### 5.2 `EstadoPedido` (interface State)
 
@@ -259,12 +257,11 @@ Pontos importantes:
 
 <div style="text-align:center;">
 
-
-![Diagrama de sequência do fluxo de uma chamada](../Assets/FluxoDeCompra(State)/FluxoChamada.png)
+![Diagrama de sequência do fluxo de uma chamada](<../assets/FluxoDeCompra(State)/FluxoChamada.png>)
 
 <p><strong>Fluxo de uma chamada</strong> — Diagrama de sequência da chamada de <code>avancar()</code> <em>Autor: José Joaquim da Silva Neto</em></p>
 
-[Clique aqui para baixar a imagem!](/Base/Subequipe03/Assets/FluxoDeCompraState/FluxoChamada.png ':ignore')
+[Clique aqui para baixar a imagem!](/Base/Subequipe03/assets/FluxoDeCompraState/FluxoChamada.png ":ignore")
 
 </div>
 
@@ -285,20 +282,20 @@ public class EstadoPago implements EstadoPedido {
 }
 ```
 
-A [documentação do Java](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/IllegalStateException.html) define `IllegalStateException` como o sinal de que um método foi chamado **em um momento ilegal ou inadequado**, o que descreve bem "tentar avançar um pedido que aguarda pagamento". Por ser uma exceção não verificada (*unchecked*), ela não precisa ser declarada nas assinaturas.
+A [documentação do Java](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/IllegalStateException.html) define `IllegalStateException` como o sinal de que um método foi chamado **em um momento ilegal ou inadequado**, o que descreve bem "tentar avançar um pedido que aguarda pagamento". Por ser uma exceção não verificada (_unchecked_), ela não precisa ser declarada nas assinaturas.
 
 **Mensagens de erro por estado** (úteis na demonstração):
 
-| Estado | Operação inválida | Mensagem |
-|---|---|---|
-| `AGUARDANDO_PAGAMENTO` | `avancar` | "Não é possível avançar um pedido que ainda aguarda pagamento." |
-| `PAGO` | `confirmarPagamento` | "Pagamento já confirmado para este pedido." |
-| `EM_SEPARACAO` | `confirmarPagamento` | "Pagamento já confirmado — pedido já está em separação." |
-| `ENVIADO` | `confirmarPagamento` | "Pagamento já confirmado — pedido já foi enviado." |
-| `ENTREGUE` | `confirmarPagamento` | "Pagamento já confirmado — pedido já foi entregue." |
-| `ENTREGUE` | `avancar` | "Pedido entregue é o fim do ciclo normal de vida — nada para avançar." |
-| `CANCELADO` | `confirmarPagamento` / `avancar` | "Pedido cancelado — operação inválida." |
-| `CANCELADO` | `cancelar` | "Pedido já está cancelado." |
+| Estado                 | Operação inválida                | Mensagem                                                               |
+| ---------------------- | -------------------------------- | ---------------------------------------------------------------------- |
+| `AGUARDANDO_PAGAMENTO` | `avancar`                        | "Não é possível avançar um pedido que ainda aguarda pagamento."        |
+| `PAGO`                 | `confirmarPagamento`             | "Pagamento já confirmado para este pedido."                            |
+| `EM_SEPARACAO`         | `confirmarPagamento`             | "Pagamento já confirmado — pedido já está em separação."               |
+| `ENVIADO`              | `confirmarPagamento`             | "Pagamento já confirmado — pedido já foi enviado."                     |
+| `ENTREGUE`             | `confirmarPagamento`             | "Pagamento já confirmado — pedido já foi entregue."                    |
+| `ENTREGUE`             | `avancar`                        | "Pedido entregue é o fim do ciclo normal de vida — nada para avançar." |
+| `CANCELADO`            | `confirmarPagamento` / `avancar` | "Pedido cancelado — operação inválida."                                |
+| `CANCELADO`            | `cancelar`                       | "Pedido já está cancelado."                                            |
 
 ---
 
@@ -314,19 +311,19 @@ A `PedidoGUI` **não conhece nenhuma regra de transição**. Ela só chama `conf
 
 ### 6.3 Componentes
 
-| Componente | Classe Swing | Função |
-|---|---|---|
-| Janela | `JFrame` | Janela principal; `EXIT_ON_CLOSE` encerra o programa ao fechar |
-| Título do pedido | `JLabel` | Mostra "Pedido PED-001 — PAGO" |
-| Botão "Novo pedido" | `JButton` | Cria um `Pedido` com id sequencial (`PED-001`, `PED-002`…) |
-| Fileira de etapas | 6 × `JLabel` em `GridLayout` | Uma caixa por status; a atual fica colorida |
-| Botões de ação | 3 × `JButton` | `Confirmar pagamento`, `Avançar`, `Cancelar` |
-| Histórico | `JTextArea` em `JScrollPane` | Registro de cada operação e de cada erro |
-| Aviso de erro | `JOptionPane` | Diálogo com a mensagem da exceção |
+| Componente          | Classe Swing                 | Função                                                         |
+| ------------------- | ---------------------------- | -------------------------------------------------------------- |
+| Janela              | `JFrame`                     | Janela principal; `EXIT_ON_CLOSE` encerra o programa ao fechar |
+| Título do pedido    | `JLabel`                     | Mostra "Pedido PED-001 — PAGO"                                 |
+| Botão "Novo pedido" | `JButton`                    | Cria um `Pedido` com id sequencial (`PED-001`, `PED-002`…)     |
+| Fileira de etapas   | 6 × `JLabel` em `GridLayout` | Uma caixa por status; a atual fica colorida                    |
+| Botões de ação      | 3 × `JButton`                | `Confirmar pagamento`, `Avançar`, `Cancelar`                   |
+| Histórico           | `JTextArea` em `JScrollPane` | Registro de cada operação e de cada erro                       |
+| Aviso de erro       | `JOptionPane`                | Diálogo com a mensagem da exceção                              |
 
 ### 6.4 Layout
 
-Combinação de *layout managers* padrão do Swing (ver o tutorial *Laying Out Components Within a Container*, da Oracle):
+Combinação de _layout managers_ padrão do Swing (ver o tutorial _Laying Out Components Within a Container_, da Oracle):
 
 - `BorderLayout` na janela: topo (título + botão), centro (etapas + ações), sul (histórico);
 - `GridLayout(1, 0)` para as 6 etapas lado a lado;
@@ -350,7 +347,7 @@ private void executar(String nome, Runnable operacao) {
 ```
 
 1. Guarda o status **antes**.
-2. Executa a operação (uma *lambda* que chama o método do `Pedido`).
+2. Executa a operação (uma _lambda_ que chama o método do `Pedido`).
 3. Se funcionar, registra `antes -> depois`.
 4. Se o estado rejeitar, captura a exceção e mostra a mensagem.
 5. Em qualquer caso, redesenha a tela.
@@ -363,35 +360,35 @@ Como a GUI compara o status antes e depois, **não foi necessário alterar a cla
 
 ### 6.7 Thread de eventos
 
-O `main` cria a janela dentro de `SwingUtilities.invokeLater`. O Swing não é *thread-safe*, e a documentação oficial (*Concurrency in Swing*) orienta que a interface seja construída e alterada na **Event Dispatch Thread**.
+O `main` cria a janela dentro de `SwingUtilities.invokeLater`. O Swing não é _thread-safe_, e a documentação oficial (_Concurrency in Swing_) orienta que a interface seja construída e alterada na **Event Dispatch Thread**.
 
 ---
 
 ## 7. Diagramas de Classes do Padrão State (PlantUML)
 
-> Esta seção explica os diagramas de classes do sistema: a **modelagem genérica** (seção 2.4) e a **modelagem aplicada** ao `Pedido` (seção 2.2). Ela segue a estrutura e a notação do material da aula *Arquitetura e Desenho de Software — GoFs Comportamentais* (Profa. Milene Serrano, UnB Gama) e, ao final, registra separadamente onde a visão crítica vai além desse material.
+> Esta seção explica os diagramas de classes do sistema: a **modelagem genérica** (seção 2.4) e a **modelagem aplicada** ao `Pedido` (seção 2.2). Ela segue a estrutura e a notação do material da aula _Arquitetura e Desenho de Software — GoFs Comportamentais_ (Profa. Milene Serrano, UnB Gama) e, ao final, registra separadamente onde a visão crítica vai além desse material.
 
 ### Objetivo dos diagramas
 
 Segundo a aula, o State tem o objetivo de **alterar o comportamento de um objeto de acordo com o estado em que ele se encontra**, e pertence à categoria dos GoFs comportamentais (padrões voltados a alterações no nível do comportamento dos objetos).
 
-Os diagramas de classes respondem a uma pergunta de **estrutura**: *quais classes participam do padrão e como se relacionam?* Eles **não** mostram, sozinhos, a ordem do fluxo do pedido; isso é papel do diagrama de estados da seção 3. Como na aula, usamos dois níveis:
+Os diagramas de classes respondem a uma pergunta de **estrutura**: _quais classes participam do padrão e como se relacionam?_ Eles **não** mostram, sozinhos, a ordem do fluxo do pedido; isso é papel do diagrama de estados da seção 3. Como na aula, usamos dois níveis:
 
 1. **Modelagem Genérica:** o padrão em abstrato (Client, Context, State, ConcreteStates), na seção 2.4.
 2. **Modelagem Aplicada/Instanciada:** o mesmo padrão com os nomes do domínio (`Pedido`, `EstadoPedido`, `EstadoPago`…), na seção 2.2.
 
-Os diagramas de classes foram escritos em PlantUML (arquivos `state-generico.puml` e `state-pedido.puml`); os diagramas de estados e de sequência (seções 3.1 e 5.3.1) também (`state-estados.puml` e `state-sequencia.puml`). Por ser texto, o código-fonte pode ser versionado no Git junto com o código e revisado em *pull requests*.
+Os diagramas de classes foram escritos em PlantUML (arquivos `state-generico.puml` e `state-pedido.puml`); os diagramas de estados e de sequência (seções 3.1 e 5.3.1) também (`state-estados.puml` e `state-sequencia.puml`). Por ser texto, o código-fonte pode ser versionado no Git junto com o código e revisado em _pull requests_.
 
 ### Modelagem genérica
 
 **Participantes**
 
-| Participante | Papel | Exemplo na aula |
-|---|---|---|
-| **Client** | Usa o Context (`<<usa>>`) | — |
-| **Context** | Mantém uma referência para um `State`, que define o estado atual, e delega a ele as requisições | `Taxímetro` |
-| **State** | Interface que padroniza os estados do Context | `Bandeira` |
-| **ConcreteState** | Implementações particulares de um `State` | `Bandeira1`, `Bandeira2` |
+| Participante      | Papel                                                                                           | Exemplo na aula          |
+| ----------------- | ----------------------------------------------------------------------------------------------- | ------------------------ |
+| **Client**        | Usa o Context (`<<usa>>`)                                                                       | —                        |
+| **Context**       | Mantém uma referência para um `State`, que define o estado atual, e delega a ele as requisições | `Taxímetro`              |
+| **State**         | Interface que padroniza os estados do Context                                                   | `Bandeira`               |
+| **ConcreteState** | Implementações particulares de um `State`                                                       | `Bandeira1`, `Bandeira2` |
 
 **Mecanismo.** O diagrama genérico combina os dois modelos apresentados na aula: o `Context` guarda o estado atual (`current`), delega a requisição ao estado passando a si mesmo (`current.handle(this)`) e **o próprio ConcreteState realiza a transição** chamando `context.setState(...)` com o próximo estado (na aula, a nota `context.setState(StateTwo);`).
 
@@ -399,28 +396,28 @@ Os diagramas de classes foram escritos em PlantUML (arquivos `state-generico.pum
 
 **Correspondência entre o genérico e o aplicado**
 
-| Modelagem genérica | Modelagem aplicada |
-|---|---|
-| `Client` | `PedidoGUI` |
-| `Context` | `Pedido` |
-| `request()` | `confirmarPagamento()`, `cancelar()`, `avancar()` |
-| `State` | `EstadoPedido` |
-| `handle(context)` | `confirmarPagamento(pedido)`, `cancelar(pedido)`, `avancar(pedido)` |
-| `ConcreteStateA/B` | `EstadoAguardandoPagamento`, `EstadoPago`, `EstadoEmSeparacao`, `EstadoEnviado`, `EstadoEntregue`, `EstadoCancelado` |
-| `setState(State)` | `mudarEstado(EstadoPedido)` |
-| — (elemento adicional) | `StatusPedido` (enum que identifica cada estado) |
+| Modelagem genérica     | Modelagem aplicada                                                                                                   |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `Client`               | `PedidoGUI`                                                                                                          |
+| `Context`              | `Pedido`                                                                                                             |
+| `request()`            | `confirmarPagamento()`, `cancelar()`, `avancar()`                                                                    |
+| `State`                | `EstadoPedido`                                                                                                       |
+| `handle(context)`      | `confirmarPagamento(pedido)`, `cancelar(pedido)`, `avancar(pedido)`                                                  |
+| `ConcreteStateA/B`     | `EstadoAguardandoPagamento`, `EstadoPago`, `EstadoEmSeparacao`, `EstadoEnviado`, `EstadoEntregue`, `EstadoCancelado` |
+| `setState(State)`      | `mudarEstado(EstadoPedido)`                                                                                          |
+| — (elemento adicional) | `StatusPedido` (enum que identifica cada estado)                                                                     |
 
 **Os relacionamentos, um por um**
 
-| Notação | Significado | O que expressa aqui |
-|---|---|---|
-| `PedidoGUI ..> Pedido : <<usa>>` | Dependência | A interface usa as operações do `Pedido` |
-| `Pedido o--> "1" EstadoPedido` | Agregação com navegação, multiplicidade 1 | O `Pedido` mantém exatamente um estado atual |
-| `EstadoPedido <\|.. EstadoX` | Realização | Cada estado concreto cumpre o contrato do State |
-| `EstadoPedido ..> Pedido : <<usa>>` | Dependência | O contexto é passado como parâmetro às operações |
-| `Pedido ..> EstadoAguardandoPagamento : <<cria>>` | Dependência de criação | Todo pedido nasce nesse estado |
-| `... ..> StatusPedido : <<usa>>` | Dependência | `PedidoGUI`, `Pedido` e `EstadoPedido` usam o enum |
-| Notas nos estados | Código da transição | Mostram o `pedido.mudarEstado(new ...)` de cada operação, como a nota `context.setState(StateTwo);` da aula |
+| Notação                                           | Significado                               | O que expressa aqui                                                                                         |
+| ------------------------------------------------- | ----------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `PedidoGUI ..> Pedido : <<usa>>`                  | Dependência                               | A interface usa as operações do `Pedido`                                                                    |
+| `Pedido o--> "1" EstadoPedido`                    | Agregação com navegação, multiplicidade 1 | O `Pedido` mantém exatamente um estado atual                                                                |
+| `EstadoPedido <\|.. EstadoX`                      | Realização                                | Cada estado concreto cumpre o contrato do State                                                             |
+| `EstadoPedido ..> Pedido : <<usa>>`               | Dependência                               | O contexto é passado como parâmetro às operações                                                            |
+| `Pedido ..> EstadoAguardandoPagamento : <<cria>>` | Dependência de criação                    | Todo pedido nasce nesse estado                                                                              |
+| `... ..> StatusPedido : <<usa>>`                  | Dependência                               | `PedidoGUI`, `Pedido` e `EstadoPedido` usam o enum                                                          |
+| Notas nos estados                                 | Código da transição                       | Mostram o `pedido.mudarEstado(new ...)` de cada operação, como a nota `context.setState(StateTwo);` da aula |
 
 **Roteiro de leitura**
 
@@ -431,15 +428,15 @@ Os diagramas de classes foram escritos em PlantUML (arquivos `state-generico.pum
 
 ### Convenções alinhadas ao material da aula
 
-| Elemento | Notação da aula | Adotada nos diagramas |
-|---|---|---|
-| Client → Context | Seta tracejada com `<<usa>>` | Idem |
-| Context → State | Agregação (losango no Context) | Idem (`o-->`) |
-| Criação de objeto | `<<cria>>` (slides de Command e Iterator) | Idem |
-| Transição entre estados | Nota com `context.setState(...)` | Notas nos ConcreteStates |
-| Papéis (cores) | Context azul, State vermelho, concretos amarelo (slides de Strategy e Template Method) | Idem, em tons mais claros para manter o texto legível |
-| Generalização de State | Triângulo vazio | Realização (`<\|..`), por ser uma `interface` Java |
-| Nomes | Modelagem genérica × aplicada | Dois diagramas: seções 2.4 e 2.2 |
+| Elemento                | Notação da aula                                                                        | Adotada nos diagramas                                 |
+| ----------------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| Client → Context        | Seta tracejada com `<<usa>>`                                                           | Idem                                                  |
+| Context → State         | Agregação (losango no Context)                                                         | Idem (`o-->`)                                         |
+| Criação de objeto       | `<<cria>>` (slides de Command e Iterator)                                              | Idem                                                  |
+| Transição entre estados | Nota com `context.setState(...)`                                                       | Notas nos ConcreteStates                              |
+| Papéis (cores)          | Context azul, State vermelho, concretos amarelo (slides de Strategy e Template Method) | Idem, em tons mais claros para manter o texto legível |
+| Generalização de State  | Triângulo vazio                                                                        | Realização (`<\|..`), por ser uma `interface` Java    |
+| Nomes                   | Modelagem genérica × aplicada                                                          | Dois diagramas: seções 2.4 e 2.2                      |
 
 A única diferença de notação é o tipo da seta de herança: a aula desenha a generalização de uma classe abstrata (linha cheia); como `EstadoPedido` é uma **interface** em Java, o correto em UML é a **realização** (linha tracejada).
 
@@ -466,14 +463,14 @@ Formato: **o que foi feito → por quê → alternativa → crítica**.
 #### Agregação entre `Pedido` e `EstadoPedido`
 
 - **Decisão:** manter o **losango**, como no modelo da aula (a agregação aparece em vários dos GoFs apresentados, como Strategy, Command e State).
-- **Crítica (observação além do material):** na UML, a agregação tem semântica fraca, e Fowler (*UML Distilled*) recomenda ignorá-la por ser, na prática, indistinguível de uma associação comum. Uma associação simples (`-->`) seria a escolha mais segura em termos de UML estrita; **nesta documentação seguimos a notação da disciplina**.
+- **Crítica (observação além do material):** na UML, a agregação tem semântica fraca, e Fowler (_UML Distilled_) recomenda ignorá-la por ser, na prática, indistinguível de uma associação comum. Uma associação simples (`-->`) seria a escolha mais segura em termos de UML estrita; **nesta documentação seguimos a notação da disciplina**.
 
 #### Transições como notas, e não como setas entre estados
 
 - **Decisão:** representar as transições em **notas** presas a cada ConcreteState, como a aula faz (`context.setState(StateTwo);`).
 - **Alternativa:** setas pontilhadas entre estados concretos (`<<cria>>`), que mostram o acoplamento diretamente.
 - **Crítica:**
-  - **A favor das notas:** o diagrama fica mais limpo e fiel ao material, e cada estado mostra *exatamente* o código da sua transição.
+  - **A favor das notas:** o diagrama fica mais limpo e fiel ao material, e cada estado mostra _exatamente_ o código da sua transição.
   - **Contra:** o **acoplamento entre estados** (cada estado conhece seus sucessores) deixa de ser visível na estrutura do desenho; ele só aparece lendo as notas. O diagrama de estados da seção 3 compensa, mostrando o fluxo completo.
 
 #### `EstadoPedido ..> Pedido`: o contexto como parâmetro
@@ -493,17 +490,17 @@ Formato: **o que foi feito → por quê → alternativa → crítica**.
 
 ### Balanço: o que os diagramas mostram bem e mal
 
-| Mostram bem | Mostram mal ou omitem |
-|---|---|
-| Os papéis do GoF e a delegação (genérico × aplicado) | O **fluxo** completo de uma só vez (só nas notas) |
-| Que `Pedido` conhece só a interface (exceto no estado inicial) | Que `mudarEstado` é público e pode ser chamado por qualquer classe |
-| O código da transição de cada estado (notas) | A relação com `IllegalStateException` como mecanismo de rejeição (apenas citada nas notas) |
-| A dependência circular entre os pacotes | O acoplamento entre estados **como estrutura** (só nas notas) |
-| A hierarquia paralela enum × classes | — |
+| Mostram bem                                                    | Mostram mal ou omitem                                                                      |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Os papéis do GoF e a delegação (genérico × aplicado)           | O **fluxo** completo de uma só vez (só nas notas)                                          |
+| Que `Pedido` conhece só a interface (exceto no estado inicial) | Que `mudarEstado` é público e pode ser chamado por qualquer classe                         |
+| O código da transição de cada estado (notas)                   | A relação com `IllegalStateException` como mecanismo de rejeição (apenas citada nas notas) |
+| A dependência circular entre os pacotes                        | O acoplamento entre estados **como estrutura** (só nas notas)                              |
+| A hierarquia paralela enum × classes                           | —                                                                                          |
 
 ### Relação dos diagramas com a literatura
 
-**Material da disciplina.** A aula *Arquitetura e Desenho de Software — GoFs Comportamentais* (Profa. Milene Serrano, UnB Gama) é a **fonte de notação** destes diagramas. Dela vêm:
+**Material da disciplina.** A aula _Arquitetura e Desenho de Software — GoFs Comportamentais_ (Profa. Milene Serrano, UnB Gama) é a **fonte de notação** destes diagramas. Dela vêm:
 
 - o enquadramento do State como GoF **comportamental** (alterações no nível do comportamento dos objetos);
 - o **objetivo** do padrão (alterar o comportamento conforme o estado);
@@ -511,7 +508,7 @@ Formato: **o que foi feito → por quê → alternativa → crítica**.
 - a notação `<<usa>>` e o losango (slides de State), `<<cria>>` (slides de Command e Iterator) e o código de cores (slides de Strategy e Template Method);
 - as referências indicadas, entre elas o livro do GoF e o artigo do SourceMaking sobre State em Java.
 
-**O catálogo GoF.** O catálogo *Design Patterns* (Gamma, Helm, Johnson e Vlissides, 1995, como citado na aula) descreve o State com os participantes **Context**, **State** e **ConcreteState**, e discute os pontos que o diagrama explicita:
+**O catálogo GoF.** O catálogo _Design Patterns_ (Gamma, Helm, Johnson e Vlissides, 1995, como citado na aula) descreve o State com os participantes **Context**, **State** e **ConcreteState**, e discute os pontos que o diagrama explicita:
 
 - **Quem define as transições** (Context ou ConcreteStates): este projeto adota a segunda opção, vista nas notas;
 - **Criação dos objetos de estado**: aqui, criados a cada transição (`new`), e não compartilhados.
@@ -519,31 +516,31 @@ Formato: **o que foi feito → por quê → alternativa → crítica**.
 **UML como linguagem de modelagem.**
 
 - A **especificação UML** (OMG) define realização, dependência, associação, agregação, estereótipos, pacotes e notas.
-- Fowler (*UML Distilled*) distingue UML como **esboço**, **projeto detalhado** e **linguagem de programação**. Estes diagramas são **esboços didáticos**, o que justifica simplificações.
-- Booch, Rumbaugh e Jacobson (*The Unified Modeling Language User Guide*) descrevem estereótipos e dependências como mecanismos de extensão, base das convenções `<<usa>>` e `<<cria>>`.
+- Fowler (_UML Distilled_) distingue UML como **esboço**, **projeto detalhado** e **linguagem de programação**. Estes diagramas são **esboços didáticos**, o que justifica simplificações.
+- Booch, Rumbaugh e Jacobson (_The Unified Modeling Language User Guide_) descrevem estereótipos e dependências como mecanismos de extensão, base das convenções `<<usa>>` e `<<cria>>`.
 
 **Estrutura × comportamento.** O diagrama de estados deriva de **Statecharts** (Harel, 1987). A ideia de que classes (estrutura) e estados (comportamento) pedem visões distintas justifica o par de diagramas desta documentação.
 
 **Princípios de projeto evidenciados**
 
-| Princípio | Fonte | O que os diagramas revelam |
-|---|---|---|
-| **Aberto/Fechado** | Meyer (1988); Martin (2002) | Novo estado = nova classe, sem alterar `Pedido`; mas os estados vizinhos precisam ser alterados |
-| **Dependências Acíclicas** | Martin (2002) | O ciclo `context` ↔ `state` |
-| **Ocultação de informação** | Parnas (1972) | `Pedido` esconde o estado atrás da interface, mas `mudarEstado` público enfraquece isso |
+| Princípio                   | Fonte                       | O que os diagramas revelam                                                                      |
+| --------------------------- | --------------------------- | ----------------------------------------------------------------------------------------------- |
+| **Aberto/Fechado**          | Meyer (1988); Martin (2002) | Novo estado = nova classe, sem alterar `Pedido`; mas os estados vizinhos precisam ser alterados |
+| **Dependências Acíclicas**  | Martin (2002)               | O ciclo `context` ↔ `state`                                                                     |
+| **Ocultação de informação** | Parnas (1972)               | `Pedido` esconde o estado atrás da interface, mas `mudarEstado` público enfraquece isso         |
 
-**O mesmo padrão em outras fontes.** *Head First Design Patterns* (Freeman e Robson) e o site Refactoring Guru apresentam a mesma estrutura de participantes. Eles destacam a semelhança com o **Strategy**: o diagrama é quase idêntico e a diferença está na **intenção**, algo que o diagrama de classes não mostra por si só. Na aula, o contraste é visível nos objetivos: o Strategy permite variar **algoritmos**, o State altera o comportamento conforme o **estado**.
+**O mesmo padrão em outras fontes.** _Head First Design Patterns_ (Freeman e Robson) e o site Refactoring Guru apresentam a mesma estrutura de participantes. Eles destacam a semelhança com o **Strategy**: o diagrama é quase idêntico e a diferença está na **intenção**, algo que o diagrama de classes não mostra por si só. Na aula, o contraste é visível nos objetivos: o Strategy permite variar **algoritmos**, o State altera o comportamento conforme o **estado**.
 
 ### Onde a visão crítica vai além do material da aula
 
 Para evitar confundir "o que a disciplina pede" com "o que a crítica acrescenta", estes são os pontos em que os diagramas **seguem a aula** apesar de existir uma objeção:
 
-| Ponto | Material da aula | Crítica / alternativa |
-|---|---|---|
-| Agregação (losango) | Usada em vários dos padrões apresentados (por exemplo, Strategy, Command e State) | Semântica fraca na UML; associação simples seria mais segura |
-| `<<cria>>` | Estereótipo em português | Na UML, o estereótipo padrão para dependência de instanciação é `«instantiate»` (confira na versão da especificação adotada) |
-| Método público de troca de estado | `+setState(in State)` público | Quebra de encapsulamento; seria melhor *package-private* (exige `Pedido` e estados no mesmo pacote) |
-| Transições em notas | Nota `context.setState(...)` | O acoplamento entre estados fica menos visível na estrutura |
+| Ponto                             | Material da aula                                                                  | Crítica / alternativa                                                                                                        |
+| --------------------------------- | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Agregação (losango)               | Usada em vários dos padrões apresentados (por exemplo, Strategy, Command e State) | Semântica fraca na UML; associação simples seria mais segura                                                                 |
+| `<<cria>>`                        | Estereótipo em português                                                          | Na UML, o estereótipo padrão para dependência de instanciação é `«instantiate»` (confira na versão da especificação adotada) |
+| Método público de troca de estado | `+setState(in State)` público                                                     | Quebra de encapsulamento; seria melhor _package-private_ (exige `Pedido` e estados no mesmo pacote)                          |
+| Transições em notas               | Nota `context.setState(...)`                                                      | O acoplamento entre estados fica menos visível na estrutura                                                                  |
 
 ### Como validar os diagramas contra o código
 
@@ -583,7 +580,7 @@ java -cp out ui.PedidoGUI
 ```
 
 - `-d out` define a pasta de saída dos `.class`.
-- `-cp out` (*classpath*) diz ao `java` onde procurá-los.
+- `-cp out` (_classpath_) diz ao `java` onde procurá-los.
 - `ui.PedidoGUI` é o nome **completo** da classe (pacote + nome).
 
 ### 8.3 Com o Makefile
@@ -598,28 +595,28 @@ O `Makefile` deve ficar na **raiz do projeto**. No Windows, o `make` exige WSL o
 
 ### 8.4 Erros comuns
 
-| Mensagem | Causa provável | Solução |
-|---|---|---|
-| `error: file not found: ui/*.java` | A pasta `ui/` não existe ou está vazia | Criar `ui/` e colocar `PedidoGUI.java` dentro |
-| `ClassNotFoundException: ui.PedidoGUI` | A compilação falhou ou `-cp` está errado | Corrigir a compilação e rodar na raiz do projeto |
-| `missing separator` (make) | Receitas do Makefile com espaços em vez de TAB | Usar TAB nas linhas de comando |
+| Mensagem                               | Causa provável                                 | Solução                                          |
+| -------------------------------------- | ---------------------------------------------- | ------------------------------------------------ |
+| `error: file not found: ui/*.java`     | A pasta `ui/` não existe ou está vazia         | Criar `ui/` e colocar `PedidoGUI.java` dentro    |
+| `ClassNotFoundException: ui.PedidoGUI` | A compilação falhou ou `-cp` está errado       | Corrigir a compilação e rodar na raiz do projeto |
+| `missing separator` (make)             | Receitas do Makefile com espaços em vez de TAB | Usar TAB nas linhas de comando                   |
 
 ---
 
 ## 9. Decisões de projeto
 
-| # | Decisão | Alternativa considerada | Justificativa | Custo / trade-off |
-|---|---|---|---|---|
-| 1 | Usar o padrão **State** | `switch` sobre o `StatusPedido` dentro de `Pedido` | Evita condicionais repetidas em 3 operações; cada estado fica isolado e legível | 7 tipos em vez de 1 classe; transições espalhadas |
-| 2 | **Transições definidas pelos estados** | Tabela central de transições no `Pedido` | O `Pedido` não precisa saber das regras; adicionar um estado altera pouco código | Cada estado conhece seus sucessores (`new EstadoX()`) |
-| 3 | `StatusPedido` como **enum separado** | Derivar o status da classe do estado (`instanceof`) | Identificação estável para GUI, log e testes | Duas hierarquias paralelas a manter em sincronia |
-| 4 | Estados recebem o `Pedido` como **parâmetro** | Estado guarda referência ao contexto | Estados sem atributos de instância | `mudarEstado` precisa ser público (ver seção 11) |
-| 5 | **`IllegalStateException`** para operação inválida | Retornar `boolean`; exceção própria; consultar ações permitidas | Simples, padrão da linguagem, não polui as assinaturas | Usa exceção para uma situação esperada (ver seção 11) |
-| 6 | **Swing** | JavaFX, interface web | Já vem no JDK; zero dependências | Visual datado; Swing está em manutenção, não em evolução |
-| 7 | **GUI sem regras de negócio** | Habilitar/desabilitar botões por estado | Uma única fonte de verdade: os estados | O usuário clica em ações que sempre falham |
-| 8 | **Log da GUI por comparação antes/depois** | Alterar `Pedido` para notificar a GUI | Nenhuma alteração no código do domínio | A GUI só vê mudanças causadas por ela mesma |
-| 9 | Um **único pedido por vez** na GUI | Lista de pedidos em paralelo | Simplicidade; foco no padrão | Não demonstra vários pedidos simultâneos |
-| 10 | **Makefile** para automatizar | Maven/Gradle; script `.bat` | Poucas linhas, sem dependências, recompilação incremental | Não é portável para Windows puro; não gerencia dependências |
+| #   | Decisão                                            | Alternativa considerada                                         | Justificativa                                                                    | Custo / trade-off                                           |
+| --- | -------------------------------------------------- | --------------------------------------------------------------- | -------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| 1   | Usar o padrão **State**                            | `switch` sobre o `StatusPedido` dentro de `Pedido`              | Evita condicionais repetidas em 3 operações; cada estado fica isolado e legível  | 7 tipos em vez de 1 classe; transições espalhadas           |
+| 2   | **Transições definidas pelos estados**             | Tabela central de transições no `Pedido`                        | O `Pedido` não precisa saber das regras; adicionar um estado altera pouco código | Cada estado conhece seus sucessores (`new EstadoX()`)       |
+| 3   | `StatusPedido` como **enum separado**              | Derivar o status da classe do estado (`instanceof`)             | Identificação estável para GUI, log e testes                                     | Duas hierarquias paralelas a manter em sincronia            |
+| 4   | Estados recebem o `Pedido` como **parâmetro**      | Estado guarda referência ao contexto                            | Estados sem atributos de instância                                               | `mudarEstado` precisa ser público (ver seção 11)            |
+| 5   | **`IllegalStateException`** para operação inválida | Retornar `boolean`; exceção própria; consultar ações permitidas | Simples, padrão da linguagem, não polui as assinaturas                           | Usa exceção para uma situação esperada (ver seção 11)       |
+| 6   | **Swing**                                          | JavaFX, interface web                                           | Já vem no JDK; zero dependências                                                 | Visual datado; Swing está em manutenção, não em evolução    |
+| 7   | **GUI sem regras de negócio**                      | Habilitar/desabilitar botões por estado                         | Uma única fonte de verdade: os estados                                           | O usuário clica em ações que sempre falham                  |
+| 8   | **Log da GUI por comparação antes/depois**         | Alterar `Pedido` para notificar a GUI                           | Nenhuma alteração no código do domínio                                           | A GUI só vê mudanças causadas por ela mesma                 |
+| 9   | Um **único pedido por vez** na GUI                 | Lista de pedidos em paralelo                                    | Simplicidade; foco no padrão                                                     | Não demonstra vários pedidos simultâneos                    |
+| 10  | **Makefile** para automatizar                      | Maven/Gradle; script `.bat`                                     | Poucas linhas, sem dependências, recompilação incremental                        | Não é portável para Windows puro; não gerencia dependências |
 
 ---
 
@@ -627,11 +624,11 @@ O `Makefile` deve ficar na **raiz do projeto**. No Windows, o `make` exige WSL o
 
 ### 10.1 Material da disciplina
 
-A aula *GoFs Comportamentais* (Profa. Milene Serrano, UnB Gama) é a **fonte de notação e de estrutura** desta documentação: define o State como padrão comportamental, apresenta seu objetivo, a modelagem genérica e a aplicada, e indica como referências o catálogo do GoF (citado como 1995) e o artigo do SourceMaking sobre State em Java.
+A aula _GoFs Comportamentais_ (Profa. Milene Serrano, UnB Gama) é a **fonte de notação e de estrutura** desta documentação: define o State como padrão comportamental, apresenta seu objetivo, a modelagem genérica e a aplicada, e indica como referências o catálogo do GoF (citado como 1995) e o artigo do SourceMaking sobre State em Java.
 
 ### 10.2 Padrões de projeto (GoF)
 
-- **State** (*Design Patterns: Elements of Reusable Object-Oriented Software*, 1995): fonte primária. A estrutura Context/State/ConcreteState, a delegação e a discussão sobre quem define as transições aparecem diretamente neste sistema.
+- **State** (_Design Patterns: Elements of Reusable Object-Oriented Software_, 1995): fonte primária. A estrutura Context/State/ConcreteState, a delegação e a discussão sobre quem define as transições aparecem diretamente neste sistema.
 - **Singleton / Flyweight**: o catálogo cita que objetos de estado sem atributos podem ser compartilhados (muitas vezes como singletons). **Este projeto não aplica essa otimização** (seção 11.3).
 - **Strategy**: estrutura semelhante, intenção diferente (seção 4.5).
 - **Observer**: não usado, mas seria a solução natural para a GUI reagir a mudanças feitas fora dela (seção 12).
@@ -639,8 +636,8 @@ A aula *GoFs Comportamentais* (Profa. Milene Serrano, UnB Gama) é a **fonte de 
 ### 10.3 Material didático
 
 - **Head First Design Patterns** (Freeman e Robson) apresenta o State com o exemplo de uma máquina de venda de chicletes, que tem a mesma estrutura deste sistema e mostra bem o problema dos `if` aninhados que o padrão elimina.
-- **Refactoring** (Fowler) descreve a técnica *Replace Conditional with Polymorphism*, que é a mecânica por trás do State: trocar condicionais sobre um tipo/estado por chamadas polimórficas.
-- **Refactoring to Patterns** (Kerievsky) cataloga a refatoração *Replace State-Altering Conditionals with State*, que parte justamente de um código com `switch` sobre status, como seria a versão "ingênua" deste sistema.
+- **Refactoring** (Fowler) descreve a técnica _Replace Conditional with Polymorphism_, que é a mecânica por trás do State: trocar condicionais sobre um tipo/estado por chamadas polimórficas.
+- **Refactoring to Patterns** (Kerievsky) cataloga a refatoração _Replace State-Altering Conditionals with State_, que parte justamente de um código com `switch` sobre status, como seria a versão "ingênua" deste sistema.
 
 ### 10.4 Modelagem de máquinas de estados
 
@@ -649,14 +646,14 @@ A aula *GoFs Comportamentais* (Profa. Milene Serrano, UnB Gama) é a **fonte de 
 
 ### 10.5 Princípios de projeto
 
-- **Princípio Aberto/Fechado** (Meyer; popularizado por Martin): adicionar um novo estado exige criar uma classe e ajustar apenas os estados vizinhos, sem reescrever condicionais em `Pedido`. A adesão é **parcial**: adicionar uma nova *operação* ainda exige alterar a interface e todos os estados.
+- **Princípio Aberto/Fechado** (Meyer; popularizado por Martin): adicionar um novo estado exige criar uma classe e ajustar apenas os estados vizinhos, sem reescrever condicionais em `Pedido`. A adesão é **parcial**: adicionar uma nova _operação_ ainda exige alterar a interface e todos os estados.
 - **Responsabilidade Única**: cada estado concentra as regras de uma etapa do ciclo de vida.
 - **Encapsulamento**: o `Pedido` esconde o estado atual; contudo `mudarEstado` público enfraquece isso (seção 11.2).
 
 ### 10.6 Boas práticas em Java
 
-- *Effective Java* (Bloch): uso de `enum` para constantes, enum como singleton, e a recomendação de usar exceções para condições excepcionais. Esta última é diretamente relevante para a crítica da seção 11.5.
-- **Documentação oficial da Oracle** para Swing (*Creating a GUI with Swing*, *Concurrency in Swing*) e para `IllegalStateException`.
+- _Effective Java_ (Bloch): uso de `enum` para constantes, enum como singleton, e a recomendação de usar exceções para condições excepcionais. Esta última é diretamente relevante para a crítica da seção 11.5.
+- **Documentação oficial da Oracle** para Swing (_Creating a GUI with Swing_, _Concurrency in Swing_) e para `IllegalStateException`.
 
 ---
 
@@ -667,7 +664,7 @@ A aula *GoFs Comportamentais* (Profa. Milene Serrano, UnB Gama) é a **fonte de 
 - **Aderência ao padrão**: a estrutura segue o GoF de forma reconhecível, o que torna o código um bom material de estudo.
 - **Ausência de condicionais sobre o status** em `Pedido` e na GUI.
 - **Regras localizadas**: para saber "o que acontece se cancelar um pedido pago", basta abrir `EstadoPago`.
-- **Mensagens de erro específicas** por estado, que ajudam o usuário a entender *por que* a operação falhou.
+- **Mensagens de erro específicas** por estado, que ajudam o usuário a entender _por que_ a operação falhou.
 - **GUI desacoplada do domínio**: nenhuma regra de transição vazou para a interface.
 - **Extensibilidade de estados**: um novo estado (por exemplo, `EM_DEVOLUCAO`) é uma nova classe, mais ajustes pontuais nos vizinhos.
 
@@ -693,7 +690,7 @@ Nota: na GUI isso é **intencional** (seção 6.6), mas em um sistema real a int
 
 ### 11.6 A operação `avancar()` é genérica demais
 
-"Avançar" esconde significados de domínio diferentes: *iniciar separação*, *enviar*, *marcar como entregue*. Na prática, cada uma dessas ações teria **pré-condições, dados e efeitos próprios** (código de rastreio, data de entrega…). Com uma única operação genérica, o modelo não consegue expressar essas diferenças.
+"Avançar" esconde significados de domínio diferentes: _iniciar separação_, _enviar_, _marcar como entregue_. Na prática, cada uma dessas ações teria **pré-condições, dados e efeitos próprios** (código de rastreio, data de entrega…). Com uma única operação genérica, o modelo não consegue expressar essas diferenças.
 
 ### 11.7 O comportamento que varia é pequeno
 
@@ -718,7 +715,7 @@ Quase todo método dos estados faz uma de duas coisas: troca de estado ou lança
 
 - **Sem testes automatizados**: a tabela de 18 transições (seção 3.2) é um convite natural a testes parametrizados.
 - **Sem proteção contra concorrência**: `Pedido` é mutável e não sincronizado. Duas threads chamando `avancar()` ao mesmo tempo poderiam gerar um estado inconsistente. Para a GUI (uma thread de eventos) não é problema; para um serviço web seria.
-- **Sem persistência**: ao fechar a janela, todo o histórico e os pedidos se perdem. Persistir exigiria mapear `StatusPedido` para o banco e reconstruir o objeto de estado a partir dele (o que justificaria uma *factory* de estados).
+- **Sem persistência**: ao fechar a janela, todo o histórico e os pedidos se perdem. Persistir exigiria mapear `StatusPedido` para o banco e reconstruir o objeto de estado a partir dele (o que justificaria uma _factory_ de estados).
 - **Idioma misturado** no código (nomes em português, termos do padrão em inglês); é uma escolha válida, mas deve ser consistente.
 
 ### 11.11 Síntese crítica
@@ -760,7 +757,7 @@ Os estados passam a fazer `p.mudarEstado(Estados.PAGO)`. Só é seguro enquanto 
 
 ### 12.3 Encapsular `mudarEstado`
 
-Colocar `Pedido` e os estados no **mesmo pacote** e tornar `mudarEstado` *package-private* (sem modificador). A GUI, em outro pacote, deixa de poder chamá-lo.
+Colocar `Pedido` e os estados no **mesmo pacote** e tornar `mudarEstado` _package-private_ (sem modificador). A GUI, em outro pacote, deixa de poder chamá-lo.
 
 ### 12.4 Expor as ações permitidas
 
@@ -768,7 +765,7 @@ Adicionar, por exemplo, `Set<Acao> acoesPermitidas()` em `EstadoPedido`. A GUI p
 
 ### 12.5 Notificar a interface
 
-Fazer o `Pedido` aceitar *listeners* (Observer) e notificá-los em `mudarEstado`. A GUI se registra e atualiza a tela e o histórico a partir do evento, eliminando o log duplicado.
+Fazer o `Pedido` aceitar _listeners_ (Observer) e notificá-los em `mudarEstado`. A GUI se registra e atualiza a tela e o histórico a partir do evento, eliminando o log duplicado.
 
 ### 12.6 Testes
 
@@ -796,41 +793,40 @@ Operações específicas (`iniciarSeparacao()`, `enviar(codigoRastreio)`, `entre
 
 **Material da disciplina**
 
-- SERRANO, M. *Arquitetura e Desenho de Software — Aula: GoFs Comportamentais*. Slides. UnB Gama.
-- SourceMaking. *State Design Pattern in Java* (indicado nos slides). <https://sourcemaking.com/design_patterns/state/java/5>
+- SERRANO, M. _Arquitetura e Desenho de Software — Aula: GoFs Comportamentais_. Slides. UnB Gama.
+- SourceMaking. _State Design Pattern in Java_ (indicado nos slides). <https://sourcemaking.com/design_patterns/state/java/5>
 
 **Padrões de projeto e refatoração**
 
-- GAMMA, E.; HELM, R.; JOHNSON, R.; VLISSIDES, J. *Design Patterns: Elements of Reusable Object-Oriented Software*. Addison-Wesley, 1995. (Padrão State; menções a Singleton, Flyweight e Strategy.)
-- FREEMAN, E.; ROBSON, E. *Head First Design Patterns*, 2ª ed. O'Reilly. (Capítulo sobre o padrão State.)
-- FOWLER, M. *Refactoring: Improving the Design of Existing Code*. Addison-Wesley. (*Replace Conditional with Polymorphism*.)
-- KERIEVSKY, J. *Refactoring to Patterns*. Addison-Wesley, 2004. (*Replace State-Altering Conditionals with State*.)
-- Refactoring Guru. *State*. <https://refactoring.guru/design-patterns/state>
+- GAMMA, E.; HELM, R.; JOHNSON, R.; VLISSIDES, J. _Design Patterns: Elements of Reusable Object-Oriented Software_. Addison-Wesley, 1995. (Padrão State; menções a Singleton, Flyweight e Strategy.)
+- FREEMAN, E.; ROBSON, E. _Head First Design Patterns_, 2ª ed. O'Reilly. (Capítulo sobre o padrão State.)
+- FOWLER, M. _Refactoring: Improving the Design of Existing Code_. Addison-Wesley. (_Replace Conditional with Polymorphism_.)
+- KERIEVSKY, J. _Refactoring to Patterns_. Addison-Wesley, 2004. (_Replace State-Altering Conditionals with State_.)
+- Refactoring Guru. _State_. <https://refactoring.guru/design-patterns/state>
 
 **Modelagem e princípios**
 
-- HAREL, D. Statecharts: A visual formalism for complex systems. *Science of Computer Programming*, 8(3), 1987.
-- OMG. *Unified Modeling Language (UML) Specification* — diagramas de classes e de máquina de estados.
-- FOWLER, M. *UML Distilled*. Addison-Wesley. (Usos da UML; crítica à agregação.)
-- BOOCH, G.; RUMBAUGH, J.; JACOBSON, I. *The Unified Modeling Language User Guide*. Addison-Wesley.
-- MEYER, B. *Object-Oriented Software Construction*. Prentice Hall, 1988. (Princípio Aberto/Fechado.)
-- MARTIN, R. C. *Agile Software Development: Principles, Patterns, and Practices*. Prentice Hall, 2002. (Princípios SOLID e de pacotes.)
-- PARNAS, D. L. On the criteria to be used in decomposing systems into modules. *Communications of the ACM*, 15(12), 1972. (Ocultação de informação.)
+- HAREL, D. Statecharts: A visual formalism for complex systems. _Science of Computer Programming_, 8(3), 1987.
+- OMG. _Unified Modeling Language (UML) Specification_ — diagramas de classes e de máquina de estados.
+- FOWLER, M. _UML Distilled_. Addison-Wesley. (Usos da UML; crítica à agregação.)
+- BOOCH, G.; RUMBAUGH, J.; JACOBSON, I. _The Unified Modeling Language User Guide_. Addison-Wesley.
+- MEYER, B. _Object-Oriented Software Construction_. Prentice Hall, 1988. (Princípio Aberto/Fechado.)
+- MARTIN, R. C. _Agile Software Development: Principles, Patterns, and Practices_. Prentice Hall, 2002. (Princípios SOLID e de pacotes.)
+- PARNAS, D. L. On the criteria to be used in decomposing systems into modules. _Communications of the ACM_, 15(12), 1972. (Ocultação de informação.)
 
 **Java**
 
-- BLOCH, J. *Effective Java*, 3ª ed. Addison-Wesley, 2018. (Enums, enum como singleton, uso adequado de exceções.)
-- ORACLE. *The Java Tutorials*: *Enum Types*; *Creating a GUI with Swing*; *Laying Out Components Within a Container*; *Concurrency in Swing*; *Managing Source and Class Files* (pacotes e estrutura de diretórios). <https://docs.oracle.com/javase/tutorial/>
-- ORACLE. *Java Platform API Specification*: `java.lang.IllegalStateException`. <https://docs.oracle.com/en/java/javase/21/docs/api/>
+- BLOCH, J. _Effective Java_, 3ª ed. Addison-Wesley, 2018. (Enums, enum como singleton, uso adequado de exceções.)
+- ORACLE. _The Java Tutorials_: _Enum Types_; _Creating a GUI with Swing_; _Laying Out Components Within a Container_; _Concurrency in Swing_; _Managing Source and Class Files_ (pacotes e estrutura de diretórios). <https://docs.oracle.com/javase/tutorial/>
+- ORACLE. _Java Platform API Specification_: `java.lang.IllegalStateException`. <https://docs.oracle.com/en/java/javase/21/docs/api/>
 - ORACLE. Documentação das ferramentas `javac` e `java`. <https://docs.oracle.com/en/java/javase/21/docs/specs/man/>
 
 **Ferramentas**
 
 - GNU Make Manual. <https://www.gnu.org/software/make/manual/make.html>
-- PlantUML. *Class Diagram* e *Language Reference Guide*. <https://plantuml.com/class-diagram> e <https://plantuml.com/guide>
+- PlantUML. _Class Diagram_ e _Language Reference Guide_. <https://plantuml.com/class-diagram> e <https://plantuml.com/guide>
 
 ---
-
 
 ## 15. Demonstração da interface (Imagens em cada estado)
 
@@ -838,12 +834,11 @@ Operações específicas (`iniciarSeparacao()`, `enviar(codigoRastreio)`, `entre
 
 <div style="text-align:center;">
 
-
-![Pedido criado aguardando pagamento](../Assets/FluxoDeCompra(State)/01.png)
+![Pedido criado aguardando pagamento](<../assets/FluxoDeCompra(State)/01.png>)
 
 <p><strong>Interface Gráfica</strong> — Pedido criado aguardando pagamento. <em>Autor: José Joaquim da Silva Neto</em></p>
 
-[Clique aqui para baixar a imagem!](/Base/Subequipe03/Assets/FluxoDeCompraState/01.png ':ignore')
+[Clique aqui para baixar a imagem!](/Base/Subequipe03/assets/FluxoDeCompraState/01.png ":ignore")
 
 </div>
 
@@ -851,11 +846,11 @@ Operações específicas (`iniciarSeparacao()`, `enviar(codigoRastreio)`, `entre
 
 <div style="text-align:center;">
 
-![Pedido Pago](../Assets/FluxoDeCompra(State)/02.png)
+![Pedido Pago](<../assets/FluxoDeCompra(State)/02.png>)
 
 <p><strong>Interface Gráfica</strong> — Pedido pago. <em>Autor: José Joaquim da Silva Neto</em></p>
 
-[Clique aqui para baixar a imagem!](/Base/Subequipe03/Assets/FluxoDeCompraState/02.png ':ignore')
+[Clique aqui para baixar a imagem!](/Base/Subequipe03/assets/FluxoDeCompraState/02.png ":ignore")
 
 </div>
 
@@ -863,11 +858,11 @@ Operações específicas (`iniciarSeparacao()`, `enviar(codigoRastreio)`, `entre
 
 <div style="text-align:center;">
 
-![Pedido em separação](../Assets/FluxoDeCompra(State)/03.png)
+![Pedido em separação](<../assets/FluxoDeCompra(State)/03.png>)
 
 <p><strong>Interface Gráfica</strong> — Pedido em separação. <em>Autor: José Joaquim da Silva Neto</em></p>
 
-[Clique aqui para baixar a imagem!](/Base/Subequipe03/Assets/FluxoDeCompraState/03.png ':ignore')
+[Clique aqui para baixar a imagem!](/Base/Subequipe03/assets/FluxoDeCompraState/03.png ":ignore")
 
 </div>
 
@@ -875,11 +870,11 @@ Operações específicas (`iniciarSeparacao()`, `enviar(codigoRastreio)`, `entre
 
 <div style="text-align:center;">
 
-![Pedido enviado](../Assets/FluxoDeCompra(State)/04.png)
+![Pedido enviado](<../assets/FluxoDeCompra(State)/04.png>)
 
 <p><strong>Interface Gráfica</strong> — Pedido enviado. <em>Autor: José Joaquim da Silva Neto</em></p>
 
-[Clique aqui para baixar a imagem!](/Base/Subequipe03/Assets/FluxoDeCompraState/04.png ':ignore')
+[Clique aqui para baixar a imagem!](/Base/Subequipe03/assets/FluxoDeCompraState/04.png ":ignore")
 
 </div>
 
@@ -887,11 +882,11 @@ Operações específicas (`iniciarSeparacao()`, `enviar(codigoRastreio)`, `entre
 
 <div style="text-align:center;">
 
-![Pedido entregue](../Assets/FluxoDeCompra(State)/05.png)
+![Pedido entregue](<../assets/FluxoDeCompra(State)/05.png>)
 
 <p><strong>Interface Gráfica</strong> — Pedido entregue. <em>Autor: José Joaquim da Silva Neto</em></p>
 
-[Clique aqui para baixar a imagem!](/Base/Subequipe03/Assets/FluxoDeCompraState/05.png ':ignore')
+[Clique aqui para baixar a imagem!](/Base/Subequipe03/assets/FluxoDeCompraState/05.png ":ignore")
 
 </div>
 
@@ -899,11 +894,11 @@ Operações específicas (`iniciarSeparacao()`, `enviar(codigoRastreio)`, `entre
 
 <div style="text-align:center;">
 
-![Fim do ciclo de vida da compra](../Assets/FluxoDeCompra(State)/06.png)
+![Fim do ciclo de vida da compra](<../assets/FluxoDeCompra(State)/06.png>)
 
 <p><strong>Interface Gráfica</strong> — Fim do ciclo de vida da compra. <em>Autor: José Joaquim da Silva Neto</em></p>
 
-[Clique aqui para baixar a imagem!](/Base/Subequipe03/Assets/FluxoDeCompraState/06.png ':ignore')
+[Clique aqui para baixar a imagem!](/Base/Subequipe03/assets/FluxoDeCompraState/06.png ":ignore")
 
 </div>
 
@@ -915,7 +910,7 @@ Esse fluxo trata do ciclo de vida padrão de um pedido, partimos de um pedido qu
 
 <div style="text-align:center;">
 
-[01.mp4](../Assets/FluxoDeCompra(State)/01.mp4 ':include :type=video controls width=80%')
+[01.mp4](<../assets/FluxoDeCompra(State)/01.mp4> ":include :type=video controls width=80%")
 
 <p><strong>Interface Gráfica</strong> — Fluxo de compra padrão. <em>Autor: José Joaquim da Silva Neto</em></p>
 
@@ -925,7 +920,7 @@ Esse fluxo trata do ciclo de vida padrão de um pedido, partimos de um pedido qu
 
 <div style="text-align:center;">
 
-[02.mp4](../Assets/FluxoDeCompra(State)/02.mp4 ':include :type=video controls width=80%')
+[02.mp4](<../assets/FluxoDeCompra(State)/02.mp4> ":include :type=video controls width=80%")
 
 <p><strong>Interface Gráfica</strong> — Fluxo de compra com cancelamentos. <em>Autor: José Joaquim da Silva Neto</em></p>
 
@@ -933,12 +928,13 @@ Esse fluxo trata do ciclo de vida padrão de um pedido, partimos de um pedido qu
 
 ## Histórico de Versões
 
-| Versão | Data | Descrição | Autor(es) | Revisor(es) |
-| -- | -- | -- | -- | -- |
-| 1.0 | 05/10/2026 | Criação da página | José Joaquim da Silva Neto | -- |
-| 1.1 | 15/10/2026 | Adiciona justificativa da tecnologia utilizada para a interface gráfica | José Joaquim da Silva Neto | -- |
-| 1.2 | 15/10/2026 | Adiciona imagens e vídeo da demonstração da interface gráfica | José Joaquim da Silva Neto | -- |
-| 1.3 | 15/10/2026 | Adiciona documentação | José Joaquim da Silva Neto | -- |
-| 1.4 | 15/10/2026 | Adiciona a explicação dos diagramas de classes, decisões de projeto, literatura, visão crítica, melhorias, limitações e referências | José Joaquim da Silva Neto | -- |
-| 1.5 | 15/10/2026 | Revisão geral: corrige referências cruzadas, legendas, textos alternativos, links de download e digitação | José Joaquim da Silva Neto | -- |
-| 1.6 | 15/10/2026 | Adiciona segundo vídeo de apresentação da interface gráfica | José Joaquim da Silva Neto | -- |
+| Versão | Data       | Descrição                                                                                                                           | Autor(es)                  | Revisor(es) |
+| ------ | ---------- | ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------- | ----------- |
+| 1.0    | 05/10/2026 | Criação da página                                                                                                                   | José Joaquim da Silva Neto | --          |
+| 1.1    | 15/10/2026 | Adiciona justificativa da tecnologia utilizada para a interface gráfica                                                             | José Joaquim da Silva Neto | --          |
+| 1.2    | 15/10/2026 | Adiciona imagens e vídeo da demonstração da interface gráfica                                                                       | José Joaquim da Silva Neto | --          |
+| 1.3    | 15/10/2026 | Adiciona documentação                                                                                                               | José Joaquim da Silva Neto | --          |
+| 1.4    | 15/10/2026 | Adiciona a explicação dos diagramas de classes, decisões de projeto, literatura, visão crítica, melhorias, limitações e referências | José Joaquim da Silva Neto | --          |
+| 1.5    | 15/10/2026 | Revisão geral: corrige referências cruzadas, legendas, textos alternativos, links de download e digitação                           | José Joaquim da Silva Neto | --          |
+| 1.6    | 15/10/2026 | Adiciona segundo vídeo de apresentação da interface gráfica                                                                         | José Joaquim da Silva Neto | --          |
+
