@@ -39,7 +39,7 @@ Com a documentação oficial aprendi detalhes que mudaram decisões concretas. A
 
 <div style="text-align:center;">
 
-![01](Assets/IAGenerativa/Joaquim/01IA.png)
+![01](assets/IAGenerativa/Joaquim/01IA.png)
 
 <p><strong>Uso de IA Generativa</strong> — Avaliação de erros. <em>Autor: José Joaquim da Silva Neto</em></p>
 
@@ -68,8 +68,8 @@ Com a documentação oficial aprendi detalhes que mudaram decisões concretas. A
 
 <div style="text-align:center;">
 
-![02](Assets/IAGenerativa/Julia/02IA.png)
-![01](Assets/IAGenerativa/Julia/01IA.png)
+![02](assets/IAGenerativa/Julia/02IA.png)
+![01](assets/IAGenerativa/Julia/01IA.png)
 
 
 <p><strong>Uso de IA Generativa</strong> — Prompt de aprendizagem do padrão Observer. <em>Autora: Júlia Santana Campos</em></p>
@@ -78,7 +78,7 @@ Com a documentação oficial aprendi detalhes que mudaram decisões concretas. A
 
 <div style="text-align:center;">
 
-![03](Assets/IAGenerativa/Julia/03IA.png)
+![03](assets/IAGenerativa/Julia/03IA.png)
 
 <p><strong>Uso de IA Generativa</strong> — Revisão do rascunho do diagrama no draw.io. <em>Autora: Júlia Santana Campos</em></p>
 
