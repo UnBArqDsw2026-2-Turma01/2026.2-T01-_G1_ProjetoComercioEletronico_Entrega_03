@@ -9,6 +9,10 @@
   - SubEquipe 03
     - [Ata de reunião do dia 30/09/26](/ReunioesAtas/Subequipe3/Ata30_09.md)
     - [Gravação da reunião do dia 30/09/26](/ReunioesAtas/Subequipe3/Gravacao30_09.md)
+    - [Ata de reunião do dia 09/10/26](/ReunioesAtas/Subequipe3/Ata09_10.md)
+    - [Gravação da reunião do dia 30/09/26](/ReunioesAtas/Subequipe3/Gravacao09_10.md)
+    - [Ata de reunião do dia 15/10/26](/ReunioesAtas/Subequipe3/Ata15_10.md)
+    - [Gravação da reunião do dia 30/09/26](/ReunioesAtas/Subequipe3/Gravacao15_10.md)
 
 - **Base**
   - [1. Desenho de Software (Padrões de Projeto)](/Base/1.PadroesDeProjeto.md)
