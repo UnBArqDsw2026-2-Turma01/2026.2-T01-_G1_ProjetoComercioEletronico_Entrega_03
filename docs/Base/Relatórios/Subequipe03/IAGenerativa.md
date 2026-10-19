@@ -8,14 +8,14 @@ Este documento apresenta as **lições aprendidas** e o **uso de Inteligência A
 
 ### Lições aprendidas
 
-* Diferença prática entre as setas de UML: realização (tracejada com triângulo vazio), agregação (losango vazio), associação e dependência.
-* O Observer não elimina as decisões (os `if`), mas as distribui para quem é responsável por elas, deixando o Subject sem regra de negócio.
-* Fluxo de Git em equipe: branches por tarefa, PRs, conflitos de nome e cuidado com o caminho dos arquivos no GitPages.
+- Diferença prática entre as setas de UML: realização (tracejada com triângulo vazio), agregação (losango vazio), associação e dependência.
+- O Observer não elimina as decisões (os `if`), mas as distribui para quem é responsável por elas, deixando o Subject sem regra de negócio.
+- Fluxo de Git em equipe: branches por tarefa, PRs, conflitos de nome e cuidado com o caminho dos arquivos no GitPages.
 
 ### Uso de IA Generativa
 
-* Usei o Claude para discutir a escolha do subsistema, mapear os papéis do GoF nas classes, gerar e revisar o código, montar a interface de demonstração e estruturar a documentação.
-* A IA errou em pontos que só percebi revisando: as pontas das setas no diagrama, a escolha da linguagem sem perguntar e os caminhos das imagens. Por isso, todo resultado foi conferido rodando o código e abrindo a página publicada.
+- Usei o Claude para discutir a escolha do subsistema, mapear os papéis do GoF nas classes, gerar e revisar o código, montar a interface de demonstração e estruturar a documentação.
+- A IA errou em pontos que só percebi revisando: as pontas das setas no diagrama, a escolha da linguagem sem perguntar e os caminhos das imagens. Por isso, todo resultado foi conferido rodando o código e abrindo a página publicada.
 
 ---
 
@@ -51,26 +51,25 @@ Com a documentação oficial aprendi detalhes que mudaram decisões concretas. A
 
 ### Lições aprendidas
 
-* O Observer separa quem **muda** de quem **reage**. O `Pagamento` só sabe que existe uma lista de `Observer` e chama `update()` em cada um. Ele não conhece `LiberacaoEnvio`, `ReposicaoEstoque` nem as notificações. Por isso, para adicionar uma nova reação, basta criar um novo observador e fazer `attach`, sem alterar o `Pagamento`.
-* Os nomes do GoF confundem no começo. No meu primeiro rascunho, coloquei `attach`, `detach` e `notify` numa classe chamada `Observer`, quando eles pertencem ao `Subject` (o objeto observado). Fixei assim: o observ**ado** é o Subject e o observ**ador** é o Observer.
-* A associação do `ConcreteObserver` para o `ConcreteSubject` é a mais fácil de esquecer e é essencial: é por ela que o `update()` chama `getState()` e descobre o novo status (modelo *pull*). No modelo *push*, ao contrário, o Subject já envia o dado como parâmetro.
-* Na notação UML, aprendi a diferenciar classe abstrata (itálico e `{abstract}`), método abstrato, estereótipos como `«ConcreteSubject»`, herança (linha cheia com triângulo vazio), associação com papel e multiplicidade (`observers 0..*`, `subject 1`) e dependência tracejada para o enum `StatusPagamento`.
-* Usar um enum em vez de `String` para o status deixa explícitos os valores possíveis (PENDENTE, APROVADO, RECUSADO, ESTORNADO) e evita estados inválidos.
-* As notas no diagrama (`notify()`, `setState()`, `update()`) mostram o comportamento que o diagrama de classes sozinho não mostra. Isso ajuda a explicar o fluxo: `setState` → `notify` → `update` → `getState`.
-* Aprendi a montar a referência do GoF na ABNT NBR 6023:2018, que aceita, para quatro ou mais autores, tanto a lista completa quanto o primeiro autor seguido de *et al.*
+- O Observer separa quem **muda** de quem **reage**. O `Pagamento` só sabe que existe uma lista de `Observer` e chama `update()` em cada um. Ele não conhece `LiberacaoEnvio`, `ReposicaoEstoque` nem as notificações. Por isso, para adicionar uma nova reação, basta criar um novo observador e fazer `attach`, sem alterar o `Pagamento`.
+- Os nomes do GoF confundem no começo. No meu primeiro rascunho, coloquei `attach`, `detach` e `notify` numa classe chamada `Observer`, quando eles pertencem ao `Subject` (o objeto observado). Fixei assim: o observ**ado** é o Subject e o observ**ador** é o Observer.
+- A associação do `ConcreteObserver` para o `ConcreteSubject` é a mais fácil de esquecer e é essencial: é por ela que o `update()` chama `getState()` e descobre o novo status (modelo _pull_). No modelo _push_, ao contrário, o Subject já envia o dado como parâmetro.
+- Na notação UML, aprendi a diferenciar classe abstrata (itálico e `{abstract}`), método abstrato, estereótipos como `«ConcreteSubject»`, herança (linha cheia com triângulo vazio), associação com papel e multiplicidade (`observers 0..*`, `subject 1`) e dependência tracejada para o enum `StatusPagamento`.
+- Usar um enum em vez de `String` para o status deixa explícitos os valores possíveis (PENDENTE, APROVADO, RECUSADO, ESTORNADO) e evita estados inválidos.
+- As notas no diagrama (`notify()`, `setState()`, `update()`) mostram o comportamento que o diagrama de classes sozinho não mostra. Isso ajuda a explicar o fluxo: `setState` → `notify` → `update` → `getState`.
+- Aprendi a montar a referência do GoF na ABNT NBR 6023:2018, que aceita, para quatro ou mais autores, tanto a lista completa quanto o primeiro autor seguido de _et al._
 
 ### Uso de IA Generativa
 
-* Usei o Claude primeiro como **tutor**. Escrevi um prompt pedindo que ele me ensinasse o Observer passo a passo, com analogias, perguntas de reflexão e um gabarito, sem me entregar o diagrama nem o texto prontos. Com isso, entendi os quatro participantes, as setas UML e a referência ABNT.
-* Depois, desenhei o diagrama no draw.io por partes e enviei prints para a IA revisar. Foi nessa revisão que percebi que tinha trocado `Subject` e `Observer`, além de corrigir um erro de digitação e a forma de marcar as classes abstratas.
-* Para acelerar a versão final do subsistema de pagamento, pedi o código PlantUML completo e uma explicação de cada bloco. Não usei o resultado diretamente: estudei a explicação e redesenhei o diagrama na ferramenta da equipe, ajustando o layout.
-* A IA funcionou como apoio para tirar dúvidas e revisar. As decisões de modelagem e a conferência final do diagrama com o GoF ficaram comigo.
+- Usei o Claude primeiro como **tutor**. Escrevi um prompt pedindo que ele me ensinasse o Observer passo a passo, com analogias, perguntas de reflexão e um gabarito, sem me entregar o diagrama nem o texto prontos. Com isso, entendi os quatro participantes, as setas UML e a referência ABNT.
+- Depois, desenhei o diagrama no draw.io por partes e enviei prints para a IA revisar. Foi nessa revisão que percebi que tinha trocado `Subject` e `Observer`, além de corrigir um erro de digitação e a forma de marcar as classes abstratas.
+- Para acelerar a versão final do subsistema de pagamento, pedi o código PlantUML completo e uma explicação de cada bloco. Não usei o resultado diretamente: estudei a explicação e redesenhei o diagrama na ferramenta da equipe, ajustando o layout.
+- A IA funcionou como apoio para tirar dúvidas e revisar. As decisões de modelagem e a conferência final do diagrama com o GoF ficaram comigo.
 
 <div style="text-align:center;">
 
 ![02](assets/IAGenerativa/Julia/02IA.png)
 ![01](assets/IAGenerativa/Julia/01IA.png)
-
 
 <p><strong>Uso de IA Generativa</strong> — Prompt de aprendizagem do padrão Observer. <em>Autora: Júlia Santana Campos</em></p>
 
@@ -90,16 +89,27 @@ Com a documentação oficial aprendi detalhes que mudaram decisões concretas. A
 
 ### Lições aprendidas
 
+A implementação do Chain of Responsibility me ensinou que o verdadeiro valor deste padrão não é apenas eliminar estruturas condicionais aninhadas (if/else), mas sim o conceito de "curto-circuito" para economia de recursos. Ao estruturar a cadeia do login (Captcha $\rightarrow$ Credenciais $\rightarrow$ Risco $\rightarrow$ 2FA), ficou claro que o padrão atua como um funil de segurança. Se um bot falha no elo do Captcha, o fluxo morre ali. O banco de dados sequer é consultado e nenhum SMS é disparado. Aprendi que o padrão arquitetural reflete uma decisão financeira e de infraestrutura do sistema: rejeitar a requisição no elo mais barato possível.
+
+Outro aprendizado técnico foi sobre a comunicação entre elos cegos. Um validador não conhece o outro, então como o validador de Risco avisa o validador de 2FA que o usuário é suspeito? A resposta veio por meio da mutabilidade do objeto de contexto (RequisicaoLogin). O elo de Risco não aciona o 2FA diretamente; ele apenas altera uma flag (exige2FA = true) no objeto que viaja pela cadeia. Isso me mostrou na prática o que significa o Princípio da Responsabilidade Única (SRP): avaliar o risco é uma tarefa, enviar o SMS é outra completamente separada.
+
 ### Uso de IA Generativa
 
+Onde usei. Como assistente de codificação para Java puro sem frameworks (evitando dependências externas para não fugir do escopo da disciplina), como solucionadora de problemas de ambiente na hora de testar a documentação e como tradutora de notação para gerar a base do código PlantUML a partir do meu fluxo lógico.
+
+Onde ajudou. A IA foi extremamente útil para prototipação rápida e estruturação de boilerplate. Ela me ajudou a arquitetar a ponte entre o código em texto do terminal e a interface reativa em Swing usando o truque de redirecionamento de PrintStream, o que salvou muito tempo.
+
+Onde ela falha e exige senso crítico. A ferramenta tem uma forte tendência a "alucinar" escopos e superdimensionar soluções. Ao pedir ajuda para estruturar os elos da cadeia de login baseados nos achados da nossa Engenharia Reversa, a IA tentou incluir validadores de biometria, checagem de rate-limit e bloqueio por IP geolocalizado. Eram soluções tecnicamente plausíveis e comuns em mercado, mas que não existiam nas nossas tabelas de observação (Achados L01 a L05). Se eu aceitasse a sugestão passivamente, teria construído um diagrama belíssimo para um problema que minha equipe nunca mapeou, quebrando a rastreabilidade metodológica.
+
+O que levo. A inteligência artificial é uma excelente "digitadora" e uma ótima parceira de brainstorming técnico, mas é uma péssima arquiteta se deixada sozinha. O senso crítico está em atuar como o guardião do escopo. O que manteve a minha entrega fiel à realidade foi o rigor em forçar a IA a justificar cada linha de código gerada apontando exclusivamente para uma evidência real da nossa fase de Engenharia Reversa. Se não está nos nossos dados observados, não entra no código, por mais elegante que a sugestão da máquina pareça.
 
 ---
 
 ## Histórico de Versões
 
-| Versão | Data | Descrição | Autor(es) | Revisor(es) |
-| -- | -- | -- | -- | -- |
-| 1.0 | 09/10/2026 | Criação da página | José Joaquim da Silva Neto | -- |
-| 1.1 | 15/10/2026 | Adiciona lições aprendidas e uso de IA | José Joaquim da Silva Neto | -- |
-| 1.2 | 16/10/2026 | Adiciona lições aprendidas e uso de IA generativa de João Paulo | João Paulo Barbosa Pereira Nunes | José Joaquim da Silva Neto, Júlia Santana Campos e Pedro Henrique Gomes |
-| 1.3 | 16/10/2026 | Adiciona lições aprendidas e uso de IA generativa de Júlia | Júlia Santana Campos | José Joaquim da Silva Neto, Pedro Henrique Gomes, João Paulo Barbosa |
+| Versão | Data       | Descrição                                                       | Autor(es)                        | Revisor(es)                                                             |
+| ------ | ---------- | --------------------------------------------------------------- | -------------------------------- | ----------------------------------------------------------------------- |
+| 1.0    | 09/10/2026 | Criação da página                                               | José Joaquim da Silva Neto       | --                                                                      |
+| 1.1    | 15/10/2026 | Adiciona lições aprendidas e uso de IA                          | José Joaquim da Silva Neto       | --                                                                      |
+| 1.2    | 16/10/2026 | Adiciona lições aprendidas e uso de IA generativa de João Paulo | João Paulo Barbosa Pereira Nunes | José Joaquim da Silva Neto, Júlia Santana Campos e Pedro Henrique Gomes |
+| 1.3    | 16/10/2026 | Adiciona lições aprendidas e uso de IA generativa de Júlia      | Júlia Santana Campos             | José Joaquim da Silva Neto, Pedro Henrique Gomes, João Paulo Barbosa    |

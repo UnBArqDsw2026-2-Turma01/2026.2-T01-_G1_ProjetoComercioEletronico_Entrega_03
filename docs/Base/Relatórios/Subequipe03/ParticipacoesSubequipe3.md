@@ -8,18 +8,13 @@ Este documento apresenta as **lições aprendidas** e o **uso de Inteligência A
 
 ### Lições aprendidas
 
-
-
 ### Uso de IA Generativa
-
 
 ---
 
 ## José Joaquim da Silva Neto
 
 ### Lições aprendidas
-
-
 
 ### Uso de IA Generativa
 
@@ -29,23 +24,16 @@ Este documento apresenta as **lições aprendidas** e o **uso de Inteligência A
 
 ### Lições aprendidas
 
-
 ### Uso de IA Generativa
 
 ---
 
 ## Pedro Henrique Gomes
 
-### Lições aprendidas
-
-
-### Uso de IA Generativa
-
-
 ---
 
 ## Histórico de Versões
 
-| Versão | Data | Descrição | Autor(es) | Revisor(es) |
-| -- | -- | -- | -- | -- |
-| 1.0 | 05/10/2026 | Criação da página | José Joaquim da Silva Neto | -- |
+| Versão | Data       | Descrição         | Autor(es)                  | Revisor(es) |
+| ------ | ---------- | ----------------- | -------------------------- | ----------- |
+| 1.0    | 05/10/2026 | Criação da página | José Joaquim da Silva Neto | --          |
