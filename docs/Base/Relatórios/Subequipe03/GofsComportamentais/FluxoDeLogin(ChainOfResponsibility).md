@@ -258,7 +258,7 @@ A tabela abaixo sintetiza o comportamento de cada elo concreto diante dos difere
 
 Segundo o catálogo GoF (Gamma _et al._, 1995), a intenção do padrão Chain of Responsibility é:
 
-> _"Evitar o acoplamento do remetente de uma solicitação ao seu receptor, ao dar a mais de um objeto a oportunidade de tratar a solicitação. Encadear os objetos receptores, passando a solicitação ao longo da cadeia até que um objeto a trate."_
+> _"Evitar o acoplamento do remetente de uma solicitação ao seu receptor, dando a mais de um objeto a oportunidade de tratar a solicitação. Encadear os objetos receptores, passando a solicitação ao longo da cadeia até que um objeto a trate."_
 
 ### 4.2 Quando usar
 
@@ -523,7 +523,7 @@ public class ServicoDeAutenticacao {
 
 ## 6. Rastreabilidade com a Engenharia Reversa
 
-A modelagem e o código deste padrão foram diretamente derivados das evidências empíricas obtidas na etapa de Engenharia Reversa e nos Diagramas de Sequência e de Comunicação do Subsistema de Login:
+A modelagem e o código deste padrão foram diretamente derivados das evidências empíricas obtidas na etapa de [Engenharia Reversa](https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_01/#/Base/Relat%C3%B3rios/SubEquipe03/EngenhariaReversa) e nos [Diagramas de Sequência](https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_02/#/Base/Relat%C3%B3rios/Subequipe03/ModelagemDinamica/DiagramaDeSequencia) e [Diagrama de Comunicação](https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_02/#/Base/Relat%C3%B3rios/Subequipe03/ModelagemDinamica/DiagramaDeComunicacao) do Subsistema de Login:
 
 | Código do Achado | Evidência na Engenharia Reversa (Entregas 1 e 2)                                                                                                                                                 | Como foi materializado no Chain of Responsibility (Entrega 3)                                                                                                                                      |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -545,67 +545,76 @@ A classe `MainLogin` executa quatro cenários de teste que exercitam todos os ca
 | **Cenário 3** | Token válido + `SENHA_ERRADA`                                 | **Elo 2 (`ValidadorCredenciais`)** | Curto-circuito no Elo 2 + Retorno HTTP 200 genérico (**Achado-L02**)                  |
 | **Cenário 4** | `TOKEN_FALSO` + `BOT_DETECTED`                                | **Elo 1 (`ValidadorCaptcha`)**     | Curto-circuito imediato no Elo 1 (**Achado-L01**)                                     |
 
-### 7.1 Saída real da execução no terminal
+A classe `InterfaceGraficaLogin` utilizando Java Swing foi criada para provar o encadeamento e o curto-circuito em tempo real. Os painéis coloridos representam os elos da cadeia:
 
-```text
->>> CENARIO 1: Risco Baixo (Sem 2FA - Achado-L03)
-==================================================================
-Iniciando autorizacao para o usuario: pedro@unb.br
-------------------------------------------------------------------
-[1. ValidadorCaptcha] Verificando token reCAPTCHA Enterprise carregado no page load (Achado-L01)...
-   -> [OK] Token Captcha validado com sucesso.
-[2. ValidadorCredenciais] Consultando usuario no Banco de Dados...
-   -> [OK] Credenciais validas para: pedro@unb.br
-[3. ValidadorRisco] Avaliando score de risco e metadados do dispositivo...
-   -> [OK] Score de risco baixo. Passando silenciosamente sem exigir 2FA (Achado-L03).
-[4. ValidadorTwoFactor] Verificando necessidade de 2FA...
-   -> [BYPASS] 2FA nao exigido para esta sessao (Fluxo silencioso concluido).
-------------------------------------------------------------------
-[SUCESSO] Login autorizado! Emitindo Token de Sessao.
-[Achado-L05] Replicando sessao entre produtos (POST /session/replicate -> 204).
-==================================================================
+- 🟢 **Verde:** Elo processado e requisição aprovada para o próximo.
+- 🔴 **Vermelho:** Elo processou, identificou falha e interrompeu a cadeia.
+- 🟡 **Amarelo:** Elo processado emitindo estado de alerta (mudança de contexto).
+- ⚪ **Cinza:** Elo não alcançado (curto-circuito anterior) ou evitado (_bypass_ silencioso).
 
->>> CENARIO 2: Risco Alto + Codigo 2FA Correto
-==================================================================
-Iniciando autorizacao para o usuario: pedro@unb.br
-------------------------------------------------------------------
-[1. ValidadorCaptcha] Verificando token reCAPTCHA Enterprise carregado no page load (Achado-L01)...
-   -> [OK] Token Captcha validado com sucesso.
-[2. ValidadorCredenciais] Consultando usuario no Banco de Dados...
-   -> [OK] Credenciais validas para: pedro@unb.br
-[3. ValidadorRisco] Avaliando score de risco e metadados do dispositivo...
-   -> [ALERTA] Score de risco elevado detectado! Exigindo confirmacao 2FA.
-[4. ValidadorTwoFactor] Verificando necessidade de 2FA...
-   -> [ACAO] Disparando codigo de confirmacao via Servico de Notificacao (SMS/E-mail)...
-   -> [OK] Codigo 2FA (123456) validado com sucesso!
-------------------------------------------------------------------
-[SUCESSO] Login autorizado! Emitindo Token de Sessao.
-[Achado-L05] Replicando sessao entre produtos (POST /session/replicate -> 204).
-==================================================================
+### 7.1 Cenário 1: Caminho Feliz (Bypass de 2FA - Achado L03)
 
->>> CENARIO 3: Senha Incorreta (Interrupcao no Elo 2 - Achado-L02)
-==================================================================
-Iniciando autorizacao para o usuario: pedro@unb.br
-------------------------------------------------------------------
-[1. ValidadorCaptcha] Verificando token reCAPTCHA Enterprise carregado no page load (Achado-L01)...
-   -> [OK] Token Captcha validado com sucesso.
-[2. ValidadorCredenciais] Consultando usuario no Banco de Dados...
-   -> [BLOQUEADO] Credenciais invalidas.
-   -> [Achado-L02] Retornando HTTP 200 com payload comprimido generico e recarregando desafio Captcha.
-------------------------------------------------------------------
-[FALHA] A tentativa de login foi rejeitada pela cadeia de validacao.
-==================================================================
+<div style="text-align:center;">
 
->>> CENARIO 4: Bot bloqueado pelo Captcha (Interrupcao no Elo 1 - Achado-L01)
-==================================================================
-Iniciando autorizacao para o usuario: pedro@unb.br
-------------------------------------------------------------------
-[1. ValidadorCaptcha] Verificando token reCAPTCHA Enterprise carregado no page load (Achado-L01)...
-   -> [BLOQUEADO] Token de Captcha invalido ou ausente. Interrompendo a cadeia.
-------------------------------------------------------------------
-[FALHA] A tentativa de login foi rejeitada pela cadeia de validacao.
-==================================================================
-```
+![Cenário 1: Bypass de 2FA](../assets/login_cenario1_bypass.png)
+
+<p><strong>O que está acontecendo:</strong> Os dados fornecidos são válidos e o dispositivo foi classificado como "IP Conhecido | Risco Baixo". Os 3 primeiros elos processam a informação (ficando verdes). O quarto elo (2FA) percebe a flag de segurança baixa e libera a sessão sem exigir o código.</p>
+<p><strong>O que significa:</strong> Comprova o <strong>Achado L03</strong>, demonstrando que o 2FA atua com <em>bypass</em> silencioso visando melhor usabilidade para usuários de baixo risco, mantendo o elo na cadeia mas sem bloqueá-la.</p>
+
+</div>
+
+---
+
+### 7.2 Cenário 2: Risco Alto Exigindo 2FA
+
+<div style="text-align:center;">
+
+![Cenário 2: Risco Alto com 2FA](../assets/login_cenario2_riscoalto.png)
+
+<p><strong>O que está acontecendo:</strong> O usuário mudou a seleção para "Novo Dispositivo | Risco Alto". A requisição é aprovada nos dois primeiros elos. O Elo 3 (Risco) fica amarelo (alerta) e altera o objeto de requisição exigindo 2FA. O Elo 4 intercepta a exigência, checa o código e, estando correto, finaliza verde.</p>
+<p><strong>O que significa:</strong> Demonstra a comunicação de estado através do objeto Contexto (`RequisicaoLogin`). Um elo pode não barrar o acesso diretamente, mas pode alterar as condições para que o elo seguinte tome a providência necessária (ativar o 2FA).</p>
+
+</div>
+
+---
+
+### 7.3 Cenário 3: Curto-circuito no Banco de Dados (Achado L02)
+
+<div style="text-align:center;">
+
+![Cenário 3: Senha Incorreta](../assets/login_cenario3_senhaerrada.png)
+
+<p><strong>O que está acontecendo:</strong> Foi inserida uma senha errada. O Elo 1 (Captcha) aprova. O Elo 2 (Credenciais) identifica a falha, barra a requisição (vermelho) e interrompe o fluxo imediatamente. Os elos de Risco e 2FA permanecem inativos (cinza).</p>
+<p><strong>O que significa:</strong> Comprova o comportamento de curto-circuito modelado no <strong>Achado L02</strong>. Como a cadeia foi quebrada no segundo estágio, o sistema economiza processamento analítico de metadados e custos operacionais de envio de SMS, provando a eficiência do padrão.</p>
+
+</div>
+
+---
+
+### 7.4 Cenário 4: Bloqueio Imediato por Bot (Achado L01)
+
+<div style="text-align:center;">
+
+![Cenário 4: Bloqueio de Bot](../assets/login_cenario4_bot.png)
+
+<p><strong>O que está acontecendo:</strong> Um token Captcha inválido/falso foi enviado na requisição. O primeiro elo na cadeia reprova a tentativa imediatamente (vermelho) e encerra o fluxo.</p>
+<p><strong>O que significa:</strong> É a materialização do <strong>Achado L01</strong>. O banco de dados (Elo 2) não sofre carga com consultas de e-mail maliciosas porque a requisição não sobreviveu à primeira barreira da arquitetura.</p>
+
+</div>
+
+---
+
+### 7.5 Vídeo de Demonstração (Padrão em Execução)
+
+Abaixo, a demonstração gravada da interface reativa exercitando todos os caminhos do padrão _Chain of Responsibility_:
+
+<div style="text-align:center;">
+
+[Vídeo: Execução do Chain of Responsibility no Login](../assets/login_chain_responsability.mp4 ":include :type=video controls width=80%")
+
+<p><strong>Vídeo Demonstrativo:</strong> Apresentação dinâmica provando a autonomia de cada validador (Elo) durante a autenticação. <em>Autor: Pedro Henrique Gomes</em></p>
+
+</div>
 
 ---
 
@@ -620,23 +629,14 @@ cd "2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_03/docs/Base/Relatórios/Su
 
 ### 8.2 Compilar e executar
 
-**Linux / macOS (com JDK instalado globalmente):**
-
-```bash
-javac context/*.java handler/*.java service/*.java
-java -cp . service.MainLogin
 ```
-
-**NixOS / Ambientes com Nix (execução efêmera sem necessidade de instalar JDK global):**
-
-```bash
-nix-shell -p jdk --run "javac context/*.java handler/*.java service/*.java && java -cp . service.MainLogin"
-```
-
-**Windows (PowerShell):**
-
-```powershell
+# Compila todos os pacotes
 javac context/*.java handler/*.java service/*.java
+
+# Roda a interface UI nativa (Swing)
+java -cp . service.InterfaceGraficaLogin
+
+# Roda a versão de texto em terminal (Opcional)
 java -cp . service.MainLogin
 ```
 
@@ -686,12 +686,12 @@ O catálogo do GoF (Gamma _et al._, 1995) discute questões clássicas de implem
 
 ## 12. Melhorias propostas
 
-| Fragilidade Identificada (Seção 11) | Melhoria Arquitetural Proposta                                                                                                                                                                                                                               |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1. Ordem sensível entre elos        | Utilizar um **Builder** (GoF Criacional) dedicado para validar regras de precedência na montagem da cadeia de segurança.                                                                                                                                     |
-| 2. Retorno booleano simples         | Substituir o retorno `boolean` por um objeto rico `ResultadoAutenticacao` contendo status (`AUTORIZADO`, `DESAFIO_2FA_PENDENTE`, `NEGADO`), mensagem e código de erro.                                                                                       |
-| 4. Fluxo de 2FA assíncrono          | Combinar o _Chain of Responsibility_ com o padrão **State**: quando o `ValidadorRisco` detectar risco alto, a sessão entra no estado `AguardandoConfirmacao2FA` e libera a _thread_ até a chegada da segunda requisição com o código.                        |
-| Integração entre subsistemas        | Conectar a saída autorizada do `ServicoDeAutenticacao` diretamente à abertura do `Pedido` no [Fluxo de Compra (State)](<./FluxoDeCompra(State).md>) e subsequente notificação no [Fluxo de Pagamento (Observer)](<./FluxoDePagamento(StrategyObserver).md>). |
+| Fragilidade Identificada (Seção 11) | Melhoria Arquitetural Proposta                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1. Ordem sensível entre elos        | Utilizar um **Builder** (GoF Criacional) dedicado para validar regras de precedência na montagem da cadeia de segurança.                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| 2. Retorno booleano simples         | Substituir o retorno `boolean` por um objeto rico `ResultadoAutenticacao` contendo status (`AUTORIZADO`, `DESAFIO_2FA_PENDENTE`, `NEGADO`), mensagem e código de erro.                                                                                                                                                                                                                                                                                                                                                                                      |
+| 4. Fluxo de 2FA assíncrono          | Combinar o _Chain of Responsibility_ com o padrão **State**: quando o `ValidadorRisco` detectar risco alto, a sessão entra no estado `AguardandoConfirmacao2FA` e libera a _thread_ até a chegada da segunda requisição com o código.                                                                                                                                                                                                                                                                                                                       |
+| Integração entre subsistemas        | Conectar a saída autorizada do `ServicoDeAutenticacao` diretamente à abertura do `Pedido` no [Fluxo de Compra (State)](<https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_03/#/Base/Relat%C3%B3rios/Subequipe03/GofsComportamentais/FluxoDeCompra(State)>) e subsequente notificação no [Fluxo de Pagamento (Observer)](<https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_03/#/Base/Relat%C3%B3rios/Subequipe03/GofsComportamentais/FluxoDePagamento(StrategyObserver)>) |
 
 ---
 
@@ -722,3 +722,7 @@ ORACLE. **Interface Filter (Jakarta Servlet API)**. Disponível em: <https://jak
 | :----: | :--------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------- | :---------------------------------------------------------------------------------- |
 | `1.0`  | 15/10/2026 | Elaboração da modelagem PlantUML e implementação em Java do padrão Chain of Responsibility no Login                                                                              | Pedro Henrique Gomes | SubEquipe 03                                                                        |
 | `1.1`  | 17/10/2026 | Expansão completa da documentação (fundamentação GoF, matriz de decisão, rastreabilidade L01-L05, decisões de projeto, visão crítica e melhorias) padronizada com a SubEquipe 03 | Pedro Henrique Gomes | João Paulo Barbosa Pereira Nunes, José Joaquim da Silva Neto e Júlia Santana Campos |
+
+```
+
+```

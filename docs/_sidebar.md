@@ -10,9 +10,9 @@
     - [Ata de reunião do dia 30/09/26](/ReunioesAtas/Subequipe3/Ata30_09.md)
     - [Gravação da reunião do dia 30/09/26](/ReunioesAtas/Subequipe3/Gravacao30_09.md)
     - [Ata de reunião do dia 09/10/26](/ReunioesAtas/Subequipe3/Ata09_10.md)
-    - [Gravação da reunião do dia 30/09/26](/ReunioesAtas/Subequipe3/Gravacao09_10.md)
+    - [Gravação da reunião do dia 09/10/26](/ReunioesAtas/Subequipe3/Gravacao09_10.md)
     - [Ata de reunião do dia 15/10/26](/ReunioesAtas/Subequipe3/Ata15_10.md)
-    - [Gravação da reunião do dia 30/09/26](/ReunioesAtas/Subequipe3/Gravacao15_10.md)
+    - [Gravação da reunião do dia 15/10/26](/ReunioesAtas/Subequipe3/Gravacao15_10.md)
 
 - **Base**
   - [1. Desenho de Software (Padrões de Projeto)](/Base/1.PadroesDeProjeto.md)
@@ -26,6 +26,8 @@
         - [Fluxo de Compra (State)](</Base/Relatórios/Subequipe03/GofsComportamentais/FluxoDeCompra(State).md>)
         - [Fluxo de Pagamento (Observer)](</Base/Relatórios/Subequipe03/GofsComportamentais/FluxoDePagamento(StrategyObserver).md>)
         - [Fluxo de Login (Chain Of Responsibility)](</Base/Relatórios/Subequipe03/GofsComportamentais/FluxoDeLogin(ChainOfResponsibility).md>)
+      - GoFs Criacionais
+        - [Fluxo de Login e Sessão (Builder)](</Base/Relatórios/Subequipe03/GofsCriacionais/FluxoLogin(Builder).md>)
 
   - 1.2. Participações - Padrões de Projeto
     - [1.2.1 SubEquipe01](/Participacoes/Subequipe1.md)
