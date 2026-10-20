@@ -135,7 +135,7 @@ ContextoDeLogin(Builder)/
 
 #### 2.5.1 Objetivo do padrão no domínio de Login
 
-O **Builder** isola o código de construção e validação de parâmetros de uma tentativa de login da representação final do objeto `RequisicaoLogin`. Em vez de obrigar o cliente a conhecer quais dos 10 atributos internos devem ser preenchidos ou deixados como `null` em um login silencioso versus um login com desafio 2FA, o padrão oferece passos nomeados e expressivos, garantindo que nenhum objeto `RequisicaoLogin` nasça em estado inválido.
+O **Builder** isola o código de construção e validação de parâmetros de uma tentativa de login da representação final do objeto `RequisicaoLogin`. Em vez de obrigar o cliente a conhecer quais dos 10 atributos internos devem ser preenchidos ou deixados como `null` em um login silencioso versus um login com desafio 2FA, o padrão oferece passos nomeados e expressivos, garantindo que nenhum objeto construído pelo Builder nasça em estado inválido.
 
 #### 2.5.2 Colaboração passo a passo entre os participantes
 
@@ -165,6 +165,17 @@ A tabela abaixo demonstra como o **mesmo processo de construção** (`Requisicao
 
 - **Imutabilidade pós-construção:** a classe `RequisicaoLogin` possui todos os seus campos marcados como `private final` e não oferece nenhum método `set`. Uma vez que `build()` entrega o objeto, nenhuma camada subsequente pode adulterar o e-mail, o hash da senha ou o token Captcha.
 - **Dedução automática de estado coerente:** quando o passo `comTelemetriaDispositivo` recebe o nível de risco `"ALTO"`, o próprio `ConcreteBuilder` já ajusta automaticamente a flag interna `exige2FA = true` (**Achado-L03**), obrigando que o passo `comDesafio2FA` seja chamado antes do `build()`.
+
+- **Dependência de ordem entre `comTelemetriaDispositivo` e `comDesafio2FA`.** Os dois métodos escrevem na mesma flag `exige2FA` por **atribuição** (`=`), de modo que vale a última chamada. O primeiro calcula `exige2FA = "ALTO".equalsIgnoreCase(risco)`; o segundo fixa `exige2FA = true`.
+
+  | Ordem das chamadas                          | `exige2FA` final | Observação                                                  |
+  | ------------------------------------------- | :--------------: | ----------------------------------------------------------- |
+  | Telemetria (`ALTO`) → `comDesafio2FA`       | `true`           | Caso previsto                                               |
+  | `comDesafio2FA` → Telemetria (`ALTO`)       | `true`           | Equivalente ao anterior                                     |
+  | Telemetria (`BAIXO`) → `comDesafio2FA`      | `true`           | 2FA voluntário em risco baixo                               |
+  | `comDesafio2FA` → Telemetria (`BAIXO`)      | `false`          | O 2FA solicitado é descartado sem erro                      |
+
+  Na última combinação, `canal2FA` e `codigo2FA` permanecem preenchidos, mas `validarInvariantes()` só os confere quando `exige2FA` é `true`; o `build()` conclui sem exceção e o produto não exige o desafio. As receitas do `DiretorContextoLogin` chamam a telemetria primeiro e por isso não são afetadas, mas um cliente que use o Builder diretamente pode cair no caso problemático. O resultado depende de uma convenção de uso, não de uma garantia do código.
 
 ---
 
@@ -606,6 +617,35 @@ java -cp . client.MainBuilder
 | Reinicialização automática (`resetar()`) ao final do método `build()` | Exigir que o cliente instancie um novo `Builder` a cada uso              | Permite reutilizar a mesma instância de `RequisicaoLoginConcretoBuilder` para construir múltiplos objetos em sequência sem vazamento de dados da requisição anterior. |
 | Validação de invariantes cruzadas no `build()`                        | Validar apenas nos validadores posteriores da regra de negócio           | Antecipa a detecção de erros (_Fail-Fast_): impede que um objeto `RequisicaoLogin` de risco alto sequer exista na memória sem os dados obrigatórios de 2FA.           |
 
+### 9.1 Quem garante as invariantes? O construtor público e a alternativa de Bloch
+
+A tabela acima cita a alternativa "inner class estática estilo Joshua Bloch" sem explicá-la. Ela importa por causa de uma limitação do código atual.
+
+**O problema.** `RequisicaoLogin` está no pacote `product` e declara um construtor `public` com 10 parâmetros (seção 5.1). As invariantes ficam em `validarInvariantes()`, no `RequisicaoLoginConcretoBuilder` (pacote `builder`). Como o construtor é público, nada impede este código:
+
+```java
+// Compila e executa: o Builder e suas invariantes nunca são consultados
+RequisicaoLogin invalida = new RequisicaoLogin(
+    null, null, null, "0.0.0.0", "X", "ALTO",
+    true, null, null, false);
+```
+
+O objeto resultante tem e-mail nulo e `exige2FA = true` sem canal nem código, exatamente os dois estados que o `build()` rejeita. Portanto, a garantia de que nenhum `RequisicaoLogin` nasça inválido vale **para quem usa o Builder**, e não é imposta pela linguagem.
+
+**Por que o Java não ajuda aqui.** Um construtor _package-private_ (sem modificador) seria a solução natural, mas só é visível dentro do mesmo pacote. Como `product` e `builder` são pacotes distintos, o `ConcreteBuilder` também não conseguiria chamá-lo. Por isso o construtor precisou ser público.
+
+**Três caminhos, com seus custos**
+
+| Alternativa                                                                      | Como funciona                                                                                                    | Custo                                                                                                         |
+| -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| **A. Builder como classe estática aninhada** (Bloch, _Effective Java_, Item 2)    | `RequisicaoLogin.Builder` fica dentro do produto; o construtor do produto é `private` e recebe o Builder.        | Perde a interface `RequisicaoLoginBuilder` e a troca de `ConcreteBuilder`; o `Director` passa a depender da classe aninhada. |
+| **B. Unir `product` e `builder` no mesmo pacote** e usar construtor _package-private_ | Mantém a estrutura GoF (interface, ConcreteBuilder, Director) e fecha o acesso externo.                          | Abandona a separação por pacotes `product`/`builder`/`client` adotada na Seção 2.1.                          |
+| **C. Validar também no construtor do produto**                                   | O construtor repete as checagens e lança `IllegalStateException`; o `ConcreteBuilder` continua como está.        | Duplica regras em dois lugares; qualquer mudança de invariante precisa ser feita duas vezes.                  |
+
+**Por que o projeto manteve a estrutura atual.** A decisão da tabela da Seção 9 foi seguir a estrutura canônica do GoF apresentada em aula. Mas o benefício que justifica a interface `Builder` (trocar o `ConcreteBuilder` para produzir representações diferentes) não é exercitado aqui: existe um único `ConcreteBuilder` e um único produto (ver Seção 10, linha "Por que não classes abstratas para produtos?"). A Alternativa A teria, neste sistema, o mesmo efeito prático com garantia mais forte.
+
+**Como ler a Seção 2.5.1.** Onde se lê "nenhum objeto `RequisicaoLogin` nasça em estado inválido", entenda: nenhum objeto construído **por meio do Builder**. A imutabilidade, por sua vez, é real: todos os campos são `final`, os tipos são `String` ou primitivos, e não há _setters_. Um reforço barato é declarar a classe como `final`, para impedir que uma subclasse adicione estado mutável.
+
 ---
 
 ## 10. Relação com a literatura
@@ -634,6 +674,7 @@ O catálogo do GoF (Gamma _et al._, 1995) e a literatura complementar (Bloch, 20
 1. **Duplicação estrutural de atributos:** todos os 10 atributos de `RequisicaoLogin` precisam ser declarados de forma espelhada dentro de `RequisicaoLoginConcretoBuilder`, aumentando a verbosidade do código.
 2. **Estado mutável interno no Builder (Não _Thread-Safe_):** como `RequisicaoLoginConcretoBuilder` acumula os atributos em variáveis de instância antes do `build()`, compartilhar a mesma instância do Builder entre múltiplas _threads_ simultâneas causaria condição de corrida (_race condition_).
 3. **Tipagem textual em campos de domínio:** atributos como `nivelRisco` (`"BAIXO"`, `"ALTO"`) e `canal2FA` (`"SMS"`, `"EMAIL"`) estão tipados como `String`, permitindo erros de digitação fora das receitas do `Director`.
+4. **Resultado dependente da ordem das chamadas:** `comTelemetriaDispositivo` sobrescreve `exige2FA`, podendo descartar um 2FA já solicitado por `comDesafio2FA` (ver 3.2).
 
 ---
 
@@ -645,6 +686,7 @@ O catálogo do GoF (Gamma _et al._, 1995) e a literatura complementar (Bloch, 20
 | 2. Concorrência no `ConcreteBuilder`       | Instanciar um novo `Builder` por requisição HTTP (_Request Scoped_) ou utilizar _Step Builders_ imutáveis.                                                                                          |
 | 3. Tipagem textual (`String`)              | Substituir `nivelRisco` e `canal2FA` por enumerações fortemente tipadas (`enum NivelRisco { BAIXO, ALTO }`, `enum Canal2FA { SMS, EMAIL, WHATSAPP }`).                                              |
 | Integração direta com os GoFs da Subequipe | Entregar o `RequisicaoLogin` construído pelo **Builder** diretamente como entrada para o método `autorizar(req)` do [Chain of Responsibility no Login](<./FluxoDeLogin(ChainOfResponsibility).md>). |
+| 4. Dependência de ordem | Separar o que o cliente informou do que é derivado: guardar `desafio2FAInformado` (definido por `comDesafio2FA`) e calcular `exige2FA = "ALTO".equalsIgnoreCase(nivelRisco) \|\| desafio2FAInformado` dentro do `build()`. Assim a ordem das chamadas deixa de importar. |
 
 ---
 
@@ -674,3 +716,5 @@ REFACTORING GURU. **Builder in Java**. Disponível em: <https://refactoring.guru
 | Versão |    Data    | Descrição                                                                                                                                      | Autor(es)            | Revisor(es)                                                                         |
 | :----: | :--------: | :--------------------------------------------------------------------------------------------------------------------------------------------- | :------------------- | :---------------------------------------------------------------------------------- |
 | `1.0`  | 19/10/2026 | Elaboração da modelagem PlantUML, implementação em Java e documentação completa do padrão GoF Criacional Builder aplicado ao Contexto de Login | Pedro Henrique Gomes | João Paulo Barbosa Pereira Nunes, José Joaquim da Silva Neto e Júlia Santana Campos |
+| `1.1`  | 19/10/2026 | Adição da subseção 9.1 (invariantes e construtor público; alternativa de Bloch) e ajuste da Seção 2.5.1 | José Joaquim da Silva Neto | João Paulo Barbosa Pereira Nunes, José Joaquim da Silva Neto e Júlia Santana Campos |
+| `1.2`  | 19/10/2026 | Explicação da dependência de ordem entre comTelemetriaDispositivo e comDesafio2FA (3.2), com fragilidade 4 (11) e melhoria correspondente (12) | José Joaquim da Silva Neto | João Paulo Barbosa Pereira Nunes, José Joaquim da Silva Neto e Júlia Santana Campos |

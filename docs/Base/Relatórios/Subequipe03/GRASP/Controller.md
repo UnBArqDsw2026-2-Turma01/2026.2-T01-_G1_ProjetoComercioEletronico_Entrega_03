@@ -393,6 +393,57 @@ Pontos técnicos de destaque:
 - **Nome qualificado para a segunda `RequisicaoLogin`.** O `import product.RequisicaoLogin` coexiste com o uso de `context.RequisicaoLogin` pelo nome completo, pois as duas classes têm o mesmo nome simples.
 - **Tradução de exceção em resultado.** A `IllegalStateException` do Builder não chega à View: vira um DTO negado.
 
+### 5.2.1 O adaptador `paraContextoDaCadeia` e o padrão Adapter (GoF)
+
+**O problema.** O Builder entrega um `product.RequisicaoLogin` e a Chain só aceita um `context.RequisicaoLogin`. As duas classes têm o mesmo nome simples, mas são tipos diferentes e nenhuma herda da outra:
+
+| Característica   | `product.RequisicaoLogin` (Builder)      | `context.RequisicaoLogin` (Chain)                    |
+| ---------------- | ---------------------------------------- | ---------------------------------------------------- |
+| Mutabilidade     | Imutável                                 | Mutável                                              |
+| Atributos        | 10                                       | 5, mais a flag `exige2FA`                            |
+| Nível de risco   | Atributo próprio (`getNivelRisco()`)     | Dentro do texto `metadadosDispositivo`               |
+
+O compilador não aceita passar uma no lugar da outra, e alterar os módulos de origem não era opção (já entregues e revisados). É exatamente a situação para a qual o padrão Adapter existe.
+
+**O padrão.** Segundo Gamma _et al._ (1995), a intenção do Adapter é converter a interface de uma classe na interface que o cliente espera, permitindo que classes com interfaces incompatíveis trabalhem juntas. Mapeamento dos participantes:
+
+| Participante (GoF) | Papel no padrão                              | No sistema                                                      |
+| ------------------ | -------------------------------------------- | --------------------------------------------------------------- |
+| **Client**         | Quem precisa de um objeto no formato esperado | `ServicoDeAutenticacao` e a Chain                               |
+| **Target**         | Formato que o Client espera                   | `context.RequisicaoLogin`                                       |
+| **Adaptee**        | Classe existente, de formato incompatível     | `product.RequisicaoLogin`, produzida pelo Builder               |
+| **Adapter**        | Quem faz a conversão                          | `ControladorDeAutenticacao.paraContextoDaCadeia`                |
+
+**O método, parte por parte**
+
+1. **Metadados em texto.** `"IP=" + r.getIpOrigem() + "|FP=" + r.getDeviceFingerprint() + "|RISCO_" + r.getNivelRisco().toUpperCase()` junta três dados do Builder em uma única `String`. O trecho `RISCO_` + nível existe porque o `ValidadorRisco` procura `"RISCO_ALTO"` dentro desse texto (seção 3.2). O `toUpperCase()` garante que `"alto"` e `"ALTO"` gerem o mesmo marcador.
+2. **Criação do objeto de destino.** `new context.RequisicaoLogin(email, senhaHash, tokenCaptcha, codigo2FA, metadados)` copia os valores para o formato da Chain. O adaptador **cria um novo objeto**; não altera o original.
+3. **Nome qualificado.** O `import product.RequisicaoLogin` ocupa o nome simples, então a outra classe é escrita com o pacote (`context.RequisicaoLogin`).
+
+**Classificação honesta.** O GoF descreve duas formas de Adapter: de **classe** (herança) e de **objeto** (composição, em que o Adapter guarda o Adaptee e delega as chamadas). A solução daqui não é nenhuma das duas em sentido estrito: é uma **conversão** que copia dados para um objeto novo (o que muitos chamam de _Mapper_ ou _Converter_). Ela cumpre a **intenção** do Adapter, mas não a **estrutura** clássica. Duas razões para essa escolha:
+
+- O Target é uma classe concreta e mutável, não uma interface; um _wrapper_ teria de herdar dela e conviver com o estado que a Chain modifica.
+- Copiar os dados mantém o objeto do Builder intacto e imutável, mesmo que a Chain altere o seu próprio contexto.
+
+**Por que um método privado e não uma classe.** Só o Controller faz essa conversão, então uma classe separada seria estrutura sem ganho. O critério para extraí-la (`AdaptadorDeRequisicao`, por exemplo) é a conversão passar a ser usada em outro ponto, como um controlador REST.
+
+**Limites desta solução**
+
+- A conversão **não repassa todos os atributos** do Builder: os 10 atributos de origem viram 5 no destino mais o texto dos metadados (fragilidade 1, seção 11).
+- O risco viaja como texto e é lido por substring (fragilidade 2). Se o `ValidadorRisco` mudar o marcador, o 2FA deixa de ser exigido sem erro de compilação.
+- Ambos os problemas somem se os módulos usarem um único modelo de requisição, proposta da Seção 12, o que elimina a necessidade do adaptador.
+
+**Adapter, Controller e Facade.** Os três "ficam no meio", mas respondem a perguntas distintas:
+
+| Elemento       | Pergunta que responde                                  | Neste sistema                                            |
+| -------------- | ------------------------------------------------------ | -------------------------------------------------------- |
+| **Controller** | Quem recebe e coordena o evento depois da UI?          | `ControladorDeAutenticacao`                              |
+| **Adapter**    | Como fazer um formato incompatível ser aceito?         | `paraContextoDaCadeia` (dentro do Controller)            |
+| **Facade**     | Como oferecer uma interface simples a um subsistema?   | Não utilizado (ver seção 4.4)                            |
+
+O mesmo objeto acumula duas responsabilidades distintas (coordenar e adaptar). Isso é aceitável enquanto o adaptador for um método pequeno, mas é um ponto de atenção para o risco de controlador inchado (fragilidade 7).
+
+
 ### 5.3 `InterfaceGraficaLogin` (View — pacote `view`)
 
 ```java
@@ -652,6 +703,26 @@ LARMAN (2004) trata o Controller no capítulo sobre GRASP. A tabela mostra como 
 
 Complementam a fundamentação a literatura de GoF utilizada nos módulos integrados (Gamma _et al._, 1995) e a distinção entre Controller e Facade discutida na seção 4.4.
 
+### 10.1 Fabricação Pura (_Pure Fabrication_): o que significa e onde aparece aqui
+
+A tabela acima cita "Fabricação Pura", princípio GRASP que merece explicação própria.
+
+**Definição.** Segundo Larman (2004), a Fabricação Pura propõe criar uma classe que **não representa um conceito do domínio do problema**, inventada apenas para manter baixo acoplamento e alta coesão quando atribuir a responsabilidade a uma classe do domínio prejudicaria esses dois objetivos.
+
+**Por que existe.** Imagine colocar a tradução "resultado da cadeia → mensagem para a tela" dentro de `RequisicaoLogin`. Essa classe do domínio passaria a conhecer detalhes de apresentação, perdendo coesão. A saída é criar uma classe que não existe no mundo real do e-commerce, mas existe para organizar o código.
+
+**Onde aparece neste sistema**
+
+| Elemento                    | É Fabricação Pura? | Justificativa                                                                                                                                  |
+| --------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ResultadoAutenticacaoDTO`  | Sim                | "Resultado de autenticação para a tela" não é um conceito de negócio; a classe existe para desacoplar a View do modelo interno.                |
+| `ControladorDeAutenticacao` | Sim (em parte)     | Um "controlador" não existe no domínio de login; é um objeto artificial criado para receber o evento da UI e coordenar os colaboradores.       |
+| `paraContextoDaCadeia`      | Apenas na intenção | É um método privado, não uma classe; cumpre o mesmo propósito (isolar a conversão entre modelos), mas a classificação formal não se aplica.   |
+
+**Cuidado conhecido.** O risco de abusar da Fabricação Pura é gerar classes que apenas "executam funções" e fragmentam demais o sistema. Aqui, o número de classes artificiais é pequeno (DTO e Controller), cada uma com um motivo claro de existir.
+
+**Relação com Indirection (Indireção).** O Controller também é um exemplo de _Indirection_: um intermediário colocado entre a View e os módulos de Builder e Chain para que um não dependa diretamente do outro.
+
 ---
 
 ## 11. Visão crítica
@@ -723,3 +794,5 @@ SUBEQUIPE 03. **Chain of Responsibility no Login**. G1_ProjetoComercioEletronico
 | :----: | :--------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------- | :----------- |
 | `1.0`  | 19/10/2026 | Elaboração da modelagem e documentação da iniciativa extra GRASP Controller                                                                                                   | Pedro Henrique Gomes | SubEquipe 03 |
 | `1.1`  | 19/10/2026 | Implementação e compilação dos códigos (Controller, DTO, Views); adaptador entre os dois `RequisicaoLogin`; correção do 2FA condicional; documentação completa com saída real | Pedro Henrique Gomes | SubEquipe 03 |
+| `1.2`  | 19/10/2026 | Adicona explicação pontual sobre Pure Fabrication | José Joaquim da Silva Neto| SubEquipe 03 |
+| `1.3`  | 19/10/2026 | Adição da subseção 5.2.1 com explicações | José Joaquim da Silva Neto| SubEquipe 03 |

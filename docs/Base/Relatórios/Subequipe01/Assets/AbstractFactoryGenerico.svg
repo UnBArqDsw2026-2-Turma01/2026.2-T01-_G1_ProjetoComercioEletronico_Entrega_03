@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="790" viewBox="0 0 1400 790" style="background:#FFFFFF">
+<rect width="1400" height="790" fill="#FFFFFF"/>
+<text x="700.0" y="25" font-family="Arial" font-size="14" fill="#000000" font-weight="bold" text-anchor="middle">Padrao Abstract Factory — estrutura generica</text>
+<text x="700.0" y="42" font-family="Arial" font-size="11" fill="#475569" font-weight="bold" text-anchor="middle">GAMMA et al., 1995 · Subequipe 01</text>
+<rect x="290" y="70" width="181" height="75" rx="2.5" fill="#F8FAFC" stroke="#334155" stroke-width="0.6"/>
+<text x="380.5" y="85" font-family="Arial" font-size="11" fill="#475569" text-anchor="middle">«interface»</text>
+<text x="380.5" y="100" font-family="Arial" font-size="12.5" fill="#000000" font-weight="bold" text-anchor="middle">AbstractFactory</text>
+<line x1="290" x2="471" y1="107" y2="107" stroke="#334155" stroke-width="0.6"/>
+<text x="297" y="121" font-family="Arial" font-size="11" fill="#000000">+criarProdutoA(): ProdutoA</text>
+<text x="297" y="135" font-family="Arial" font-size="11" fill="#000000">+criarProdutoB(): ProdutoB</text>
+<rect x="700" y="70" width="150" height="61" rx="2.5" fill="#F8FAFC" stroke="#334155" stroke-width="0.6"/>
+<text x="775.0" y="85" font-family="Arial" font-size="11" fill="#475569" text-anchor="middle">«interface»</text>
+<text x="775.0" y="100" font-family="Arial" font-size="12.5" fill="#000000" font-weight="bold" text-anchor="middle">AbstractProductA</text>
+<line x1="700" x2="850" y1="107" y2="107" stroke="#334155" stroke-width="0.6"/>
+<text x="707" y="121" font-family="Arial" font-size="11" fill="#000000">+operacao()</text>
+<rect x="1020" y="70" width="150" height="61" rx="2.5" fill="#F8FAFC" stroke="#334155" stroke-width="0.6"/>
+<text x="1095.0" y="85" font-family="Arial" font-size="11" fill="#475569" text-anchor="middle">«interface»</text>
+<text x="1095.0" y="100" font-family="Arial" font-size="12.5" fill="#000000" font-weight="bold" text-anchor="middle">AbstractProductB</text>
+<line x1="1020" x2="1170" y1="107" y2="107" stroke="#334155" stroke-width="0.6"/>
+<text x="1027" y="121" font-family="Arial" font-size="11" fill="#000000">+operacao()</text>
+<rect x="40" y="250" width="175" height="46" rx="2.5" fill="#F8FAFC" stroke="#334155" stroke-width="0.6"/>
+<text x="127.5" y="265" font-family="Arial" font-size="12.5" fill="#000000" font-weight="bold" text-anchor="middle">Client</text>
+<line x1="40" x2="215" y1="272" y2="272" stroke="#334155" stroke-width="0.6"/>
+<text x="47" y="286" font-family="Arial" font-size="11" fill="#000000">-fabrica: AbstractFactory</text>
+<rect x="230" y="250" width="150" height="60" rx="2.5" fill="#F8FAFC" stroke="#334155" stroke-width="0.6"/>
+<text x="305.0" y="265" font-family="Arial" font-size="12.5" fill="#000000" font-weight="bold" text-anchor="middle">ConcreteFactory1</text>
+<line x1="230" x2="380" y1="272" y2="272" stroke="#334155" stroke-width="0.6"/>
+<text x="237" y="286" font-family="Arial" font-size="11" fill="#000000">+criarProdutoA()</text>
+<text x="237" y="300" font-family="Arial" font-size="11" fill="#000000">+criarProdutoB()</text>
+<rect x="430" y="250" width="150" height="60" rx="2.5" fill="#F8FAFC" stroke="#334155" stroke-width="0.6"/>
+<text x="505.0" y="265" font-family="Arial" font-size="12.5" fill="#000000" font-weight="bold" text-anchor="middle">ConcreteFactory2</text>
+<line x1="430" x2="580" y1="272" y2="272" stroke="#334155" stroke-width="0.6"/>
+<text x="437" y="286" font-family="Arial" font-size="11" fill="#000000">+criarProdutoA()</text>
+<text x="437" y="300" font-family="Arial" font-size="11" fill="#000000">+criarProdutoB()</text>
+<rect x="640" y="430" width="150" height="24" rx="2.5" fill="#F8FAFC" stroke="#334155" stroke-width="0.6"/>
+<text x="715.0" y="445" font-family="Arial" font-size="12.5" fill="#000000" font-weight="bold" text-anchor="middle">ProductA1</text>
+<rect x="830" y="430" width="150" height="24" rx="2.5" fill="#F8FAFC" stroke="#334155" stroke-width="0.6"/>
+<text x="905.0" y="445" font-family="Arial" font-size="12.5" fill="#000000" font-weight="bold" text-anchor="middle">ProductA2</text>
+<rect x="1020" y="430" width="150" height="24" rx="2.5" fill="#F8FAFC" stroke="#334155" stroke-width="0.6"/>
+<text x="1095.0" y="445" font-family="Arial" font-size="12.5" fill="#000000" font-weight="bold" text-anchor="middle">ProductB1</text>
+<rect x="1210" y="430" width="150" height="24" rx="2.5" fill="#F8FAFC" stroke="#334155" stroke-width="0.6"/>
+<text x="1285.0" y="445" font-family="Arial" font-size="12.5" fill="#000000" font-weight="bold" text-anchor="middle">ProductB2</text>
+<path d="M318.1,250.0 L364.1,145.0" fill="none" stroke="#334155" stroke-width="1" stroke-dasharray="6,5"/>
+<polygon points="364.1,145.0 364.8,159.5 352.9,154.3" fill="#FFFFFF" stroke="#334155" stroke-width="1"/>
+<path d="M483.3,250.0 L407.6,145.0" fill="none" stroke="#334155" stroke-width="1" stroke-dasharray="6,5"/>
+<polygon points="407.6,145.0 420.4,151.7 409.9,159.3" fill="#FFFFFF" stroke="#334155" stroke-width="1"/>
+<path d="M717.1,430.0 L769.6,131.0" fill="none" stroke="#334155" stroke-width="1" stroke-dasharray="6,5"/>
+<polygon points="769.6,131.0 773.8,144.9 761.0,142.7" fill="#FFFFFF" stroke="#334155" stroke-width="1"/>
+<path d="M900.4,430.0 L786.6,131.0" fill="none" stroke="#334155" stroke-width="1" stroke-dasharray="6,5"/>
+<polygon points="786.6,131.0 797.3,140.8 785.2,145.5" fill="#FFFFFF" stroke="#334155" stroke-width="1"/>
+<path d="M1095.0,430.0 L1095.0,131.0" fill="none" stroke="#334155" stroke-width="1" stroke-dasharray="6,5"/>
+<polygon points="1095.0,131.0 1101.5,144.0 1088.5,144.0" fill="#FFFFFF" stroke="#334155" stroke-width="1"/>
+<path d="M1278.3,430.0 L1112.0,131.0" fill="none" stroke="#334155" stroke-width="1" stroke-dasharray="6,5"/>
+<polygon points="1112.0,131.0 1124.0,139.2 1112.6,145.5" fill="#FFFFFF" stroke="#334155" stroke-width="1"/>
+<path d="M162.7,250.0 L323.2,145.0" fill="none" stroke="#334155" stroke-width="1"/>
+<path d="M316.4,154.8 L323.2,145.0 L311.5,147.3" fill="none" stroke="#334155" stroke-width="1"/>
+<text x="242.91691842900303" y="192.5" font-family="Arial" font-size="10.5" fill="#475569" text-anchor="middle">usa</text>
+<path d="M380.0,309.6 L684.6,430.0" fill="none" stroke="#334155" stroke-width="1" stroke-dasharray="6,5"/>
+<path d="M672.7,430.1 L684.6,430.0 L676.1,421.8" fill="none" stroke="#334155" stroke-width="1"/>
+<text x="532.3148148148148" y="364.8170731707317" font-family="Arial" font-size="10.5" fill="#475569" text-anchor="middle">cria</text>
+<path d="M579.1,310.0 L875.4,430.0" fill="none" stroke="#334155" stroke-width="1" stroke-dasharray="6,5"/>
+<path d="M863.5,430.0 L875.4,430.0 L866.9,421.7" fill="none" stroke="#334155" stroke-width="1"/>
+<text x="727.2222222222222" y="365.0" font-family="Arial" font-size="10.5" fill="#475569" text-anchor="middle">cria</text>
+<path d="M40,420 L491,420 L500,429 L500,497 L40,497 Z" fill="#FFFBEB" stroke="#92400E" stroke-width="0.6"/>
+<path d="M491,420 L491,429 L500,429" fill="none" stroke="#92400E" stroke-width="0.6"/>
+<text x="48" y="436" font-family="Arial" font-size="11" fill="#000000">Uma fabrica concreta por familia. O Client recebe a fabrica,</text>
+<text x="48" y="449" font-family="Arial" font-size="11" fill="#000000">chama criarProdutoA e criarProdutoB e nunca escreve o nome</text>
+<text x="48" y="462" font-family="Arial" font-size="11" fill="#000000">de uma classe concreta: por isso nao ha como combinar</text>
+<text x="48" y="475" font-family="Arial" font-size="11" fill="#000000">ProductA1 com ProductB2. A coerencia entre os produtos nao</text>
+<text x="48" y="488" font-family="Arial" font-size="11" fill="#000000">e validada em tempo de execucao - ela e inalcancavel.</text>
+<rect x="40" y="600" width="1320" height="108" rx="6" fill="#DDDDDD" stroke="#000000" stroke-width="0.9"/>
+<text x="49" y="613" font-family="Arial" font-size="11.5" fill="#000000" font-weight="bold">Papel no padrao</text>
+<text x="340" y="613" font-family="Arial" font-size="11.5" fill="#000000" font-weight="bold">Quem e no G1_ProjetoComercioEletronico</text>
+<text x="49" y="631" font-family="Arial" font-size="11.5" fill="#000000">AbstractFactory</text>
+<text x="340" y="631" font-family="Arial" font-size="11.5" fill="#000000">FabricaMeioPagamento</text>
+<line x1="40" x2="1360" y1="618" y2="618" stroke="#000000" stroke-width="0.5"/>
+<text x="49" y="649" font-family="Arial" font-size="11.5" fill="#000000">ConcreteFactory</text>
+<text x="340" y="649" font-family="Arial" font-size="11.5" fill="#000000">FabricaCartao, FabricaPix, FabricaBoleto, FabricaSaldoEmConta</text>
+<line x1="40" x2="1360" y1="636" y2="636" stroke="#000000" stroke-width="0.5"/>
+<text x="49" y="667" font-family="Arial" font-size="11.5" fill="#000000">AbstractProduct</text>
+<text x="340" y="667" font-family="Arial" font-size="11.5" fill="#000000">Autorizador, Comprovante, PoliticaEstorno</text>
+<line x1="40" x2="1360" y1="654" y2="654" stroke="#000000" stroke-width="0.5"/>
+<text x="49" y="685" font-family="Arial" font-size="11.5" fill="#000000">ConcreteProduct</text>
+<text x="340" y="685" font-family="Arial" font-size="11.5" fill="#000000">AutorizadorCartao, ComprovanteCartao, EstornoCartao, e o trio de cada familia</text>
+<line x1="40" x2="1360" y1="672" y2="672" stroke="#000000" stroke-width="0.5"/>
+<text x="49" y="703" font-family="Arial" font-size="11.5" fill="#000000">Client</text>
+<text x="340" y="703" font-family="Arial" font-size="11.5" fill="#000000">ServicoDeCheckout</text>
+<line x1="40" x2="1360" y1="690" y2="690" stroke="#000000" stroke-width="0.5"/>
+<line x1="330" x2="330" y1="600" y2="708" stroke="#000000" stroke-width="0.5"/>
+</svg>
