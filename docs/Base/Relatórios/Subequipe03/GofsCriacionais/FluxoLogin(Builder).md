@@ -235,7 +235,7 @@ end note
 
 #### 2.5.1 Objetivo do padrão no domínio de Login
 
-O **Builder** isola o código de construção e validação de parâmetros de uma tentativa de login da representação final do objeto `RequisicaoLogin`. Em vez de obrigar o cliente a conhecer quais dos 10 atributos internos devem ser preenchidos ou deixados como `null` em um login silencioso versus um login com desafio 2FA, o padrão oferece passos nomeados e expressivos, garantindo que nenhum objeto `RequisicaoLogin` nasça em estado inválido.
+O **Builder** isola o código de construção e validação de parâmetros de uma tentativa de login da representação final do objeto `RequisicaoLogin`. Em vez de obrigar o cliente a conhecer quais dos 10 atributos internos devem ser preenchidos ou deixados como `null` em um login silencioso versus um login com desafio 2FA, o padrão oferece passos nomeados e expressivos, garantindo que nenhum objeto construído pelo Builder nasça em estado inválido.
 
 #### 2.5.2 Colaboração passo a passo entre os participantes
 
@@ -680,6 +680,35 @@ java -cp . client.MainBuilder
 | Reinicialização automática (`resetar()`) ao final do método `build()` | Exigir que o cliente instancie um novo `Builder` a cada uso              | Permite reutilizar a mesma instância de `RequisicaoLoginConcretoBuilder` para construir múltiplos objetos em sequência sem vazamento de dados da requisição anterior. |
 | Validação de invariantes cruzadas no `build()`                        | Validar apenas nos validadores posteriores da regra de negócio           | Antecipa a detecção de erros (_Fail-Fast_): impede que um objeto `RequisicaoLogin` de risco alto sequer exista na memória sem os dados obrigatórios de 2FA.           |
 
+### 9.1 Quem garante as invariantes? O construtor público e a alternativa de Bloch
+
+A tabela acima cita a alternativa "inner class estática estilo Joshua Bloch" sem explicá-la. Ela importa por causa de uma limitação do código atual.
+
+**O problema.** `RequisicaoLogin` está no pacote `product` e declara um construtor `public` com 10 parâmetros (seção 5.1). As invariantes ficam em `validarInvariantes()`, no `RequisicaoLoginConcretoBuilder` (pacote `builder`). Como o construtor é público, nada impede este código:
+
+```java
+// Compila e executa: o Builder e suas invariantes nunca são consultados
+RequisicaoLogin invalida = new RequisicaoLogin(
+    null, null, null, "0.0.0.0", "X", "ALTO",
+    true, null, null, false);
+```
+
+O objeto resultante tem e-mail nulo e `exige2FA = true` sem canal nem código, exatamente os dois estados que o `build()` rejeita. Portanto, a garantia de que nenhum `RequisicaoLogin` nasça inválido vale **para quem usa o Builder**, e não é imposta pela linguagem.
+
+**Por que o Java não ajuda aqui.** Um construtor _package-private_ (sem modificador) seria a solução natural, mas só é visível dentro do mesmo pacote. Como `product` e `builder` são pacotes distintos, o `ConcreteBuilder` também não conseguiria chamá-lo. Por isso o construtor precisou ser público.
+
+**Três caminhos, com seus custos**
+
+| Alternativa                                                                      | Como funciona                                                                                                    | Custo                                                                                                         |
+| -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| **A. Builder como classe estática aninhada** (Bloch, _Effective Java_, Item 2)    | `RequisicaoLogin.Builder` fica dentro do produto; o construtor do produto é `private` e recebe o Builder.        | Perde a interface `RequisicaoLoginBuilder` e a troca de `ConcreteBuilder`; o `Director` passa a depender da classe aninhada. |
+| **B. Unir `product` e `builder` no mesmo pacote** e usar construtor _package-private_ | Mantém a estrutura GoF (interface, ConcreteBuilder, Director) e fecha o acesso externo.                          | Abandona a separação por pacotes `product`/`builder`/`client` adotada na Seção 2.1.                          |
+| **C. Validar também no construtor do produto**                                   | O construtor repete as checagens e lança `IllegalStateException`; o `ConcreteBuilder` continua como está.        | Duplica regras em dois lugares; qualquer mudança de invariante precisa ser feita duas vezes.                  |
+
+**Por que o projeto manteve a estrutura atual.** A decisão da tabela da Seção 9 foi seguir a estrutura canônica do GoF apresentada em aula. Mas o benefício que justifica a interface `Builder` (trocar o `ConcreteBuilder` para produzir representações diferentes) não é exercitado aqui: existe um único `ConcreteBuilder` e um único produto (ver Seção 10, linha "Por que não classes abstratas para produtos?"). A Alternativa A teria, neste sistema, o mesmo efeito prático com garantia mais forte.
+
+**Como ler a Seção 2.5.1.** Onde se lê "nenhum objeto `RequisicaoLogin` nasça em estado inválido", entenda: nenhum objeto construído **por meio do Builder**. A imutabilidade, por sua vez, é real: todos os campos são `final`, os tipos são `String` ou primitivos, e não há _setters_. Um reforço barato é declarar a classe como `final`, para impedir que uma subclasse adicione estado mutável.
+
 ---
 
 ## 10. Relação com a literatura
@@ -748,3 +777,4 @@ REFACTORING GURU. **Builder in Java**. Disponível em: <https://refactoring.guru
 | Versão |    Data    | Descrição                                                                                                                                      | Autor(es)            | Revisor(es)                                                                         |
 | :----: | :--------: | :--------------------------------------------------------------------------------------------------------------------------------------------- | :------------------- | :---------------------------------------------------------------------------------- |
 | `1.0`  | 19/10/2026 | Elaboração da modelagem PlantUML, implementação em Java e documentação completa do padrão GoF Criacional Builder aplicado ao Contexto de Login | Pedro Henrique Gomes | João Paulo Barbosa Pereira Nunes, José Joaquim da Silva Neto e Júlia Santana Campos |
+| `1.1`  | 19/10/2026 | Adição da subseção 9.1 (invariantes e construtor público; alternativa de Bloch) e ajuste da Seção 2.5.1 | José Joaquim da Silva Neto | João Paulo Barbosa Pereira Nunes, José Joaquim da Silva Neto e Júlia Santana Campos |
