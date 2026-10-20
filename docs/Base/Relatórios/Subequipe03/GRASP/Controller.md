@@ -1,6 +1,6 @@
 # GRASP Controller no Subsistema de Login
 
-> Sistema em Java que modela a aplicação do princípio **GRASP Controller (Controlador)** no subsistema de **Login e Autenticação** do G1_ProjetoComercioEletronico: o `ControladorDeAutenticacao` é o primeiro objeto, além da camada de apresentação (Swing), a receber o evento de sistema "solicitar login". Ele isola a UI da lógica de negócio e coordena o fluxo entre o padrão criacional [Builder](<./ContextoDeLogin(Builder).md>) (montagem e validação do contexto) e o padrão comportamental [Chain of Responsibility](<./FluxoDeLogin(ChainOfResponsibility).md>) (barreiras de segurança), devolvendo à UI um `ResultadoAutenticacaoDTO` e refletindo os achados de Engenharia Reversa (**Achados L01 a L05**).
+> Sistema em Java que modela a aplicação do princípio **GRASP Controller (Controlador)** no subsistema de **Login e Autenticação** do G1_ProjetoComercioEletronico: o `ControladorDeAutenticacao` é o primeiro objeto, além da camada de apresentação (Swing), a receber o evento de sistema "solicitar login". Ele isola a UI da lógica de negócio e coordena o fluxo entre o padrão criacional [Builder](<https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_03/#/Base/Relat%C3%B3rios/Subequipe03/GofsCriacionais/FluxoLogin(Builder)>) (montagem e validação do contexto) e o padrão comportamental [Chain of Responsibility](<https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_03/#/Base/Relat%C3%B3rios/Subequipe03/GofsComportamentais/FluxoDeLogin(ChainOfResponsibility)>) (barreiras de segurança), devolvendo à UI um `ResultadoAutenticacaoDTO` e refletindo os achados de Engenharia Reversa (**Achados L01 a L05**).
 
 ## Sumário
 
@@ -279,6 +279,7 @@ public final class ResultadoAutenticacaoDTO {
                 + ", mensagem='" + mensagem + "'}";
     }
 }
+
 ```
 
 Os campos são `private final` e não há _setters_: o DTO é imutável. As fábricas estáticas `autorizado` e `negado` garantem que `tokenSessaoEmitido` só seja `true` quando `sucesso` for `true`, evitando combinações incoerentes.
@@ -327,15 +328,23 @@ public class ControladorDeAutenticacao {
             RequisicaoLogin requisicao = montarRequisicao(email, senha, tokenCaptcha, nivelRisco, codigo2FA);
 
             // 2. Chain: adapta o contexto do Builder ao contexto da Chain e delega
-            boolean autorizado = servicoAutenticacao.autorizar(paraContextoDaCadeia(requisicao));
+            boolean autorizado;
+            try {
+                autorizado = servicoAutenticacao.autorizar(paraContextoDaCadeia(requisicao));
+            } catch (SecurityException ex) {
+                // A Chain barrou a requisição (Cenários 3 e 4)!
+                resultado = ResultadoAutenticacaoDTO.negado("Cadeia de Segurança: " + ex.getMessage());
+                System.out.println(">>> [GRASP Controller] Retorno enviado à UI via DTO: " + resultado.getMensagem());
+                return resultado;
+            }
 
-            // 3. DTO: traduz o booleano da cadeia para a UI
+            // 3. Sucesso (Cenários 1 e 2)
             resultado = autorizado
                     ? ResultadoAutenticacaoDTO.autorizado("Autenticação bem-sucedida. Sessão replicada (Achado-L05).")
-                    : ResultadoAutenticacaoDTO.negado("Falha na validação de segurança da cadeia.");
+                    : ResultadoAutenticacaoDTO.negado("Falha desconhecida.");
 
         } catch (IllegalStateException e) {
-            // Invariante violada no Builder: a requisição nem chega a existir; a Chain não é acionada
+            // Invariante violada no Builder (Cenário 5): a requisição nem chega a existir; a Chain não é acionada
             resultado = ResultadoAutenticacaoDTO.negado("Erro de validação do Builder: " + e.getMessage());
         }
 
@@ -352,7 +361,6 @@ public class ControladorDeAutenticacao {
                 .comTelemetriaDispositivo(IP_DEMO, FINGERPRINT_DEMO, nivelRisco);
 
         // O 2FA só entra na montagem quando o risco é ALTO (Achado-L03).
-        // Chamar comDesafio2FA incondicionalmente forçaria exige2FA = true em todo login.
         if ("ALTO".equalsIgnoreCase(nivelRisco)) {
             builder.comDesafio2FA(CANAL_2FA_PADRAO, codigo2FA);
         }
@@ -374,6 +382,8 @@ public class ControladorDeAutenticacao {
                 r.getCodigo2FA(), metadados);
     }
 }
+
+
 ```
 
 Pontos técnicos de destaque:
@@ -437,6 +447,7 @@ O mesmo objeto acumula duas responsabilidades distintas (coordenar e adaptar). I
 ### 5.3 `InterfaceGraficaLogin` (View — pacote `view`)
 
 ```java
+
 package view;
 
 import controller.ControladorDeAutenticacao;
@@ -514,6 +525,7 @@ public class InterfaceGraficaLogin extends JFrame {
                 new InterfaceGraficaLogin(new ControladorDeAutenticacao()).setVisible(true));
     }
 }
+
 ```
 
 A lista de `import` da View é a prova do desacoplamento: **apenas** `controller` e `dto`. Sua lógica se resume a `aoClicarBotaoLogin`, que apenas delega ao Controller, e `exibir`, que pinta o DTO.
@@ -571,13 +583,11 @@ O Controller não implementa nenhum achado por conta própria: ele **coordena** 
 | **Achado-L04**   | Fora do escopo do subsistema de Login modelado nos padrões de origem.                                                           | —                                                                                 | Não tratado neste módulo.                                                                                                               |
 | **Achado-L05**   | Após o login, `POST /session/replicate` (status 204) replica a sessão para o ecossistema integrado.                             | Builder (`comReplicacaoEcossistema`) e `ServicoDeAutenticacao.autorizar()`.       | Solicita a replicação no Builder e reflete no DTO autorizado a mensagem "Sessão replicada (Achado-L05)".                                |
 
-> **Nota:** o Achado-L04 não aparece nos documentos do Builder e da Chain; confirme, no relatório de Engenharia Reversa da Subequipe, se ele deve ser mencionado aqui. Se não pertencer ao Login, a linha pode ser removida.
-
-Referências cruzadas: [Engenharia Reversa](https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_01/#/Base/Relat%C3%B3rios/SubEquipe03/EngenhariaReversa), [Diagramas de Sequência](https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_02/#/Base/Relat%C3%B3rios/Subequipe03/ModelagemDinamica/DiagramaDeSequencia) e [Diagrama de Comunicação](https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_02/#/Base/Relat%C3%B3rios/Subequipe03/ModelagemDinamica/DiagramaDeComunicacao) do Subsistema de Login; [Builder](<./ContextoDeLogin(Builder).md>) e [Chain of Responsibility](<./FluxoDeLogin(ChainOfResponsibility).md>).
+Referências cruzadas: [Engenharia Reversa](https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_01/#/Base/Relat%C3%B3rios/SubEquipe03/EngenhariaReversa), [Diagramas de Sequência](https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_02/#/Base/Relat%C3%B3rios/Subequipe03/ModelagemDinamica/DiagramaDeSequencia) e [Diagrama de Comunicação](https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_02/#/Base/Relat%C3%B3rios/Subequipe03/ModelagemDinamica/DiagramaDeComunicacao) do Subsistema de Login; [Builder](<https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_03/#/Base/Relat%C3%B3rios/Subequipe03/GofsCriacionais/FluxoLogin(Builder)>) e [Chain of Responsibility](<https://unbarqdsw2026-2-turma01.github.io/2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_03/#/Base/Relat%C3%B3rios/Subequipe03/GofsComportamentais/FluxoDeLogin(ChainOfResponsibility)>).
 
 ---
 
-## 7. Demonstração e Saída no Terminal
+## 7. Demonstração Visual
 
 A classe `MainControlador` simula a UI e dispara cinco eventos de sistema sobre o **mesmo** Controller, exercitando todos os desfechos possíveis:
 
@@ -589,103 +599,29 @@ A classe `MainControlador` simula a UI e dispara cinco eventos de sistema sobre 
 | **Cenário 4** | `TOKEN_FALSO`                                                 | **Elo 1** (`ValidadorCaptcha`)     | DTO negado; curto-circuito imediato (**L01**)                         |
 | **Cenário 5** | Risco `ALTO` sem código 2FA                                   | **Builder** (`build()`)            | DTO negado com a mensagem do Builder; **a Chain não é acionada**      |
 
-### 7.1 Saída real da execução no terminal
+### 7.1 Demonstração Visual e Passo a Passo
 
-```text
-######## CENARIO 1: Risco baixo (bypass silencioso de 2FA) ########
->>> [GRASP Controller] Recebendo evento de sistema da UI...
-[ControladorDeAutenticacao] Solicitacao de login recebida para: pedro@unb.br
-==================================================================
-Iniciando autorizacao para o usuario: pedro@unb.br
-------------------------------------------------------------------
-[1. ValidadorCaptcha] Verificando token reCAPTCHA Enterprise carregado no page load (Achado-L01)...
-   -> [OK] Token Captcha validado com sucesso.
-[2. ValidadorCredenciais] Consultando usuario no Banco de Dados...
-   -> [OK] Credenciais validas para: pedro@unb.br
-[3. ValidadorRisco] Avaliando score de risco e metadados do dispositivo...
-   -> [OK] Score de risco baixo. Passando silenciosamente sem exigir 2FA (Achado-L03).
-[4. ValidadorTwoFactor] Verificando necessidade de 2FA...
-   -> [BYPASS] 2FA nao exigido para esta sessao (Fluxo silencioso concluido).
-------------------------------------------------------------------
-[SUCESSO] Login autorizado! Emitindo Token de Sessao.
-[Achado-L05] Replicando sessao entre produtos (POST /session/replicate -> 204).
-==================================================================
+A classe `InterfaceGraficaLogin` simulando a camada de Apresentação (View) foi utilizada para disparar os cinco eventos de sistema sobre o **mesmo** Controller, exercitando todos os desfechos possíveis e provando o isolamento das regras de negócio.
 
->>> [GRASP Controller] Retorno enviado à UI via DTO: Autenticação bem-sucedida. Sessão replicada (Achado-L05).
-[View] sucesso=true | tokenEmitido=true
+Abaixo, a demonstração gravada da interface interagindo com o Controlador.
 
-######## CENARIO 2: Risco alto com 2FA correto ########
->>> [GRASP Controller] Recebendo evento de sistema da UI...
-[ControladorDeAutenticacao] Solicitacao de login recebida para: pedro@unb.br
-==================================================================
-Iniciando autorizacao para o usuario: pedro@unb.br
-------------------------------------------------------------------
-[1. ValidadorCaptcha] Verificando token reCAPTCHA Enterprise carregado no page load (Achado-L01)...
-   -> [OK] Token Captcha validado com sucesso.
-[2. ValidadorCredenciais] Consultando usuario no Banco de Dados...
-   -> [OK] Credenciais validas para: pedro@unb.br
-[3. ValidadorRisco] Avaliando score de risco e metadados do dispositivo...
-   -> [ALERTA] Score de risco elevado detectado! Exigindo confirmacao 2FA.
-[4. ValidadorTwoFactor] Verificando necessidade de 2FA...
-   -> [ACAO] Disparando codigo de confirmacao via Servico de Notificacao (SMS/E-mail)...
-   -> [OK] Codigo 2FA (123456) validado com sucesso!
-------------------------------------------------------------------
-[SUCESSO] Login autorizado! Emitindo Token de Sessao.
-[Achado-L05] Replicando sessao entre produtos (POST /session/replicate -> 204).
-==================================================================
+<div style="text-align:center;">
 
->>> [GRASP Controller] Retorno enviado à UI via DTO: Autenticação bem-sucedida. Sessão replicada (Achado-L05).
-[View] sucesso=true | tokenEmitido=true
+[Vídeo: Padrão GRASP Controller - Subsistema de Login](../assets/video_grasp_controller.mp4 ":include :type=video controls width=80%")
 
-######## CENARIO 3: Senha incorreta (curto-circuito no Elo 2) ########
->>> [GRASP Controller] Recebendo evento de sistema da UI...
-[ControladorDeAutenticacao] Solicitacao de login recebida para: pedro@unb.br
-==================================================================
-Iniciando autorizacao para o usuario: pedro@unb.br
-------------------------------------------------------------------
-[1. ValidadorCaptcha] Verificando token reCAPTCHA Enterprise carregado no page load (Achado-L01)...
-   -> [OK] Token Captcha validado com sucesso.
-[2. ValidadorCredenciais] Consultando usuario no Banco de Dados...
-   -> [BLOQUEADO] Credenciais invalidas.
-   -> [Achado-L02] Retornando HTTP 200 com payload comprimido generico e recarregando desafio Captcha.
-------------------------------------------------------------------
-[FALHA] A tentativa de login foi rejeitada pela cadeia de validacao.
-==================================================================
+<p><strong>Vídeo Demonstrativo:</strong> Apresentação da UI repassando dados brutos e reagindo unicamente ao DTO gerado pelo Controller em 5 cenários distintos. <em>Autor: Pedro Henrique Gomes</em></p>
 
->>> [GRASP Controller] Retorno enviado à UI via DTO: Falha na validação de segurança da cadeia.
-[View] sucesso=false | tokenEmitido=false
+</div>
 
-######## CENARIO 4: Token Captcha falso (curto-circuito no Elo 1) ########
->>> [GRASP Controller] Recebendo evento de sistema da UI...
-[ControladorDeAutenticacao] Solicitacao de login recebida para: pedro@unb.br
-==================================================================
-Iniciando autorizacao para o usuario: pedro@unb.br
-------------------------------------------------------------------
-[1. ValidadorCaptcha] Verificando token reCAPTCHA Enterprise carregado no page load (Achado-L01)...
-   -> [BLOQUEADO] Token de Captcha invalido ou ausente. Interrompendo a cadeia.
-------------------------------------------------------------------
-[FALHA] A tentativa de login foi rejeitada pela cadeia de validacao.
-==================================================================
+### Passo a passo da demonstração em vídeo
 
->>> [GRASP Controller] Retorno enviado à UI via DTO: Falha na validação de segurança da cadeia.
-[View] sucesso=false | tokenEmitido=false
-
-######## CENARIO 5: Risco alto sem codigo 2FA (barrado pelo Builder) ########
->>> [GRASP Controller] Recebendo evento de sistema da UI...
-[ControladorDeAutenticacao] Solicitacao de login recebida para: pedro@unb.br
->>> [GRASP Controller] Retorno enviado à UI via DTO: Erro de validação do Builder: [Erro do Builder] Sessao classificada como RISCO ALTO exige que o canal e o codigo 2FA sejam preenchidos.
-[View] sucesso=false | tokenEmitido=false
-```
-
-**Como ler a saída:**
-
-- Em todos os cenários, as linhas `[GRASP Controller]` abrem e fecham o fluxo: é o Controller recebendo o evento da UI e devolvendo o DTO.
-- Nos cenários 1 a 4, as linhas numeradas `[1.]` a `[4.]` pertencem à Chain e mostram o curto-circuito (cenários 3 e 4 interrompem a cadeia antes do fim).
-- No **cenário 5**, não aparece nenhuma linha de validador: a requisição foi barrada pelo Builder, antes de a Chain existir no fluxo. É a evidência de que o Controller trata o erro de criação sem acionar a validação.
-
-### 7.2 Interface Swing
-
-A `InterfaceGraficaLogin` oferece os mesmos cenários de forma interativa (e-mail, senha, token de captcha válido ou falso, nível de risco e código 2FA). O painel de status mostra a mensagem do DTO em **verde** (autorizado) ou **vermelho** (negado). Como a View só recebe o DTO, ela **não** exibe o estado individual de cada elo da cadeia; essa visão fina exigiria um retorno mais rico da Chain (ver seção 12).
+| Trecho do Vídeo                  | O que acontece na tela                                                                                    | O que isso prova sobre a Arquitetura                                                                                                                                                |
+| :------------------------------- | :-------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Cenário 1 (Risco Baixo)**      | O usuário envia dados corretos e risco BAIXO. A tela fica verde e o Controller retorna DTO autorizado.    | O Controller montou o objeto e orquestrou a Chain com sucesso. Ocorreu o _bypass_ do 2FA (**L03**) e a sessão foi replicada (**L05**).                                              |
+| **Cenário 3 (Senha Errada)**     | O usuário altera a senha para um valor inválido. A tela fica vermelha imediatamente.                      | **Curto-circuito na Chain (Elo 2):** O Controller recebeu a falha do `ValidadorCredenciais` e encapsulou em um DTO de negação, blindando a UI do erro interno (**L02**).            |
+| **Cenário 4 (Token Falso)**      | A senha é corrigida, mas o token Captcha é adulterado. A tela fica vermelha novamente.                    | **Curto-circuito na Chain (Elo 1):** O Controller captura a rejeição imediata do `ValidadorCaptcha`, abortando o acesso ao banco de dados e economizando recursos (**L01**).        |
+| **Cenário 5 (Erro do Builder)**  | O usuário corrige o token, muda o risco para ALTO, mas deixa o 2FA vazio. A tela acusa erro de validação. | **Proteção do Builder:** O _Fail-Fast_ impediu a criação da requisição. O Controller interceptou a `IllegalStateException` e não chegou sequer a acionar a Chain of Responsibility. |
+| **Cenário 2 (Risco Alto + 2FA)** | O usuário fornece o código 2FA faltante. O Controller envia, a Chain valida e a tela volta a ficar verde. | Prova a consistência do fluxo completo mediado pelo Controlador, recuperando-se de erros e validando o segundo fator condicionalmente de ponta a ponta.                             |
 
 ---
 
@@ -693,20 +629,47 @@ A `InterfaceGraficaLogin` oferece os mesmos cenários de forma interativa (e-mai
 
 O Controller reutiliza o Builder e a Chain pelo `-sourcepath`, sem copiar seus arquivos. A partir da pasta `GRASP_Controller/`, e assumindo a árvore `src/criacionais`, `src/comportamentais` e `src/extras/GRASP_Controller` (ajuste os caminhos relativos se a sua for diferente):
 
-```bash
-# Compila Controller, DTO e Views; o javac localiza Builder e Chain pelo sourcepath
+### Linux e macOS (Terminal)
+
+```
+# 1. Cria o diretório de saída para os arquivos compilados
+mkdir -p out
+
+# 2. Compila Controller, DTO e Views; o javac localiza Builder e Chain pelo sourcepath
 javac -encoding UTF-8 -d out \
   -sourcepath "../../criacionais/ContextoDeLogin(Builder):../../comportamentais/FluxoDeLogin(ChainOfResponsibility)" \
   controller/*.java dto/*.java view/*.java
 
-# Demonstração em console (5 cenários)
+# 3. Demonstração em console (5 cenários)
 java -Dstdout.encoding=UTF-8 -cp out view.MainControlador
 
-# Interface Swing (requer ambiente gráfico)
+# 4. Interface Swing (requer ambiente gráfico)
 java -cp out view.InterfaceGraficaLogin
+
 ```
 
-No Windows (PowerShell), troque o separador de caminhos do `-sourcepath` de `:` para `;` e use uma única linha de comando. A opção `-Dstdout.encoding=UTF-8` evita que acentos apareçam como `?` no console.
+### Windows (PowerShell ou CMD)
+
+No Windows, o separador de caminhos do -sourcepath deve ser obrigatoriamente o ponto e vírgula (;).
+PowerShell
+
+```
+
+# 1. Cria o diretório de saída para os arquivos compilados
+mkdir out
+
+# 2. Compila Controller, DTO e Views em uma única linha
+javac -encoding UTF-8 -d out -sourcepath "../../criacionais/ContextoDeLogin(Builder);../../comportamentais/FluxoDeLogin(ChainOfResponsibility)" controller/*.java dto/*.java view/*.java
+
+# 3. Demonstração em console (5 cenários)
+java -Dstdout.encoding=UTF-8 -cp out view.MainControlador
+
+# 4. Interface Swing (requer ambiente gráfico)
+
+java -cp out view.InterfaceGraficaLogin
+
+
+```
 
 ---
 

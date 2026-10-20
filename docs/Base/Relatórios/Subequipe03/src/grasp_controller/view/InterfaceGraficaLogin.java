@@ -4,74 +4,140 @@ import controller.ControladorDeAutenticacao;
 import dto.ResultadoAutenticacaoDTO;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
 
 public class InterfaceGraficaLogin extends JFrame {
 
-    private static final Color VERDE = new Color(0x2E7D32);
-    private static final Color VERMELHO = new Color(0xC62828);
-
+    // A UI conhece apenas o Controlador (GRASP Controller) e os DTOs
     private final ControladorDeAutenticacao controlador;
 
-    private final JTextField campoEmail = new JTextField("pedro@unb.br", 20);
-    private final JPasswordField campoSenha = new JPasswordField("HASH_SENHA_123", 20);
-    private final JComboBox<String> comboCaptcha =
-            new JComboBox<>(new String[]{"CAPTCHA_OK_TOKEN_VALIDO", "TOKEN_FALSO"});
-    private final JComboBox<String> comboRisco = new JComboBox<>(new String[]{"BAIXO", "ALTO"});
-    private final JTextField campoCodigo2FA = new JTextField("123456", 20);
-    private final JButton botaoLogin = new JButton("Entrar");
-    private final JLabel rotuloStatus = new JLabel("Aguardando autenticação...", SwingConstants.CENTER);
+    // Componentes Visuais
+    private JTextField txtEmail;
+    private JPasswordField txtSenha;
+    private JTextField txtCaptcha;
+    private JComboBox<String> cbRisco;
+    private JTextField txtCodigo2FA;
+    private JTextArea txtConsole;
+    private JPanel painelStatus;
 
-    public InterfaceGraficaLogin(ControladorDeAutenticacao controlador) {
-        super("Login - GRASP Controller");
-        this.controlador = controlador;
-        montarTela();
-        botaoLogin.addActionListener(e -> aoClicarBotaoLogin());
+    public InterfaceGraficaLogin() {
+        super("Padrão GRASP: Controller - Login");
+        this.controlador = new ControladorDeAutenticacao();
+
+        configurarJanela();
+        inicializarComponentes();
+        this.setVisible(true);
     }
 
-    private void montarTela() {
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        JPanel form = new JPanel(new GridLayout(0, 2, 8, 8));
-        form.setBorder(BorderFactory.createEmptyBorder(16, 16, 8, 16));
-        form.add(new JLabel("E-mail:"));          form.add(campoEmail);
-        form.add(new JLabel("Senha (hash):"));    form.add(campoSenha);
-        form.add(new JLabel("Token captcha:"));   form.add(comboCaptcha);
-        form.add(new JLabel("Nível de risco:"));  form.add(comboRisco);
-        form.add(new JLabel("Código 2FA:"));      form.add(campoCodigo2FA);
-
-        rotuloStatus.setOpaque(true);
-        rotuloStatus.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        JPanel rodape = new JPanel(new BorderLayout(8, 8));
-        rodape.setBorder(BorderFactory.createEmptyBorder(0, 16, 16, 16));
-        rodape.add(botaoLogin, BorderLayout.NORTH);
-        rodape.add(rotuloStatus, BorderLayout.CENTER);
-
-        add(form, BorderLayout.CENTER);
-        add(rodape, BorderLayout.SOUTH);
-        pack();
-        setLocationRelativeTo(null);
+    private void configurarJanela() {
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setSize(500, 600);
+        this.setLocationRelativeTo(null);
+        this.setLayout(new BorderLayout(10, 10));
     }
 
-    /** Evento de sistema: a View apenas delega ao Controller. */
+    private void inicializarComponentes() {
+        // Painel de Formulário
+        JPanel painelFormulario = new JPanel(new GridLayout(5, 2, 10, 15));
+        painelFormulario.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createEtchedBorder(), "Dados da Requisição (Camada de Apresentação)", TitledBorder.LEFT, TitledBorder.TOP));
+
+        painelFormulario.add(new JLabel("E-mail:"));
+        txtEmail = new JTextField("pedro@unb.br");
+        painelFormulario.add(txtEmail);
+
+        painelFormulario.add(new JLabel("Senha Hash:"));
+        txtSenha = new JPasswordField("HASH_SENHA_123");
+        painelFormulario.add(txtSenha);
+
+        painelFormulario.add(new JLabel("Token Captcha (Achado L01):"));
+        txtCaptcha = new JTextField("CAPTCHA_ENTERPRISE_OK_9981");
+        painelFormulario.add(txtCaptcha);
+
+        painelFormulario.add(new JLabel("Nível de Risco do Dispositivo:"));
+        cbRisco = new JComboBox<>(new String[]{"BAIXO", "ALTO"});
+        painelFormulario.add(cbRisco);
+
+        painelFormulario.add(new JLabel("Código 2FA (Se SMS/Email):"));
+        txtCodigo2FA = new JTextField("");
+        painelFormulario.add(txtCodigo2FA);
+
+        // Painel do Botão
+        JPanel painelBotao = new JPanel();
+        JButton btnLogin = new JButton("Autenticar (Disparar Evento do Sistema)");
+        btnLogin.setBackground(new Color(40, 167, 69));
+        btnLogin.setForeground(Color.WHITE);
+        btnLogin.setFont(new Font("SansSerif", Font.BOLD, 14));
+        btnLogin.setPreferredSize(new Dimension(400, 40));
+        
+        // DELEGAÇÃO GRASP: O clique apenas coleta dados e repassa ao controlador
+        btnLogin.addActionListener(e -> aoClicarBotaoLogin());
+        painelBotao.add(btnLogin);
+
+        // Painel de Saída (Feedback visual)
+        painelStatus = new JPanel();
+        painelStatus.setBackground(Color.DARK_GRAY);
+        painelStatus.setPreferredSize(new Dimension(500, 30));
+
+        txtConsole = new JTextArea(8, 40);
+        txtConsole.setEditable(false);
+        txtConsole.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        JScrollPane scrollConsole = new JScrollPane(txtConsole);
+        scrollConsole.setBorder(BorderFactory.createTitledBorder("Retorno do Controlador (DTO)"));
+
+        JPanel painelInferior = new JPanel(new BorderLayout());
+        painelInferior.add(painelStatus, BorderLayout.NORTH);
+        painelInferior.add(scrollConsole, BorderLayout.CENTER);
+
+        this.add(painelFormulario, BorderLayout.NORTH);
+        this.add(painelBotao, BorderLayout.CENTER);
+        this.add(painelInferior, BorderLayout.SOUTH);
+    }
+
+    /**
+     * Este método prova a aplicação do GRASP Controller.
+     * A interface não contém regras de negócio. Ela capta as strings e aciona o controlador.
+     */
     private void aoClicarBotaoLogin() {
+        String email = txtEmail.getText();
+        String senha = new String(txtSenha.getPassword());
+        String tokenCaptcha = txtCaptcha.getText().isEmpty() ? null : txtCaptcha.getText();
+        String risco = cbRisco.getSelectedItem().toString();
+        String codigo2FA = txtCodigo2FA.getText();
+
+        log("[UI] Enviando evento de sistema para o ControladorDeAutenticacao...");
+
+        // Chama o controlador e recebe o DTO de resposta
         ResultadoAutenticacaoDTO resultado = controlador.processarSolicitacaoLogin(
-                campoEmail.getText(),
-                new String(campoSenha.getPassword()),
-                (String) comboCaptcha.getSelectedItem(),
-                (String) comboRisco.getSelectedItem(),
-                campoCodigo2FA.getText());
-        exibir(resultado);
+                email, senha, tokenCaptcha, risco, codigo2FA
+        );
+
+        // Atualiza a tela com base no DTO
+        atualizarPainelVisual(resultado);
     }
 
-    private void exibir(ResultadoAutenticacaoDTO resultado) {
-        rotuloStatus.setText("<html><center>" + resultado.getMensagem() + "</center></html>");
-        rotuloStatus.setBackground(resultado.isSucesso() ? VERDE : VERMELHO);
-        rotuloStatus.setForeground(Color.WHITE);
+    private void atualizarPainelVisual(ResultadoAutenticacaoDTO resultado) {
+        log("[UI] DTO Recebido. Sucesso: " + resultado.isSucesso());
+        log("[UI] Mensagem: " + resultado.getMensagem());
+        log("------------------------------------------------------\n");
+
+        if (resultado.isSucesso()) {
+            painelStatus.setBackground(new Color(40, 167, 69)); // Verde
+            JOptionPane.showMessageDialog(this, resultado.getMensagem(), "Autorizado", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            painelStatus.setBackground(new Color(220, 53, 69)); // Vermelho
+            JOptionPane.showMessageDialog(this, resultado.getMensagem(), "Acesso Negado", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void log(String mensagem) {
+        txtConsole.append(mensagem + "\n");
+        txtConsole.setCaretPosition(txtConsole.getDocument().getLength());
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() ->
-                new InterfaceGraficaLogin(new ControladorDeAutenticacao()).setVisible(true));
+        // Ponto de entrada da aplicação cliente
+        SwingUtilities.invokeLater(InterfaceGraficaLogin::new);
     }
 }

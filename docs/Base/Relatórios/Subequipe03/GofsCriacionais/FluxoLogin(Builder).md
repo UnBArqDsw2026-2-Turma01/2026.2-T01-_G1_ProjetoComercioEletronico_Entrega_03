@@ -10,7 +10,7 @@
 4. [Fundamentação: o padrão Builder](#4-fundamentação-o-padrão-builder)
 5. [Implementação, classe por classe](#5-implementação-classe-por-classe)
 6. [Rastreabilidade com a Engenharia Reversa](#6-rastreabilidade-com-a-engenharia-reversa)
-7. [Demonstração e Saída no Terminal](#7-demonstração-e-saída-no-terminal)
+7. [Demonstração Visual e Terminal](#7-demonstração-e-saída-no-terminal)
 8. [Como compilar e executar](#8-como-compilar-e-executar)
 9. [Decisões de projeto](#9-decisões-de-projeto)
 10. [Relação com a literatura](#10-relação-com-a-literatura)
@@ -108,106 +108,6 @@ ContextoDeLogin(Builder)/
 </div>
 
 **Notação seguida:** seta tracejada com triângulo vazio representando **realização** (`RequisicaoLoginConcretoBuilder` implementa a interface `RequisicaoLoginBuilder`); **agregação** (losango vazio) entre `DiretorContextoLogin` e `RequisicaoLoginBuilder`, indicando que o diretor utiliza o construtor abstrato sem conhecer a classe concreta; seta tracejada de **dependência/criação** (`<<creates>>`) do `RequisicaoLoginConcretoBuilder` para o produto `RequisicaoLogin`; e dependências do `MainBuilder` (_Client_) para o Diretor e o Builder.
-
-#### Código-fonte PlantUML do diagrama
-
-```plantuml
-@startuml
-skinparam classAttributeIconSize 0
-skinparam monochrome true
-skinparam shadowing false
-
-title Modelo GoF Criacional: Builder - Construção de Requisição e Contexto de Login
-
-package "product" {
-    class RequisicaoLogin <<Product>> {
-        - email: String
-        - senhaHash: String
-        - tokenCaptchaEnterprise: String
-        - ipOrigem: String
-        - deviceFingerprint: String
-        - nivelRisco: String
-        - exige2FA: boolean
-        - canal2FA: String
-        - codigo2FA: String
-        - replicarSessaoEcossistema: boolean
-        + RequisicaoLogin(...)
-        + getEmail(): String
-        + isExige2FA(): boolean
-        + isReplicarSessaoEcossistema(): boolean
-        + exibirResumo(): void
-    }
-}
-
-package "builder" {
-    interface RequisicaoLoginBuilder <<Builder>> {
-        + resetar(): RequisicaoLoginBuilder
-        + comCredenciais(email: String, senhaHash: String): RequisicaoLoginBuilder
-        + comTokenCaptcha(token: String): RequisicaoLoginBuilder
-        + comTelemetriaDispositivo(ip: String, fingerprint: String, risco: String): RequisicaoLoginBuilder
-        + comDesafio2FA(canal: String, codigo: String): RequisicaoLoginBuilder
-        + comReplicacaoEcossistema(ativar: boolean): RequisicaoLoginBuilder
-        + build(): RequisicaoLogin
-    }
-
-    class RequisicaoLoginConcretoBuilder <<ConcreteBuilder>> {
-        - email: String
-        - senhaHash: String
-        - tokenCaptchaEnterprise: String
-        - ipOrigem: String
-        - deviceFingerprint: String
-        - nivelRisco: String
-        - exige2FA: boolean
-        - canal2FA: String
-        - codigo2FA: String
-        - replicarSessaoEcossistema: boolean
-        + resetar(): RequisicaoLoginBuilder
-        + comCredenciais(email: String, senhaHash: String): RequisicaoLoginBuilder
-        + comTokenCaptcha(token: String): RequisicaoLoginBuilder
-        + comTelemetriaDispositivo(ip: String, fingerprint: String, risco: String): RequisicaoLoginBuilder
-        + comDesafio2FA(canal: String, codigo: String): RequisicaoLoginBuilder
-        + comReplicacaoEcossistema(ativar: boolean): RequisicaoLoginBuilder
-        - validarInvariantes(): void
-        + build(): RequisicaoLogin
-    }
-
-    class DiretorContextoLogin <<Director>> {
-        - builder: RequisicaoLoginBuilder
-        + DiretorContextoLogin(builder: RequisicaoLoginBuilder)
-        + construirLoginWebBaixoRisco(email: String, senha: String): RequisicaoLogin
-        + construirLoginDispositivoNovoAltoRisco(email: String, senha: String, codigo2FA: String): RequisicaoLogin
-        + construirTentativaBotSemCaptcha(email: String, senha: String): RequisicaoLogin
-    }
-}
-
-package "client" {
-    class MainBuilder <<Client>> {
-        + {static} main(args: String[]): void
-    }
-}
-
-RequisicaoLoginBuilder <|.. RequisicaoLoginConcretoBuilder
-DiretorContextoLogin o--> "1" RequisicaoLoginBuilder : builder
-RequisicaoLoginConcretoBuilder ..> RequisicaoLogin : <<creates>>
-MainBuilder ..> DiretorContextoLogin : solicita receitas
-MainBuilder ..> RequisicaoLoginBuilder : construção customizada
-
-note right of RequisicaoLogin
-  Objeto imutável após construído.
-  Não expõe métodos set(), evitando
-  alteração acidental dos dados de
-  segurança após a montagem.
-end note
-
-note right of RequisicaoLoginConcretoBuilder::validarInvariantes
-  Garante consistência na criação:
-  - E-mail e Senha são obrigatórios;
-  - Se risco == ALTO (Achado-L03),
-    canal2FA e codigo2FA não podem
-    ser nulos ou vazios.
-end note
-@enduml
-```
 
 ### 2.3 Papéis no padrão
 
@@ -605,7 +505,7 @@ A modelagem e o código deste padrão foram diretamente derivados das evidência
 
 ---
 
-## 7. Demonstração e Saída no Terminal
+## 7. Demonstração Visual e Terminal
 
 A classe `MainBuilder` executa quatro cenários de teste que exercitam tanto o uso do `DiretorContextoLogin` quanto o uso fluente direto do `RequisicaoLoginBuilder` e sua barreira de validação:
 
@@ -657,6 +557,29 @@ A classe `MainBuilder` executa quatro cenários de teste que exercitam tanto o u
 
 ---
 
+### 7.2 Demonstração Visual e Passo a Passo
+
+A classe `InterfaceGraficaBuilderLogin` utilizando Java Swing foi criada para atuar como o **Client** e demonstrar as configurações prontas do **Director** e a proteção rígida (_Fail-Fast_) do **Builder**.
+
+Abaixo, a demonstração gravada da interface interagindo com as etapas de construção e provando o comportamento do padrão.
+
+<div style="text-align:center;">
+
+[Vídeo: Padrão GoF Criacional: Builder - Contexto de Login](../assets/builder_login.mp4 ":include :type=video controls width=80%")
+
+<p><strong>Vídeo Demonstrativo:</strong> Apresentação do Director encapsulando configurações complexas e o Builder rejeitando estados inconsistentes. <em>Autor: Pedro Henrique Gomes</em></p>
+
+</div>
+
+### Passo a passo da demonstração em vídeo
+
+| Trecho do Vídeo | O que acontece na tela                                                                                                                                                                                                               | O que isso prova sobre o padrão GoF                                                                                                                                                                                                                                            |
+| :-------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **0:00 - 0:13** | O usuário seleciona `Diretor: Web Baixo Risco (L01, L03, L05)` e clica em construir. O console exibe o `RequisicaoLogin` montado com a telemetria deduzida (Exige 2FA? NÃO) e o SSO ativado.                                         | A classe `DiretorContextoLogin` (_Director_) encapsula de forma transparente as receitas de montagem, combinando métodos como `comTelemetriaDispositivo` e omitindo `comDesafio2FA` sem que o cliente (_Client_) saiba.                                                        |
+| **0:14 - 0:27** | O usuário muda para `Diretor: Dispositivo Novo com 2FA` e reconstrói o produto. O console agora reflete `Nível Risco: ALTO` e `Exige 2FA? SIM`, preenchendo automaticamente o canal SMS e o código fornecido.                        | O mesmo processo de construção abstrato (interface `Builder`) foi reutilizado pelo _Director_ para gerar uma representação inteiramente diferente e válida do objeto complexo.                                                                                                 |
+| **0:28 - 0:43** | **A Proteção do Builder:** O usuário ativa o modo "Customizado", força o Nível de Risco para "ALTO", mas deixa os campos do 2FA propositalmente vazios. Ao tentar construir, uma caixa vermelha de erro do Java bloqueia a operação. | Esta é a prova de **garantia de invariantes**. O método `validarInvariantes()` dentro de `RequisicaoLoginConcretoBuilder` aplicou a lógica _Fail-Fast_, impedindo a criação de um objeto de segurança inconsistente na memória. A falha é contida _antes_ da instância nascer. |
+| **0:44 - Fim**  | O usuário corrige o erro preenchendo o canal como `WHATSAPP` e fornecendo um código, marcando também a caixa de SSO. A construção tem sucesso e o resumo final exibe a requisição validada.                                          | Mostra o cliente instanciando o objeto complexo de forma fluente diretamente pela classe _ConcreteBuilder_ e configurando passos não listados no _Director_, gerando um produto imutável e seguro.                                                                             |
+
 ## 8. Como compilar e executar
 
 ### 8.1 Clonar o repositório e acessar a pasta do módulo
@@ -675,6 +598,9 @@ cd "2026.2-T01-_G1_ProjetoComercioEletronico_Entrega_03/docs/Base/Relatórios/Su
 
 # Compila todos os pacotes (product, builder e client)
 javac product/*.java builder/*.java client/*.java
+
+# Executa a interface visual demonstrando o padrao
+java -cp . client.InterfaceGraficaBuilderLogin
 
 # Executa a demonstracao no terminal
 java -cp . client.MainBuilder
