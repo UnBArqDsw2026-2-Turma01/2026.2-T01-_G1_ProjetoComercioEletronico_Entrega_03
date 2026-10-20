@@ -908,23 +908,13 @@ Operações específicas (`iniciarSeparacao()`, `enviar(codigoRastreio)`, `entre
 
 Esse fluxo trata do ciclo de vida padrão de um pedido, partimos de um pedido que foi criado, logo em seguida o pagamento desse pedido é realizado, em seguida é testado que é exibida uma mensagem de operação inválida ao clicar em confirmar pagamento de um pedido cujo pagamento já foi realizado, após isso o estado do pedido é atualizado para "em separação", ou seja, sendo separado e aguardando o envio ser realizado, em seguida o estado do pedido é atualizado para enviado e logo em seguida para entregue, assim finalizando o ciclo de vida padrão da compra de um pedido.
 
-<div style="text-align:center;">
+[Fluxo de compra padrão](../assets/FluxoDeCompra(State)/01.mp4 ':include :type=video controls width=90%')
 
-[01.mp4](<../assets/FluxoDeCompra(State)/01.mp4> ":include :type=video controls width=80%")
-
-<p><strong>Interface Gráfica</strong> — Fluxo de compra padrão. <em>Autor: José Joaquim da Silva Neto</em></p>
-
-</div>
 
 ### Fluxo de compra com cancelamentos
 
-<div style="text-align:center;">
+[Fluxo de compra com cancelamentos](../assets/FluxoDeCompra(State)/02.mp4 ':include :type=video controls width=90%')
 
-[02.mp4](<../assets/FluxoDeCompra(State)/02.mp4> ":include :type=video controls width=80%")
-
-<p><strong>Interface Gráfica</strong> — Fluxo de compra com cancelamentos. <em>Autor: José Joaquim da Silva Neto</em></p>
-
-</div>
 
 ## Histórico de Versões
 
@@ -937,4 +927,5 @@ Esse fluxo trata do ciclo de vida padrão de um pedido, partimos de um pedido qu
 | 1.4    | 15/10/2026 | Adiciona a explicação dos diagramas de classes, decisões de projeto, literatura, visão crítica, melhorias, limitações e referências | José Joaquim da Silva Neto | --          |
 | 1.5    | 15/10/2026 | Revisão geral: corrige referências cruzadas, legendas, textos alternativos, links de download e digitação                           | José Joaquim da Silva Neto | --          |
 | 1.6    | 15/10/2026 | Adiciona segundo vídeo de apresentação da interface gráfica                                                                         | José Joaquim da Silva Neto | --          |
+| 1.7    | 19/10/2026 | Corrige erro de renderização dos vídeos gráfica                                                                         | José Joaquim da Silva Neto | --          |
 
