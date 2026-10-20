@@ -266,6 +266,17 @@ A tabela abaixo demonstra como o **mesmo processo de construção** (`Requisicao
 - **Imutabilidade pós-construção:** a classe `RequisicaoLogin` possui todos os seus campos marcados como `private final` e não oferece nenhum método `set`. Uma vez que `build()` entrega o objeto, nenhuma camada subsequente pode adulterar o e-mail, o hash da senha ou o token Captcha.
 - **Dedução automática de estado coerente:** quando o passo `comTelemetriaDispositivo` recebe o nível de risco `"ALTO"`, o próprio `ConcreteBuilder` já ajusta automaticamente a flag interna `exige2FA = true` (**Achado-L03**), obrigando que o passo `comDesafio2FA` seja chamado antes do `build()`.
 
+- **Dependência de ordem entre `comTelemetriaDispositivo` e `comDesafio2FA`.** Os dois métodos escrevem na mesma flag `exige2FA` por **atribuição** (`=`), de modo que vale a última chamada. O primeiro calcula `exige2FA = "ALTO".equalsIgnoreCase(risco)`; o segundo fixa `exige2FA = true`.
+
+  | Ordem das chamadas                          | `exige2FA` final | Observação                                                  |
+  | ------------------------------------------- | :--------------: | ----------------------------------------------------------- |
+  | Telemetria (`ALTO`) → `comDesafio2FA`       | `true`           | Caso previsto                                               |
+  | `comDesafio2FA` → Telemetria (`ALTO`)       | `true`           | Equivalente ao anterior                                     |
+  | Telemetria (`BAIXO`) → `comDesafio2FA`      | `true`           | 2FA voluntário em risco baixo                               |
+  | `comDesafio2FA` → Telemetria (`BAIXO`)      | `false`          | O 2FA solicitado é descartado sem erro                      |
+
+  Na última combinação, `canal2FA` e `codigo2FA` permanecem preenchidos, mas `validarInvariantes()` só os confere quando `exige2FA` é `true`; o `build()` conclui sem exceção e o produto não exige o desafio. As receitas do `DiretorContextoLogin` chamam a telemetria primeiro e por isso não são afetadas, mas um cliente que use o Builder diretamente pode cair no caso problemático. O resultado depende de uma convenção de uso, não de uma garantia do código.
+
 ---
 
 ## 4. Fundamentação: o padrão Builder
@@ -737,6 +748,7 @@ O catálogo do GoF (Gamma _et al._, 1995) e a literatura complementar (Bloch, 20
 1. **Duplicação estrutural de atributos:** todos os 10 atributos de `RequisicaoLogin` precisam ser declarados de forma espelhada dentro de `RequisicaoLoginConcretoBuilder`, aumentando a verbosidade do código.
 2. **Estado mutável interno no Builder (Não _Thread-Safe_):** como `RequisicaoLoginConcretoBuilder` acumula os atributos em variáveis de instância antes do `build()`, compartilhar a mesma instância do Builder entre múltiplas _threads_ simultâneas causaria condição de corrida (_race condition_).
 3. **Tipagem textual em campos de domínio:** atributos como `nivelRisco` (`"BAIXO"`, `"ALTO"`) e `canal2FA` (`"SMS"`, `"EMAIL"`) estão tipados como `String`, permitindo erros de digitação fora das receitas do `Director`.
+4. **Resultado dependente da ordem das chamadas:** `comTelemetriaDispositivo` sobrescreve `exige2FA`, podendo descartar um 2FA já solicitado por `comDesafio2FA` (ver 3.2).
 
 ---
 
@@ -748,6 +760,7 @@ O catálogo do GoF (Gamma _et al._, 1995) e a literatura complementar (Bloch, 20
 | 2. Concorrência no `ConcreteBuilder`       | Instanciar um novo `Builder` por requisição HTTP (_Request Scoped_) ou utilizar _Step Builders_ imutáveis.                                                                                          |
 | 3. Tipagem textual (`String`)              | Substituir `nivelRisco` e `canal2FA` por enumerações fortemente tipadas (`enum NivelRisco { BAIXO, ALTO }`, `enum Canal2FA { SMS, EMAIL, WHATSAPP }`).                                              |
 | Integração direta com os GoFs da Subequipe | Entregar o `RequisicaoLogin` construído pelo **Builder** diretamente como entrada para o método `autorizar(req)` do [Chain of Responsibility no Login](<./FluxoDeLogin(ChainOfResponsibility).md>). |
+| 4. Dependência de ordem | Separar o que o cliente informou do que é derivado: guardar `desafio2FAInformado` (definido por `comDesafio2FA`) e calcular `exige2FA = "ALTO".equalsIgnoreCase(nivelRisco) \|\| desafio2FAInformado` dentro do `build()`. Assim a ordem das chamadas deixa de importar. |
 
 ---
 
@@ -778,3 +791,4 @@ REFACTORING GURU. **Builder in Java**. Disponível em: <https://refactoring.guru
 | :----: | :--------: | :--------------------------------------------------------------------------------------------------------------------------------------------- | :------------------- | :---------------------------------------------------------------------------------- |
 | `1.0`  | 19/10/2026 | Elaboração da modelagem PlantUML, implementação em Java e documentação completa do padrão GoF Criacional Builder aplicado ao Contexto de Login | Pedro Henrique Gomes | João Paulo Barbosa Pereira Nunes, José Joaquim da Silva Neto e Júlia Santana Campos |
 | `1.1`  | 19/10/2026 | Adição da subseção 9.1 (invariantes e construtor público; alternativa de Bloch) e ajuste da Seção 2.5.1 | José Joaquim da Silva Neto | João Paulo Barbosa Pereira Nunes, José Joaquim da Silva Neto e Júlia Santana Campos |
+| `1.2`  | 19/10/2026 | Explicação da dependência de ordem entre comTelemetriaDispositivo e comDesafio2FA (3.2), com fragilidade 4 (11) e melhoria correspondente (12) | José Joaquim da Silva Neto | João Paulo Barbosa Pereira Nunes, José Joaquim da Silva Neto e Júlia Santana Campos |
