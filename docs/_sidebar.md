@@ -35,6 +35,9 @@
         - [Fluxo de Login (Chain Of Responsibility)](</Base/Relatórios/Subequipe03/GofsComportamentais/FluxoDeLogin(ChainOfResponsibility).md>)
       - GoFs Criacionais
         - [Fluxo de Login e Sessão (Builder)](</Base/Relatórios/Subequipe03/GofsCriacionais/FluxoLogin(Builder).md>)
+      - GoFs Estruturais
+        - [Emissão de Sessão(Facade)](</Base/Relatórios/Subequipe03/GofsEstruturais/EmissaoDeSessao(Facade).md>)
+
       - GRASP
         - [Controller (Controlador)](/Base/Relatórios/Subequipe03/GRASP/Controller.md)
 
