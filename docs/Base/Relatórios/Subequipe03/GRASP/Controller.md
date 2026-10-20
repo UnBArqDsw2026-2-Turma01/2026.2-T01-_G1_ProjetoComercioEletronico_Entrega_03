@@ -689,6 +689,26 @@ LARMAN (2004) trata o Controller no capítulo sobre GRASP. A tabela mostra como 
 
 Complementam a fundamentação a literatura de GoF utilizada nos módulos integrados (Gamma _et al._, 1995) e a distinção entre Controller e Facade discutida na seção 4.4.
 
+### 10.1 Fabricação Pura (_Pure Fabrication_): o que significa e onde aparece aqui
+
+A tabela acima cita "Fabricação Pura", princípio GRASP que merece explicação própria.
+
+**Definição.** Segundo Larman (2004), a Fabricação Pura propõe criar uma classe que **não representa um conceito do domínio do problema**, inventada apenas para manter baixo acoplamento e alta coesão quando atribuir a responsabilidade a uma classe do domínio prejudicaria esses dois objetivos.
+
+**Por que existe.** Imagine colocar a tradução "resultado da cadeia → mensagem para a tela" dentro de `RequisicaoLogin`. Essa classe do domínio passaria a conhecer detalhes de apresentação, perdendo coesão. A saída é criar uma classe que não existe no mundo real do e-commerce, mas existe para organizar o código.
+
+**Onde aparece neste sistema**
+
+| Elemento                    | É Fabricação Pura? | Justificativa                                                                                                                                  |
+| --------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ResultadoAutenticacaoDTO`  | Sim                | "Resultado de autenticação para a tela" não é um conceito de negócio; a classe existe para desacoplar a View do modelo interno.                |
+| `ControladorDeAutenticacao` | Sim (em parte)     | Um "controlador" não existe no domínio de login; é um objeto artificial criado para receber o evento da UI e coordenar os colaboradores.       |
+| `paraContextoDaCadeia`      | Apenas na intenção | É um método privado, não uma classe; cumpre o mesmo propósito (isolar a conversão entre modelos), mas a classificação formal não se aplica.   |
+
+**Cuidado conhecido.** O risco de abusar da Fabricação Pura é gerar classes que apenas "executam funções" e fragmentam demais o sistema. Aqui, o número de classes artificiais é pequeno (DTO e Controller), cada uma com um motivo claro de existir.
+
+**Relação com Indirection (Indireção).** O Controller também é um exemplo de _Indirection_: um intermediário colocado entre a View e os módulos de Builder e Chain para que um não dependa diretamente do outro.
+
 ---
 
 ## 11. Visão crítica
@@ -760,3 +780,4 @@ SUBEQUIPE 03. **Chain of Responsibility no Login**. G1_ProjetoComercioEletronico
 | :----: | :--------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------- | :----------- |
 | `1.0`  | 19/10/2026 | Elaboração da modelagem e documentação da iniciativa extra GRASP Controller                                                                                                   | Pedro Henrique Gomes | SubEquipe 03 |
 | `1.1`  | 19/10/2026 | Implementação e compilação dos códigos (Controller, DTO, Views); adaptador entre os dois `RequisicaoLogin`; correção do 2FA condicional; documentação completa com saída real | Pedro Henrique Gomes | SubEquipe 03 |
+| `1.2`  | 19/10/2026 | Adicona explicação pontual sobre Pure Fabrication | José Joaquim da Silva Neto| SubEquipe 03 |
