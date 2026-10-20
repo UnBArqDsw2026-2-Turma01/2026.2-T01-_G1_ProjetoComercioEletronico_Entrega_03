@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1340" height="900" viewBox="0 0 1340 900" style="background:#FFFFFF">
+<rect width="1340" height="900" fill="#FFFFFF"/>
+<text x="670.0" y="25" font-family="Arial" font-size="14" fill="#000000" font-weight="bold" text-anchor="middle">Abstract Factory aplicado — meios de pagamento</text>
+<text x="670.0" y="42" font-family="Arial" font-size="11" fill="#475569" font-weight="bold" text-anchor="middle">G1_ProjetoComercioEletronico · Subequipe 01, Entrega 3</text>
+<rect x="500" y="60" width="163" height="103" rx="2.5" fill="#F8FAFC" stroke="#334155" stroke-width="0.6"/>
+<text x="581.5" y="75" font-family="Arial" font-size="11" fill="#475569" text-anchor="middle">«interface»</text>
+<text x="581.5" y="90" font-family="Arial" font-size="12.5" fill="#000000" font-weight="bold" text-anchor="middle">FabricaMeioPagamento</text>
+<line x1="500" x2="663" y1="97" y2="97" stroke="#334155" stroke-width="0.6"/>
+<text x="507" y="111" font-family="Arial" font-size="11" fill="#000000">+meio(): MeioPagamento</text>
+<text x="507" y="125" font-family="Arial" font-size="11" fill="#000000">+criarAutorizador()</text>
+<text x="507" y="139" font-family="Arial" font-size="11" fill="#000000">+criarComprovante()</text>
+<text x="507" y="153" font-family="Arial" font-size="11" fill="#000000">+criarPoliticaEstorno()</text>
+<rect x="900" y="60" width="223" height="117" rx="2.5" fill="#F8FAFC" stroke="#334155" stroke-width="0.6"/>
+<text x="1011.5" y="75" font-family="Arial" font-size="11" fill="#475569" text-anchor="middle">«Client»</text>
+<text x="1011.5" y="90" font-family="Arial" font-size="12.5" fill="#000000" font-weight="bold" text-anchor="middle">ServicoDeCheckout</text>
+<line x1="900" x2="1123" y1="97" y2="97" stroke="#334155" stroke-width="0.6"/>
+<text x="907" y="111" font-family="Arial" font-size="11" fill="#000000">-autorizador: Autorizador</text>
+<text x="907" y="125" font-family="Arial" font-size="11" fill="#000000">-comprovante: Comprovante</text>
+<text x="907" y="139" font-family="Arial" font-size="11" fill="#000000">-politicaEstorno: PoliticaEstorno</text>
+<text x="907" y="153" font-family="Arial" font-size="11" fill="#000000">+pagar(pedido, valor)</text>
+<text x="907" y="167" font-family="Arial" font-size="11" fill="#000000">+reembolsar(pedido, valor, aut)</text>
+<rect x="90" y="240" width="150" height="24" rx="2.5" fill="#F8FAFC" stroke="#334155" stroke-width="0.6"/>
+<text x="165.0" y="255" font-family="Arial" font-size="12.5" fill="#000000" font-weight="bold" text-anchor="middle">FabricaCartao</text>
+<rect x="270" y="240" width="150" height="24" rx="2.5" fill="#F8FAFC" stroke="#334155" stroke-width="0.6"/>
+<text x="345.0" y="255" font-family="Arial" font-size="12.5" fill="#000000" font-weight="bold" text-anchor="middle">FabricaPix</text>
+<rect x="450" y="240" width="150" height="38" rx="2.5" fill="#F1F5F9" stroke="#334155" stroke-width="0.6" stroke-dasharray="5,4"/>
+<text x="525.0" y="255" font-family="Arial" font-size="12.5" fill="#000000" font-weight="bold" text-anchor="middle">FabricaBoleto</text>
+<text x="525.0" y="275" font-family="Arial" font-size="10.5" fill="#475569" text-anchor="middle">a entregar</text>
+<rect x="630" y="240" width="154" height="38" rx="2.5" fill="#F1F5F9" stroke="#334155" stroke-width="0.6" stroke-dasharray="5,4"/>
+<text x="707.0" y="255" font-family="Arial" font-size="12.5" fill="#000000" font-weight="bold" text-anchor="middle">FabricaSaldoEmConta</text>
+<text x="707.0" y="275" font-family="Arial" font-size="10.5" fill="#475569" text-anchor="middle">a entregar</text>
+<rect x="110" y="430" width="175" height="89" rx="2.5" fill="#F8FAFC" stroke="#334155" stroke-width="0.6"/>
+<text x="197.5" y="445" font-family="Arial" font-size="11" fill="#475569" text-anchor="middle">«interface»</text>
+<text x="197.5" y="460" font-family="Arial" font-size="12.5" fill="#000000" font-weight="bold" text-anchor="middle">Autorizador</text>
+<line x1="110" x2="285" y1="467" y2="467" stroke="#334155" stroke-width="0.6"/>
+<text x="117" y="481" font-family="Arial" font-size="11" fill="#000000">+autorizar(pedido, valor)</text>
+<text x="117" y="495" font-family="Arial" font-size="11" fill="#000000">+prazoLimiteEmMinutos()</text>
+<text x="117" y="509" font-family="Arial" font-size="11" fill="#000000">+ehAssincrono()</text>
+<rect x="40" y="610" width="150" height="38" rx="2.5" fill="#F8FAFC" stroke="#334155" stroke-width="0.6"/>
+<text x="115.0" y="625" font-family="Arial" font-size="12.5" fill="#000000" font-weight="bold" text-anchor="middle">AutorizadorCartao</text>
+<text x="115.0" y="645" font-family="Arial" font-size="10.5" fill="#475569" text-anchor="middle">3 desfechos</text>
+<rect x="230" y="610" width="150" height="38" rx="2.5" fill="#F8FAFC" stroke="#334155" stroke-width="0.6"/>
+<text x="305.0" y="625" font-family="Arial" font-size="12.5" fill="#000000" font-weight="bold" text-anchor="middle">AutorizadorPix</text>
+<text x="305.0" y="645" font-family="Arial" font-size="10.5" fill="#475569" text-anchor="middle">imediato</text>
+<rect x="530" y="430" width="150" height="75" rx="2.5" fill="#F8FAFC" stroke="#334155" stroke-width="0.6"/>
+<text x="605.0" y="445" font-family="Arial" font-size="11" fill="#475569" text-anchor="middle">«interface»</text>
+<text x="605.0" y="460" font-family="Arial" font-size="12.5" fill="#000000" font-weight="bold" text-anchor="middle">Comprovante</text>
+<line x1="530" x2="680" y1="467" y2="467" stroke="#334155" stroke-width="0.6"/>
+<text x="537" y="481" font-family="Arial" font-size="11" fill="#000000">+gerar(...)</text>
+<text x="537" y="495" font-family="Arial" font-size="11" fill="#000000">+formato()</text>
+<rect x="460" y="610" width="150" height="38" rx="2.5" fill="#F8FAFC" stroke="#334155" stroke-width="0.6"/>
+<text x="535.0" y="625" font-family="Arial" font-size="12.5" fill="#000000" font-weight="bold" text-anchor="middle">ComprovanteCartao</text>
+<text x="535.0" y="645" font-family="Arial" font-size="10.5" fill="#475569" text-anchor="middle">parcelamento</text>
+<rect x="650" y="610" width="150" height="38" rx="2.5" fill="#F8FAFC" stroke="#334155" stroke-width="0.6"/>
+<text x="725.0" y="625" font-family="Arial" font-size="12.5" fill="#000000" font-weight="bold" text-anchor="middle">ComprovantePix</text>
+<text x="725.0" y="645" font-family="Arial" font-size="10.5" fill="#475569" text-anchor="middle">QR Code</text>
+<rect x="930" y="430" width="175" height="89" rx="2.5" fill="#F8FAFC" stroke="#334155" stroke-width="0.6"/>
+<text x="1017.5" y="445" font-family="Arial" font-size="11" fill="#475569" text-anchor="middle">«interface»</text>
+<text x="1017.5" y="460" font-family="Arial" font-size="12.5" fill="#000000" font-weight="bold" text-anchor="middle">PoliticaEstorno</text>
+<line x1="930" x2="1105" y1="467" y2="467" stroke="#334155" stroke-width="0.6"/>
+<text x="937" y="481" font-family="Arial" font-size="11" fill="#000000">+podeEstornar(aut)</text>
+<text x="937" y="495" font-family="Arial" font-size="11" fill="#000000">+estornar(...)</text>
+<text x="937" y="509" font-family="Arial" font-size="11" fill="#000000">+prazoDeDevolucaoEmDias()</text>
+<rect x="880" y="610" width="150" height="38" rx="2.5" fill="#F8FAFC" stroke="#334155" stroke-width="0.6"/>
+<text x="955.0" y="625" font-family="Arial" font-size="12.5" fill="#000000" font-weight="bold" text-anchor="middle">EstornoCartao</text>
+<text x="955.0" y="645" font-family="Arial" font-size="10.5" fill="#475569" text-anchor="middle">pela fatura</text>
+<rect x="1070" y="610" width="150" height="38" rx="2.5" fill="#F8FAFC" stroke="#334155" stroke-width="0.6"/>
+<text x="1145.0" y="625" font-family="Arial" font-size="12.5" fill="#000000" font-weight="bold" text-anchor="middle">EstornoPix</text>
+<text x="1145.0" y="645" font-family="Arial" font-size="10.5" fill="#475569" text-anchor="middle">conta de origem</text>
+<path d="M200.6,240.0 L500.0,139.0" fill="none" stroke="#334155" stroke-width="1" stroke-dasharray="6,5"/>
+<polygon points="500.0,139.0 489.8,149.3 485.6,137.0" fill="#FFFFFF" stroke="#334155" stroke-width="1"/>
+<path d="M365.2,240.0 L500.0,159.9" fill="none" stroke="#334155" stroke-width="1" stroke-dasharray="6,5"/>
+<polygon points="500.0,159.9 492.1,172.1 485.5,161.0" fill="#FFFFFF" stroke="#334155" stroke-width="1"/>
+<path d="M532.3,240.0 L561.8,163.0" fill="none" stroke="#334155" stroke-width="1" stroke-dasharray="6,5"/>
+<polygon points="561.8,163.0 563.2,177.5 551.1,172.8" fill="#FFFFFF" stroke="#334155" stroke-width="1"/>
+<path d="M690.8,240.0 L625.3,163.0" fill="none" stroke="#334155" stroke-width="1" stroke-dasharray="6,5"/>
+<polygon points="625.3,163.0 638.7,168.7 628.8,177.1" fill="#FFFFFF" stroke="#334155" stroke-width="1"/>
+<path d="M900.0,116.7 L663.0,112.8" fill="none" stroke="#334155" stroke-width="1"/>
+<path d="M674.1,108.5 L663.0,112.8 L673.9,117.5" fill="none" stroke="#334155" stroke-width="1"/>
+<text x="781.5" y="109.75581395348837" font-family="Arial" font-size="10.5" fill="#475569" text-anchor="middle">recebe</text>
+<path d="M125.1,610.0 L173.7,519.0" fill="none" stroke="#334155" stroke-width="1" stroke-dasharray="6,5"/>
+<polygon points="173.7,519.0 173.3,533.5 161.9,527.4" fill="#FFFFFF" stroke="#334155" stroke-width="1"/>
+<path d="M291.8,610.0 L228.5,519.0" fill="none" stroke="#334155" stroke-width="1" stroke-dasharray="6,5"/>
+<polygon points="228.5,519.0 241.2,526.0 230.6,533.4" fill="#FFFFFF" stroke="#334155" stroke-width="1"/>
+<path d="M543.2,610.0 L588.7,505.0" fill="none" stroke="#334155" stroke-width="1" stroke-dasharray="6,5"/>
+<polygon points="588.7,505.0 589.5,519.5 577.6,514.3" fill="#FFFFFF" stroke="#334155" stroke-width="1"/>
+<path d="M710.9,610.0 L632.9,505.0" fill="none" stroke="#334155" stroke-width="1" stroke-dasharray="6,5"/>
+<polygon points="632.9,505.0 645.8,511.6 635.4,519.3" fill="#FFFFFF" stroke="#334155" stroke-width="1"/>
+<path d="M962.7,610.0 L999.5,519.0" fill="none" stroke="#334155" stroke-width="1" stroke-dasharray="6,5"/>
+<polygon points="999.5,519.0 1000.6,533.5 988.6,528.6" fill="#FFFFFF" stroke="#334155" stroke-width="1"/>
+<path d="M1129.3,610.0 L1054.2,519.0" fill="none" stroke="#334155" stroke-width="1" stroke-dasharray="6,5"/>
+<polygon points="1054.2,519.0 1067.5,524.9 1057.5,533.2" fill="#FFFFFF" stroke="#334155" stroke-width="1"/>
+<path d="M900,240 L1291,240 L1300,249 L1300,369 L900,369 Z" fill="#FFFBEB" stroke="#92400E" stroke-width="0.6"/>
+<path d="M1291,240 L1291,249 L1300,249" fill="none" stroke="#92400E" stroke-width="0.6"/>
+<text x="908" y="256" font-family="Arial" font-size="11" fill="#000000">Cada fabrica cria o trio inteiro da sua familia:</text>
+<text x="908" y="269" font-family="Arial" font-size="11" fill="#000000">autorizador, comprovante e politica de estorno.</text>
+<text x="908" y="282" font-family="Arial" font-size="11" fill="#000000">A relacao «cria» esta desenhada no diagrama</text>
+<text x="908" y="295" font-family="Arial" font-size="11" fill="#000000">generico; aqui ela foi omitida porque as quatro</text>
+<text x="908" y="308" font-family="Arial" font-size="11" fill="#000000">fabricas criam doze produtos, e as setas</text>
+<text x="908" y="321" font-family="Arial" font-size="11" fill="#000000">cobririam o desenho.</text>
+<text x="908" y="334" font-family="Arial" font-size="11" fill="#000000">O ServicoDeCheckout cria os tres de uma unica</text>
+<text x="908" y="347" font-family="Arial" font-size="11" fill="#000000">fabrica, no construtor, e nao ha caminho no</text>
+<text x="908" y="360" font-family="Arial" font-size="11" fill="#000000">codigo para obter um produto isolado.</text>
+<rect x="40" y="700" width="1260" height="108" rx="6" fill="#DDDDDD" stroke="#000000" stroke-width="0.9"/>
+<text x="49" y="713" font-family="Arial" font-size="11.5" fill="#000000" font-weight="bold">Elemento</text>
+<text x="270" y="713" font-family="Arial" font-size="11.5" fill="#000000" font-weight="bold">Origem nas entregas anteriores</text>
+<text x="49" y="731" font-family="Arial" font-size="11.5" fill="#000000">MeioPagamento</text>
+<text x="270" y="731" font-family="Arial" font-size="11.5" fill="#000000">Enumeracao do Diagrama de Classes (Entrega 2)</text>
+<line x1="40" x2="1300" y1="718" y2="718" stroke="#000000" stroke-width="0.5"/>
+<text x="49" y="749" font-family="Arial" font-size="11.5" fill="#000000">Autorizador</text>
+<text x="270" y="749" font-family="Arial" font-size="11.5" fill="#000000">Tarefa 'Autorizar pagamento' do BPMN 1 (Entrega 1)</text>
+<line x1="40" x2="1300" y1="736" y2="736" stroke="#000000" stroke-width="0.5"/>
+<text x="49" y="767" font-family="Arial" font-size="11.5" fill="#000000">Os tres desfechos do cartao</text>
+<text x="270" y="767" font-family="Arial" font-size="11.5" fill="#000000">Eventos de borda do BPMN 1; estados Autorizando, Pago, Recusado e Expirado</text>
+<line x1="40" x2="1300" y1="754" y2="754" stroke="#000000" stroke-width="0.5"/>
+<text x="49" y="785" font-family="Arial" font-size="11.5" fill="#000000">PoliticaEstorno</text>
+<text x="270" y="785" font-family="Arial" font-size="11.5" fill="#000000">'Estornar pagamento via operadora' (Diagrama de Atividades, Entrega 2)</text>
+<line x1="40" x2="1300" y1="772" y2="772" stroke="#000000" stroke-width="0.5"/>
+<text x="49" y="803" font-family="Arial" font-size="11.5" fill="#000000">ServicoDeCheckout</text>
+<text x="270" y="803" font-family="Arial" font-size="11.5" fill="#000000">Servico de Checkout e Pedidos, que requer IPagamento (Diagrama de Componentes)</text>
+<line x1="40" x2="1300" y1="790" y2="790" stroke="#000000" stroke-width="0.5"/>
+<line x1="260" x2="260" y1="700" y2="808" stroke="#000000" stroke-width="0.5"/>
+<text x="40" y="828" font-family="Arial" font-size="11" fill="#475569">Tracejado e cinza: familia ainda nao entregue no repositorio.</text>
+</svg>
